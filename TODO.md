@@ -13,3 +13,4 @@
 - [x] Add the original `Omkar_Shettigar_Resume.pdf` as a downloadable resume asset.
 - [x] Add a dark/light mode toggle with coordinated Renaissance-inspired themes.
 - [x] Add an interactive particle background, scroll progress indicator, and visible crumbling-ball loading animation with orbiting dust ring.
+- [x] Replace only the hero’s right-side planet/orb with a procedurally generated Canvas 2D fractal tree, four time-based elliptical orbital paths with moving particles, pointer response, restrained growth animation, reduced-motion behavior, and a keyboard/touch-accessible central O with five visual states.

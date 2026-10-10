@@ -54,13 +54,18 @@
           <p class="hero-tagline">I turn noisy signals into decisions worth trusting.</p>
         </div>
 
-        <div class="hero-art reveal reveal-delay-2" aria-label="Abstract gold intelligence diagram">
-          <div class="hero-orbit orbit-one"></div>
-          <div class="hero-orbit orbit-two"></div>
-          <div class="hero-orbit orbit-three"></div>
-          <div class="hero-sun"><span>O</span></div>
-          <span class="orbit-dot dot-one"></span><span class="orbit-dot dot-two"></span><span class="orbit-dot dot-three"></span>
-          <div class="art-caption"><span>01</span><span>signal → system</span></div>
+        <div class="hero-art reveal reveal-delay-2" aria-label="Interactive golden fractal intelligence tree. Use the central O button to change its signature.">
+          <div class="hero-visual-shell" id="heroVisual">
+            <canvas id="fractalCanvas" aria-hidden="true"></canvas>
+            <div class="hero-visual-glow" aria-hidden="true"></div>
+            <button class="signature-glyph" id="signatureGlyph" type="button" data-state="0" aria-label="Change the central O signature" aria-describedby="glyphHint">
+              <span class="glyph-sheen" aria-hidden="true"></span>
+              <span class="glyph-letter" id="glyphLetter" aria-hidden="true">O</span>
+              <span class="glyph-core" aria-hidden="true"></span>
+            </button>
+            <span class="glyph-hint" id="glyphHint">hover / tap to explore</span>
+            <div class="art-caption"><span>01</span><span>signal → system</span></div>
+          </div>
         </div>
 
         <div class="hero-meta reveal reveal-delay-3">

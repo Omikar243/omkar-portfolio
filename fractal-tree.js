@@ -10,10 +10,10 @@ export function initFractalTree(shell, canvas, button) {
   const constrainedCPU = (navigator.hardwareConcurrency || 8) <= 4;
   let lowPower = mobileQuery.matches || constrainedCPU;
   // Fixed lifetime topology prevents twigs popping on orientation/breakpoint changes.
-  const depth = lowPower ? 6 : 7;
+  let depth = lowPower ? 6 : 7;
   let fps = lowPower ? 30 : 60;
   let ratio = Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 2);
-  const poses = TREE_PROFILES.map((_, state) => buildTree(state, depth));
+  let poses = TREE_PROFILES.map((_, state) => buildTree(state, depth));
   let current = cloneTree(poses[0]);
   let source = cloneTree(current);
   let target = poses[0];
@@ -155,7 +155,7 @@ export function initFractalTree(shell, canvas, button) {
   function updatePalette() {
     const dark = document.body.classList.contains('dark');
     shell.dataset.theme = canvas.dataset.theme = dark ? 'dark' : 'light';
-    colors.background = dark ? '#211a15' : '#f3eadc';
+    colors.background = dark ? '#211a15' : '#f5ebdd';
     colors.branch = dark ? '213,175,119' : '130,92,49';
     colors.tip = dark ? 'rgba(225,194,141,.68)' : 'rgba(175,129,64,.53)';
     colors.orbit = dark ? '209,176,121' : '139,102,57';
@@ -212,6 +212,56 @@ export function initFractalTree(shell, canvas, button) {
     }
   }
 
+  function paintCircuitDetails() {
+    // These traces continue from real twig endpoints; they are not a second
+    // illustration layered over the tree. Keep the density intentionally low
+    // on mobile so the canopy stays botanical rather than schematic.
+    const limit = lowPower ? 12 : 18;
+    let drawn = 0;
+    ctx.save();
+    ctx.lineCap = 'square';
+    ctx.lineJoin = 'miter';
+    for (let i = 0; i < current.tips.length && drawn < limit; i += 1) {
+      if ((i + state) % 3 !== 0) continue;
+      const tipIndex = current.tips[i];
+      const parentEdge = current.edges.find((edge) => edge.b === tipIndex);
+      if (!parentEdge) continue;
+      const a = current.nodes[parentEdge.a];
+      const b = current.nodes[parentEdge.b];
+      const start = point(b);
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const length = Math.hypot(dx, dy) || 1;
+      const ux = dx / length;
+      const uy = dy / length;
+      const turn = i % 2 ? -1 : 1;
+      const bendX = (ux * Math.cos(Math.PI / 4) - turn * uy * Math.sin(Math.PI / 4));
+      const bendY = (uy * Math.cos(Math.PI / 4) + turn * ux * Math.sin(Math.PI / 4));
+      const first = { x: start.x + ux * scale * .016, y: start.y + uy * scale * .016 };
+      const pad = { x: first.x + bendX * scale * .018, y: first.y + bendY * scale * .018 };
+      const pulse = motion.matches ? 0 : Math.max(0, Math.sin(clock * 1.35 + i * 1.7)) ** 8;
+      ctx.beginPath();
+      ctx.moveTo(start.x, start.y);
+      ctx.lineTo(first.x, first.y);
+      ctx.lineTo(pad.x, pad.y);
+      ctx.lineWidth = Math.max(.55, scale * .00145);
+      ctx.strokeStyle = `rgba(${colors.branch},${.48 + pulse * .3})`;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(pad.x, pad.y, Math.max(1.8, scale * .0058 + pulse * scale * .0024), 0, Math.PI * 2);
+      ctx.globalAlpha = .7 + pulse * .3;
+      ctx.fillStyle = colors.tip;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.arc(pad.x, pad.y, Math.max(.55, scale * .0018), 0, Math.PI * 2);
+      ctx.fillStyle = colors.background;
+      ctx.fill();
+      drawn += 1;
+    }
+    ctx.restore();
+  }
+
   function paint() {
     if (!width || !height || disposed || contextLost) return;
     // Paint in physical pixels first, including rounded-DPR border pixels.
@@ -245,6 +295,7 @@ export function initFractalTree(shell, canvas, button) {
       ctx.strokeStyle = `rgba(${colors.branch},${alpha})`;
       ctx.stroke();
     }
+    paintCircuitDetails();
     // Terminal particles share the twig endpoint coordinates during every morph.
     ctx.fillStyle = colors.tip;
     ctx.beginPath();
@@ -295,7 +346,19 @@ export function initFractalTree(shell, canvas, button) {
   }
   function resize() {
     const bounds = shell.getBoundingClientRect();
-    lowPower = mobileQuery.matches || constrainedCPU;
+    const nextLowPower = mobileQuery.matches || constrainedCPU;
+    if (nextLowPower !== lowPower) {
+      lowPower = nextLowPower;
+      depth = lowPower ? 6 : 7;
+      poses = TREE_PROFILES.map((_, poseState) => buildTree(poseState, depth));
+      current = cloneTree(poses[state]);
+      source = cloneTree(current);
+      target = poses[state];
+      morphStart = -Infinity;
+      shell.dataset.morphing = 'false';
+      canvas.dataset.branchCount = String(current.edges.length);
+      announceForm(false);
+    }
     fps = lowPower ? 30 : 60;
     const nextRatio = Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 2);
     canvas.dataset.renderTier = lowPower ? 'mobile-30fps' : 'desktop-60fps';
@@ -306,6 +369,7 @@ export function initFractalTree(shell, canvas, button) {
     scale = Math.min(width, height) * .96;
     canvas.width = Math.max(1, Math.round(width * ratio));
     canvas.height = Math.max(1, Math.round(height * ratio));
+    canvas.dataset.branchCount = String(current.edges.length);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     paint();
   }

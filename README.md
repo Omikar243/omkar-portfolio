@@ -18,6 +18,8 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Scroll-triggered experience timeline with expandable chapters for Catalysk, the internship, and education.
 - Personal first-person About story covering identity, projects and ambition, alongside the supplied real portrait (optimized WebP, full frame retained, lazy loading and light/dark editorial framing).
 - Downloadable original resume PDF.
+- Quiet owner-only resume-download email alerts with first-landing source/referrer, campaign tags, UTC time, device category and country when available; no public activity feed or exposed recipient address.
+- Included Vercel Hobby pageview analytics, visible only in the signed-in project dashboard. Historical sources are unavailable because tracking was previously disabled; paid custom download events are not enabled.
 - Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation and received-inbox verification are complete.
 - **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound.
 
@@ -42,6 +44,7 @@ The server listens on `0.0.0.0:3000` by default. Override the port with `PORT=30
 ## Backend API
 
 - `GET api/health` — readiness check.
+- `POST api/resume-event` — bounds/sanitizes anonymous download attribution, writes to private Vercel runtime logs, and returns only coarse country context. No public event-history endpoint exists. Logs are not durable storage; see [private alerts](resume-alerts.md) for limitations and the owner inbox record.
 - `POST api/contact` — accepts `{ "name": "…", "email": "…", "message": "…" }`, validates the payload, and forwards through FormSubmit. A failed or activation-required provider response is never shown as successful delivery. The website calls the provider directly from the browser so contact also works on the static Pages backup; server-side forwarding can be rejected by provider anti-abuse rules. No new messages are saved to ephemeral local files. See [contact setup](contact-setup.md) for the owner activation requirement.
 - `GET Omkar_Shettigar_Resume.pdf` — downloads the original resume with PDF content and attachment headers.
 
@@ -52,6 +55,9 @@ index.html                         Portfolio page and resume-grounded copy
 styles.css                         Renaissance design system and responsive layout
 app.js                             Portfolio interaction and module lifecycle
 contact-delivery.js                Shared forwarding payload and response interpretation
+resume-tracking.js                 Silent download alerts and free pageview integration
+resume-attribution.js              Privacy-limited attribution normalization
+resume-alerts.md                   Owner-only notification and traffic-reporting guide
 orbit-game.js                      Canvas arcade rendering/input/UI/lifecycle
 orbit-physics.js                   Testable delta-time physics, score and state
 orbit-game.css                     Responsive espresso-and-gold game styling
@@ -82,6 +88,7 @@ Activation completed on 10 October 2026. The owner confirmed receiving the live 
 
 ```bash
 node tests/contact-delivery.test.js
+node tests/resume-attribution.test.js
 node tests/tree-geometry.test.js
 node --test tests/orbit-physics.test.js
 # Optional real-touch and timeline-style browser checks:
@@ -89,6 +96,7 @@ python3 tests/feedback-timeline.test.py
 python3 tests/mobile-tree.test.py
 python3 tests/leaves-about.test.py
 python3 tests/live-portfolio.test.py
+python3 tests/resume-download.test.py
 ```
 
 Browser tests use real Chromium touchscreen events in mobile emulation. The vibration API is instrumented to verify 8ms requests for each signature; tests cannot confirm physical actuator sensation. Unsupported vibration and reduced-motion fallbacks are tested.

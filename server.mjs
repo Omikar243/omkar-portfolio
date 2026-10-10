@@ -1,11 +1,15 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { forwardContact } from './contact-delivery.js';
+import { countryFromHeaders, normalizeResumeEvent } from './resume-attribution.js';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 const port = Number(process.env.PORT || 3000);
+const recentResumeEvents = new Map();
+const alertOrigins = new Set(['https://omkar-v-shettigar.vercel.app',
+  'https://omkar-portfolio-murex-seven.vercel.app', `http://127.0.0.1:${port}`, `http://localhost:${port}`]);
 const types = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -37,6 +41,36 @@ const handler = async (req, res) => {
 
   if (req.method === 'GET' && pathname === '/api/health') {
     sendJson(res, 200, { ok: true, service: 'portfolio-api' });
+    return;
+  }
+
+  if (req.method === 'POST' && pathname === '/api/resume-event') {
+    if (!alertOrigins.has(String(req.headers.origin || ''))) {
+      sendJson(res, 403, { ok: false });
+      return;
+    }
+    try {
+      const event = normalizeResumeEvent(JSON.parse(await readRequestBody(req)));
+      const country = countryFromHeaders(req.headers);
+      const now = Date.now();
+      for (const [id, time] of recentResumeEvents) {
+        if (now - time > 60000) recentResumeEvents.delete(id);
+      }
+      if (recentResumeEvents.size >= 120) {
+        sendJson(res, 429, { ok: false });
+        return;
+      }
+      const notify = !recentResumeEvents.has(event.eventId);
+      if (notify) {
+        recentResumeEvents.set(event.eventId, now);
+        // Owner-authenticated Vercel runtime logs; never an HTTP history endpoint.
+        // No raw IP, full referrer URL, user-agent or visitor contact fields.
+        console.info(JSON.stringify({ event: 'resume_download_initiated', ...event, country }));
+      }
+      sendJson(res, 200, { ok: true, country, notify });
+    } catch {
+      sendJson(res, 400, { ok: false });
+    }
     return;
   }
 

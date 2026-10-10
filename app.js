@@ -1,6 +1,7 @@
 import { initOrbitGame } from './orbit-game.js';
 import { forwardContact } from './contact-delivery.js';
 import { initFractalTree } from './fractal-tree.js';
+import { initPrivateWebAnalytics, initResumeTracking } from './resume-tracking.js';
 
 const body = document.body;
 const loader = document.querySelector('#loader');
@@ -196,10 +197,12 @@ window.addEventListener('pointermove', (event) => {
 
 const destroyOrbitGame = initOrbitGame(document.querySelector('[data-orbit-game]'));
 const destroyFractalTree = initFractalTree(document.querySelector('#heroVisual'), document.querySelector('#fractalCanvas'), document.querySelector('#signatureGlyph'));
+const destroyResumeTracking = initResumeTracking();
+initPrivateWebAnalytics();
 
 window.addEventListener('pagehide', (event) => {
   cancelAnimationFrame(particleFrame);
-  if (!event.persisted) { destroyFractalTree(); destroyOrbitGame(); }
+  if (!event.persisted) { destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
 });
 window.addEventListener('pageshow', () => {
   if (!particleFrame && !document.hidden) animateParticles();

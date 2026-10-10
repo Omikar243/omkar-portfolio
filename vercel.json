@@ -14,6 +14,8 @@
           "manus-routes.json",
           "public/**",
           "contact-delivery.js",
+          "resume-tracking.js",
+          "resume-attribution.js",
           "orbit-game.js",
           "orbit-physics.js",
           "orbit-game.css"

@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import { arrivalAttribution, normalizeResumeEvent, notificationPayload, countryFromHeaders, safeCampaign } from '../resume-attribution.js';
+
+const landing = arrivalAttribution('https://omkar-v-shettigar.vercel.app/?utm_source=linkedin&utm_medium=profile&utm_campaign=ai-portfolio&email=private', 'https://www.linkedin.com/in/person?secret=private', 'mobile');
+assert.equal(landing.source, 'linkedin');
+assert.equal(landing.referrerHostname, 'www.linkedin.com');
+assert.equal(landing.medium, 'profile');
+assert.equal(landing.campaign, 'ai-portfolio');
+assert.equal(landing.device, 'mobile');
+assert(!JSON.stringify(landing).includes('secret') && !JSON.stringify(landing).includes('person'));
+assert.equal(arrivalAttribution('https://site.test/', '').source, 'direct / unknown');
+assert.equal(arrivalAttribution('https://site.test/', 'https://site.test/work').source, 'direct / unknown');
+assert.equal(safeCampaign('someone@example.test'), '');
+assert.equal(safeCampaign('https://site.test/private'), '');
+assert.equal(safeCampaign('x'.repeat(500)).length, 64);
+assert.equal(countryFromHeaders({'x-vercel-ip-country':'in'}), 'IN');
+assert.equal(countryFromHeaders({'x-vercel-ip-country':'Mumbai'}), 'unknown');
+const event = { ...landing, eventId:'unit-test-download-01', time:'2026-10-10T18:30:00Z', host:'omkar-v-shettigar.vercel.app' };
+const payload = notificationPayload(event, 'IN');
+assert.equal(payload['Approximate country'], 'IN');
+assert.equal(payload['Traffic source'], 'linkedin');
+assert.equal(payload['UTC time'], '2026-10-10T18:30:00.000Z');
+assert.match(payload.message, /does not confirm/);
+assert(!('_cc' in payload) && !('_autoresponse' in payload) && !('email' in payload));
+assert.throws(()=>normalizeResumeEvent({eventId:'bad',time:'invalid'}));
+assert.equal(normalizeResumeEvent({...event,source:'direct / unknown'}).source,'direct / unknown');
+assert(!JSON.stringify(normalizeResumeEvent({...event,ip:'secret',name:'secret',userAgent:'secret'})).includes('secret'));
+console.log('PASS: source/UTM/device attribution, country limits, no visitor identity, no public recipients, no extra CC or autoresponse, and honest download semantics. No emails sent.');

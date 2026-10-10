@@ -65,3 +65,7 @@ Anonymous transport verified on 10 October 2026: a labelled real submission to t
 - [x] Retest all five mobile signature states with real browser touch events, haptic request instrumentation, sound start/mute/theme isolation, reduced-motion and unsupported vibration behavior. Distinguish requested API pulses in emulation from physical-device vibration that cannot be felt in the sandbox.
 
 Evidence: all five real touchscreen transitions in mobile Chromium requested8ms haptics and completed; noise audio used one cached buffer, five buffer sources, five high-/low-pass pairs and zero oscillators. Sound mute, missing vibration API and closed-context recovery passed. Portrait loaded900×1200 at390/768/1440 widths in both themes without overflow; no source mailbox address or resume changes. Physical handset vibration is not verified.
+
+## Project destinations
+
+- [x] Ancient Modern Apparel opens the owner-supplied live website; Knee Osteoarthritis Detection opens the owner-supplied GitHub repository. Replace placeholder notes buttons with clearly labelled accessible external links that open in a new tab, retaining existing project descriptions and design.

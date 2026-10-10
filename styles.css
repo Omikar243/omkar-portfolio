@@ -70,3 +70,8 @@ body.dark .hero-visual-glow{background:radial-gradient(circle,rgba(209,171,112,.
 .about-ambition{border-top:1px solid var(--line);padding-top:0}
 @media(min-width:641px) and (max-width:900px){.about-grid>.section-heading{display:grid;grid-template-columns:1fr 250px;gap:0 35px;align-items:start}.about-grid>.section-heading>.eyebrow{grid-column:1}.about-grid>.section-heading>h2{grid-column:1}.about-portrait{grid-column:2;grid-row:1 / span 2;margin-top:0}}
 @media(max-width:640px){.about-portrait{width:min(100%,310px);margin-top:30px}.about-grid{gap:36px}.about-body .lead-copy{font-size:23px}.about-body p{font-size:14px}}
+
+/* Project actions are real external links, with the existing editorial underline. */
+a.project-link{text-decoration:none;align-self:flex-start}
+a.project-link:hover{color:var(--gold)}
+a.project-link:focus-visible{outline:2px solid var(--gold);outline-offset:5px}

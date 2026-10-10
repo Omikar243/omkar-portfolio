@@ -1,8 +1,8 @@
 
-## Orbital organic-circuit tree refinement
+## Clean O, organic-circuit canopy and roots
 
-- [x] Preserve the existing hero composition, circular orbit system, dotted orbital paths, orbiting particles, light/dark canvas themes, reduced-motion behavior, offscreen pausing, and mobile scaling.
-- [x] Evolve the shared connected fractal graph into an organic-circuit hybrid: retain the clean lower trunk and integrated O bifurcation, add deterministic 45-degree continuation traces from real twig endpoints, add restrained circular terminal pads, and keep the upper canopy finer than the trunk.
-- [x] Add lightweight time-based terminal signal pulses that remain subordinate to the orbit and do not introduce neon, heavy glow, rigid PCB symmetry, external dependencies, or layout changes.
+- [x] Refine the shared tree graph into a cleaner intentional capital O with stable shared junctions, smooth trunk entry/exit, stronger central hierarchy, and no accidental side intersections.
+- [x] Preserve approximately 60–70% organic fractal character while using selective 45-degree circuit continuations and circular pads toward outer canopy and root endpoints; keep orbit paths, particles, themes, interactions and responsive behavior intact.
+- [x] Add four connected primary roots that split into eight finer endpoints, with graceful organic curves, selected circuit terminals, asymmetric balance, negative space and mobile-safe bounds inside the existing orbit.
 
-Evidence: existing geometry, mobile budgets, renderer lifecycle and route checks passed; desktop and 390px hero captures show the preserved orbital composition and legible integrated O.
+Evidence: graph topology, node bounds, continuous morphs, desktop/mobile captures and renderer syntax checks passed.

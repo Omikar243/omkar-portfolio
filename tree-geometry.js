@@ -41,33 +41,59 @@ export function buildTree(state = 0, depth = 7) {
   const centerX = .5 + p.lean * .32;
   const bottomY = .636;
   const topY = bottomY - p.loopHeight;
-  const shoulder = lerp(.44, .065, p.square);
-  const root = node(.493, .865, 0);
-  const split = node(centerX - p.lean * .4, bottomY, 1);
+  // The O uses six shared junctions with a stable, intentional silhouette:
+  // the trunk enters at split, follows two clean limbs, then exits at reunion.
+  // Only the control handles become angular in the squared profiles.
+  const shoulder = lerp(.22, .16, p.square);
+  const root = node(centerX, .832, 0);
+  const split = node(centerX - p.lean * .12, bottomY, 1);
   const leftLower = node(centerX - p.loopWidth, bottomY - p.loopHeight * shoulder, 2);
-  const leftUpper = node(centerX - p.loopWidth + p.lean * .2, topY + p.loopHeight * shoulder, 2);
-  const reunion = node(centerX + p.lean * .7, topY, 1);
-  const rightUpper = node(centerX + p.loopWidth * .94 + p.lean * .2, topY + p.loopHeight * shoulder * .93, 2);
-  const rightLower = node(centerX + p.loopWidth * .94, bottomY - p.loopHeight * shoulder * 1.05, 2);
+  const leftUpper = node(centerX - p.loopWidth * (.99 - p.lean * .25), topY + p.loopHeight * shoulder, 2);
+  const reunion = node(centerX + p.lean * .12, topY, 1);
+  const rightUpper = node(centerX + p.loopWidth * (1 + p.lean * .16), topY + p.loopHeight * shoulder, 2);
+  const rightLower = node(centerX + p.loopWidth * (.99 + p.lean * .2), bottomY - p.loopHeight * shoulder, 2);
 
   const trunkWidth = .0084;
   edge(root, split, .028 + p.lean * .2, -.079, 0, .058, trunkWidth, 0);
-  const loopWidth = .0055;
+  const loopWidth = .0064;
   const h = p.loopHeight;
   const w = p.loopWidth;
-  // These six edges ARE the two trunk limbs. They share split/reunion nodes.
-  // Rounded and squared versions have identical connectivity and edge count.
-  edge(split, leftLower, -w * .64, -h * .01, 0, h * .17, loopWidth, 1);
-  edge(leftLower, leftUpper, -w * (.24 * (1 - p.square)), -h * .23,
-    -w * (.19 * (1 - p.square)), h * .23, loopWidth * .86, 2);
-  edge(leftUpper, reunion, 0, -h * .17, -w * .64, h * .01, loopWidth * .82, 1);
-  edge(split, rightLower, w * .64, -h * .01, 0, h * .17, loopWidth * .91, 1);
-  edge(rightLower, rightUpper, w * (.2 * (1 - p.square)), -h * .23,
-    w * (.23 * (1 - p.square)), h * .23, loopWidth * .82, 2);
-  edge(rightUpper, reunion, 0, -h * .17, w * .64, h * .01, loopWidth * .82, 1);
+  const curve = 1 - p.square;
+  // These six edges ARE the two trunk limbs. Their handles stay inside the
+  // silhouette, avoiding the old side protrusions and accidental crossings.
+  edge(split, leftLower, -w * (.58 + curve * .1), -h * .01, -w * .08, h * .12, loopWidth, 1);
+  edge(leftLower, leftUpper, -w * (.06 + curve * .18), -h * .26,
+    -w * (.06 + curve * .18), h * .26, loopWidth * .94, 2);
+  edge(leftUpper, reunion, w * .08, -h * .12, w * (.58 + curve * .1), h * .01, loopWidth * .9, 1);
+  edge(split, rightLower, w * (.58 + curve * .1), -h * .01, w * .08, h * .12, loopWidth, 1);
+  edge(rightLower, rightUpper, w * (.06 + curve * .18), -h * .26,
+    w * (.06 + curve * .18), h * .26, loopWidth * .94, 2);
+  edge(rightUpper, reunion, -w * .08, -h * .12, -w * (.58 + curve * .1), h * .01, loopWidth * .9, 1);
 
   const crown = node(nodes[reunion].x + p.lean * .6, topY - .054 + p.crown, 3);
   edge(reunion, crown, p.lean * .13, -.019, -p.lean * .13, .019, .0048, 2);
+
+  const rootGrow = (parent, length, angle, remaining, width, level, id) => {
+    const start = nodes[parent];
+    const direction = angle + (noise(id, 12) - .5) * .08;
+    const end = node(start.x + Math.cos(direction) * length,
+      start.y + Math.sin(direction) * length, level);
+    line(parent, end, width, level, (noise(id, 13) - .5) * p.curvature * .8);
+    if (remaining === 0) { tips.push(end); return; }
+    const splitAngle = .52 + (noise(id, 14) - .5) * .1;
+    const nextLength = length * (.5 + noise(id, 15) * .08);
+    rootGrow(end, nextLength, direction - splitAngle, remaining - 1,
+      width * .58, level + 1, id * 2 + 17);
+    rootGrow(end, nextLength * (.86 + noise(id, 16) * .1), direction + splitAngle,
+      remaining - 1, width * .54, level + 1, id * 2 + 23);
+  };
+  // Four primary roots keep the lower composition grounded without symmetry.
+  const rootAngles = [2.2, 1.86, 1.26, .9];
+  const rootLengths = [.07, .064, .068, .074];
+  for (let i = 0; i < rootAngles.length; i += 1) {
+    rootGrow(root, rootLengths[i] * (state === 2 && i === 0 ? .9 : 1),
+      rootAngles[i] + p.lean * (i < 2 ? -.12 : .1), 1, .0031, 1, 80 + i);
+  }
 
   const grow = (parent, length, angle, remaining, width, level, id) => {
     const start = nodes[parent];

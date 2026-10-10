@@ -9,7 +9,7 @@ export function initFractalTree(shell, canvas, button) {
   const mobileQuery = window.matchMedia('(max-width: 640px)');
   const constrainedCPU = (navigator.hardwareConcurrency || 8) <= 4;
   let lowPower = mobileQuery.matches || constrainedCPU;
-  // Fixed lifetime topology prevents twigs popping on orientation/breakpoint changes.
+  // Each power tier has a stable topology; switching tiers rebuilds all poses together.
   let depth = lowPower ? 6 : 7;
   let fps = lowPower ? 30 : 60;
   let ratio = Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 2);

@@ -10,6 +10,10 @@ for (const depth of [6, 7]) {
     assert.equal(pose.edges[1].a, pose.edges[4].a, 'trunk splits into two limbs');
     assert.equal(pose.edges[3].b, pose.edges[6].b, 'both limbs rejoin');
     assert.equal(pose.edges[7].a, pose.edges[3].b, 'crown starts at reunion');
+    const rootTips = pose.tips.filter((index) => pose.nodes[index].y > .87);
+    assert.equal(rootTips.length, 8, 'four primary roots split into eight fine endpoints');
+    assert.ok(pose.nodes[0].y < .85, 'root hub stays inside the orbital composition');
+    assert.ok(Math.abs(pose.nodes[2].x - pose.nodes[5].x) > .05, 'O keeps a deliberate central silhouette');
     for (const n of pose.nodes) {
       assert.ok(n.x > 0 && n.x < 1 && n.y > 0 && n.y < 1);
     }

@@ -14,6 +14,8 @@ for (const depth of [6, 7]) {
     assert.equal(rootTips.length, 8, 'four primary roots split into eight fine endpoints');
     assert.ok(pose.nodes[0].y < .85, 'root hub stays inside the orbital composition');
     assert.ok(Math.abs(pose.nodes[2].x - pose.nodes[5].x) > .05, 'O keeps a deliberate central silhouette');
+    assert.equal((pose.nodes[2].x + pose.nodes[6].x) / 2, pose.nodes[1].x, 'O lower sides stay paired');
+    assert.equal((pose.nodes[3].x + pose.nodes[5].x) / 2, pose.nodes[4].x, 'O upper sides stay paired');
     for (const n of pose.nodes) {
       assert.ok(n.x > 0 && n.x < 1 && n.y > 0 && n.y < 1);
     }

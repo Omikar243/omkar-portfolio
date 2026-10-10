@@ -46,13 +46,16 @@ export function buildTree(state = 0, depth = 7) {
   // Only the control handles become angular in the squared profiles.
   const shoulder = lerp(.22, .16, p.square);
   const root = node(centerX, .832, 0);
-  const split = node(centerX - p.lean * .12, bottomY, 1);
+  // Lean translates the O from bottom to top as one clean silhouette. The
+  // paired left/right nodes remain equal around their local center, so an O
+  // can slant without becoming crooked or accidentally pinched.
+  const split = node(centerX, bottomY, 1);
   const topCenter = centerX + p.tilt;
-  const leftLower = node(centerX - p.loopWidth + p.tilt * .2, bottomY - p.loopHeight * shoulder, 2);
-  const leftUpper = node(topCenter - p.loopWidth * (.99 - p.lean * .25), topY + p.loopHeight * shoulder, 2);
-  const reunion = node(topCenter + p.lean * .12, topY, 1);
-  const rightUpper = node(topCenter + p.loopWidth * (1 + p.lean * .16), topY + p.loopHeight * shoulder, 2);
-  const rightLower = node(centerX + p.loopWidth * (.99 + p.lean * .2) + p.tilt * .2, bottomY - p.loopHeight * shoulder, 2);
+  const leftLower = node(centerX - p.loopWidth, bottomY - p.loopHeight * shoulder, 2);
+  const leftUpper = node(topCenter - p.loopWidth, topY + p.loopHeight * shoulder, 2);
+  const reunion = node(topCenter, topY, 1);
+  const rightUpper = node(topCenter + p.loopWidth, topY + p.loopHeight * shoulder, 2);
+  const rightLower = node(centerX + p.loopWidth, bottomY - p.loopHeight * shoulder, 2);
 
   const trunkWidth = .0084;
   edge(root, split, .028 + p.lean * .2, -.079, 0, .058, trunkWidth, 0);

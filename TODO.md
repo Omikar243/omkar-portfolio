@@ -1,8 +1,5 @@
 
-## O profile variation and device-resolution smoke check
+## Non-crooked O correction
 
-- [x] Increase visible O variation through explicit shared-graph tilt and profile geometry: rounded left lean, squared right lean, wide asymmetric left lean, taller botanical right lean, and compact geometric left lean.
-- [x] Preserve shared topology, morph continuity, orbit composition, roots, themes and touch behavior while making the five center signatures visibly distinct.
-- [x] Verify touch targets, five cyclic O transitions, haptic path, leaf-sound toggle path, theme switching, no horizontal overflow and no browser errors on iPhone SE, iPhone 14, iPad mini, compact Android and large Android viewport profiles.
-
-Evidence: geometry tests passed; visual captures show distinct forms 1–5; all five device profiles passed with 44px+ touch targets and the existing mobile interaction contract.
+- [x] Keep whole-shape lean while pairing the O’s left/right nodes around their local centers, so round profiles remain round and squared profiles remain squared instead of becoming skewed or pinched.
+- [x] Add regression checks for paired lower and upper O sides; geometry, continuous morph, five-state mobile, haptic, theme and reduced-motion checks pass.

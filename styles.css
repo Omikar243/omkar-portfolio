@@ -62,7 +62,7 @@ body.dark .hero-visual-glow{background:radial-gradient(circle,rgba(209,171,112,.
 .about-portrait{margin:36px 0 0;width:min(100%,340px)}
 .portrait-frame{position:relative;padding:8px;border:1px solid var(--gold);background:var(--paper-2);box-shadow:var(--shadow)}
 .portrait-frame img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:contain}
-.about-portrait figcaption{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.about-portrait figcaption{display:flex;align-items:center;justify-content:flex-start;gap:16px;margin-top:12px}
 .about-portrait figcaption>span:first-child{color:var(--ink-soft);font:9px/1.6 var(--sans);letter-spacing:.12em;text-transform:uppercase;max-width:140px}
 .portrait-signature{color:var(--gold);font:27px/1.2 var(--script);white-space:nowrap}
 .about-chapter{padding:0 0 7px}

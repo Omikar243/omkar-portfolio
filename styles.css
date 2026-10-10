@@ -38,3 +38,22 @@ body.dark .hero-visual-glow{background:radial-gradient(circle,rgba(209,171,112,.
 
 .contact-private-note{color:var(--ink-soft);font:14px/1.6 var(--serif)}
 @media(max-width:640px){.hero-visual-shell .art-caption{right:1%;bottom:0}}
+
+/* Editorial chapter toggles: no native grey browser-button treatment. */
+.timeline-card-top .timeline-toggle{appearance:none;-webkit-appearance:none;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:2px;background:transparent;color:var(--ink-soft);font:500 9px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;cursor:pointer;touch-action:manipulation;transition:background .2s,color .2s,border-color .2s}
+.timeline-card-top .timeline-toggle .chapter-label{margin:0;display:inline;color:inherit;font:inherit;text-align:left}
+.timeline-card-top .timeline-toggle .chapter-symbol{display:inline;margin:0;color:var(--gold);font:22px/1 var(--serif);letter-spacing:0;text-align:center}
+.timeline-card-top .timeline-toggle:hover,.timeline-card-top .timeline-toggle.is-open{color:var(--ink);border-color:var(--gold);background:var(--paper-2)}
+.timeline-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.timeline-detail{margin:0 0 18px;padding:15px 0 15px 18px;border-left:1px solid var(--gold);color:var(--ink-soft);font:13px/1.8 var(--sans)}
+.timeline-detail:not([hidden]){animation:chapter-open .28s ease-out}
+@keyframes chapter-open{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(max-width:640px){.timeline-card-top .timeline-toggle{margin-top:15px;padding:10px 12px}}
+/* Independent sound toggle is quiet until deliberately enabled. */
+.tree-art-controls{position:absolute;top:2%;right:1%;z-index:5;display:flex;align-items:center;gap:7px}
+.tree-art-controls .tree-theme-toggle{position:static}
+.tree-sound-toggle{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:22px;background:var(--paper);color:var(--ink-soft);font:500 9px var(--sans);letter-spacing:.08em;text-transform:uppercase;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.tree-sound-toggle>span:first-child{color:var(--gold);font-size:15px}
+.tree-sound-toggle[aria-pressed="true"],.tree-sound-toggle:hover{border-color:var(--gold);color:var(--ink)}
+.tree-sound-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+@media(max-width:640px){.tree-art-controls{top:0;right:0;gap:5px}.tree-sound-toggle{font-size:8px;padding:8px}}

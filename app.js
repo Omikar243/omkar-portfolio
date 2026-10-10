@@ -68,7 +68,8 @@ document.querySelectorAll('.timeline-toggle').forEach((toggle) => {
     const willOpen = toggle.getAttribute('aria-expanded') !== 'true';
     toggle.setAttribute('aria-expanded', String(willOpen));
     toggle.classList.toggle('is-open', willOpen);
-    toggle.querySelector('span').textContent = willOpen ? '−' : '+';
+    toggle.querySelector('.chapter-symbol').textContent = willOpen ? '−' : '+';
+    toggle.querySelector('.chapter-label').textContent = willOpen ? 'close chapter' : 'open chapter';
     if (detail) detail.hidden = !willOpen;
     item?.classList.toggle('is-expanded', willOpen);
   });

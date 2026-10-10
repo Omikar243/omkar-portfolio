@@ -33,6 +33,49 @@ export function initFractalTree(shell, canvas, button) {
   const listeners = new AbortController();
   let resizeObserver;
   let visibilityObserver;
+  const soundButton = shell.querySelector('#treeSoundToggle');
+  let soundEnabled = false;
+  let audio = null;
+  let feedbackAt = -Infinity;
+  const notes = [196, 220, 246.94, 261.63, 293.66];
+
+  function setSound(enabled) {
+    soundEnabled = enabled;
+    if (!soundButton) return;
+    soundButton.setAttribute('aria-pressed', String(enabled));
+    soundButton.setAttribute('aria-label', enabled ? 'Mute gentle tree sounds' : 'Enable gentle tree sounds');
+    soundButton.querySelector('[data-tree-sound-label]').textContent = enabled ? 'Sound on' : 'Sound off';
+  }
+
+  async function signatureFeedback(event) {
+    // Only real visitor gestures produce feedback. No autoplay or synthetic tests.
+    if (!event?.isTrusted || disposed || performance.now() - feedbackAt < 110) return;
+    feedbackAt = performance.now();
+    if (!motion.matches && navigator.vibrate) {
+      try { navigator.vibrate(8); } catch { /* Not supported on many iOS browsers. */ }
+    }
+    if (!soundEnabled) return;
+    try {
+      const Audio = window.AudioContext || window.webkitAudioContext;
+      if (!Audio) { setSound(false); return; }
+      if (!audio || audio.state === 'closed') audio = new Audio();
+      if (audio.state === 'suspended') await audio.resume();
+      if (disposed || !soundEnabled || audio.state !== 'running') return;
+      const oscillator = audio.createOscillator();
+      const envelope = audio.createGain();
+      const now = audio.currentTime;
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(notes[state], now);
+      oscillator.frequency.exponentialRampToValueAtTime(notes[state] * .97, now + .12);
+      envelope.gain.setValueAtTime(.0001, now);
+      envelope.gain.exponentialRampToValueAtTime(.025, now + .014);
+      envelope.gain.exponentialRampToValueAtTime(.0001, now + .14);
+      oscillator.connect(envelope).connect(audio.destination);
+      oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); };
+      oscillator.start(now);
+      oscillator.stop(now + .16);
+    } catch { setSound(false); }
+  }
   const orbitPaths = [
     { rx: .49, ry: .19, rotation: -.28, speed: .18, alpha: .25, particles: [{ phase: .1, size: 1.8 }, { phase: 3.45, size: 1.1 }] },
     { rx: .39, ry: .31, rotation: .57, speed: -.12, alpha: .3, particles: [{ phase: 1.2, size: 1.5 }, { phase: 4.15, size: .9 }] },
@@ -193,7 +236,7 @@ export function initFractalTree(shell, canvas, button) {
     if (hint) hint.textContent = `tap the tree · form ${state + 1} / ${poses.length}`;
   }
 
-  function advance() {
+  function advance(event) {
     const now = performance.now();
     sample(now); // Exact currently interpolated node/control geometry, even mid-morph.
     source = cloneTree(current);
@@ -203,6 +246,7 @@ export function initFractalTree(shell, canvas, button) {
     shell.dataset.morphing = 'true';
     button.dataset.state = String(state);
     announceForm(true);
+    signatureFeedback(event);
     if (motion.matches) {
       current = cloneTree(target);
       morphStart = -Infinity;
@@ -224,11 +268,12 @@ export function initFractalTree(shell, canvas, button) {
       paint();
     } else start();
   }
+  if (soundButton) listen(soundButton, 'click', () => { setSound(!soundEnabled); });
   listen(button, 'click', advance);
   listen(button, 'keydown', (event) => {
     if (!event.repeat && ['ArrowRight', 'ArrowDown'].includes(event.key)) {
       event.preventDefault();
-      advance();
+      advance(event);
     }
   });
   listen(shell, 'pointermove', (event) => {
@@ -267,6 +312,7 @@ export function initFractalTree(shell, canvas, button) {
     listeners.abort();
     resizeObserver?.disconnect();
     visibilityObserver?.disconnect();
+    if (audio && audio.state !== 'closed') audio.close().catch(() => {});
   }
   canvas.dataset.renderTier = lowPower ? 'mobile-30fps' : 'desktop-60fps';
   canvas.dataset.branchCount = String(current.edges.length);

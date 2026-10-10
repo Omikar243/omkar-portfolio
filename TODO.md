@@ -44,6 +44,13 @@ Contact forwarding activation and received-inbox delivery were confirmed by the 
 ## Inbox address privacy
 
 - [ ] Replace the exposed recipient constant/form action with a provider-issued anonymous form identifier; no personal inbox address in current public source, HTML, browser assets or fallback messages. Preserve working forwarding and visitor Reply-To. Pending: owner supplies anonymous FormSubmit form URL.
-- [ ] Resolve original-PDF email exposure according to the owner’s choice; retain original privately if a redacted public download is approved. Older Git history remains exposed unless separately addressed with explicit approval.
+- [x] Owner explicitly chose to keep the exact original resume PDF with its email visible. This is an intentional exception to source-code email hiding. Preserve its original bytes; do not redact or remove it. Older Git history remains exposed unless separately addressed with explicit approval.
 
 Mobile evidence: Chromium 390×844, touch enabled, device scale 3; actual taps cycled all five forms, rapid retargets passed, both theme controls synchronized without advancing form, 33 canvas paints per 1.1s at capped DPR ~1.5, reduced-motion immediate repaint, persisted theme and remaining game start/pause passed with no browser errors. This is emulation, not measurement on a physical low-end phone.
+
+## Signature feedback and editorial timeline controls
+
+- [x] Add a brief, restrained haptic pulse on trusted O-signature changes where supported; offer opt-in low-volume procedural sound, muted initially, with spam-tap throttling, safe unsupported/browser-blocked fallbacks and audio cleanup. No autoplay and no feedback from changing themes.
+- [x] Restyle open/close chapter controls with the site’s serif/sans hierarchy, transparent cream/espresso background, gold accents, accessible 44px touch targets, matching dark/light states and accurate open/close labels. Preserve all timeline content and expansion behavior.
+
+Privacy transport test: Vercel-scoped environment API remains403 and server-side FormSubmit forwarding returned502. Do not switch confirmed browser delivery to this failing backend. A provider anonymous form URL is still required to remove the current mailbox endpoint; original resume remains public by explicit choice.

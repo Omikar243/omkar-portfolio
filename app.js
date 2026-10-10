@@ -257,29 +257,42 @@ window.addEventListener('pointermove', (event) => {
   }
 });
 
-/* Interactive fractal tree + orbital system for the hero visual */
+/* Interactive fractal tree + structural O signature system */
 const heroVisual = document.querySelector('#heroVisual');
 const fractalCanvas = document.querySelector('#fractalCanvas');
-const fractalContext = fractalCanvas?.getContext('2d');
+const fractalContext = fractalCanvas?.getContext('2d', { alpha: true, desynchronized: true });
 const signatureGlyph = document.querySelector('#signatureGlyph');
 const glyphLetter = document.querySelector('#glyphLetter');
 
 if (heroVisual && fractalCanvas && fractalContext) {
   const branchSegments = [];
   const tipNodes = [];
-  const pointer = { x: 0, y: 0, intensity: 0 };
+  const pointer = { x: 0, y: 0 };
   const glyphNames = ['calligraphic O', 'geometric O', 'orbital O', 'botanical O', 'mathematical O'];
+  const profiles = [
+    { split: .43, ratio: .665, bend: .15, angular: false, depth: 8 },
+    { split: .24, ratio: .71, bend: .035, angular: true, depth: 7 },
+    { split: .57, ratio: .64, bend: .2, angular: false, depth: 7 },
+    { split: .34, ratio: .68, bend: .16, angular: false, depth: 8 },
+    { split: .18, ratio: .73, bend: .025, angular: true, depth: 7 },
+  ];
   const orbitConfig = [
     { rx: .49, ry: .19, rotation: -.28, speed: .18, phase: .12, front: false, particles: [{ phase: .1, size: 1.8 }, { phase: 3.45, size: 1.1 }] },
     { rx: .39, ry: .31, rotation: .57, speed: -.12, phase: 1.1, front: true, particles: [{ phase: 1.2, size: 1.5 }, { phase: 4.15, size: .9 }] },
     { rx: .53, ry: .12, rotation: .08, speed: .1, phase: 2.4, front: false, particles: [{ phase: 2.1, size: 1.25 }] },
     { rx: .3, ry: .44, rotation: -.9, speed: .075, phase: .7, front: true, particles: [{ phase: .35, size: 1.05 }] },
   ];
+  const powerSave = window.matchMedia('(max-width: 640px)').matches || (navigator.hardwareConcurrency || 8) <= 4;
+  const frameInterval = powerSave ? 1000 / 30 : 1000 / 60;
   let dimensions = { width: 0, height: 0, scale: 0, centerX: 0, centerY: 0 };
   let seed = 314159;
   let glyphState = 0;
+  let previousGlyphState = 0;
+  let glyphTransitionStart = performance.now();
   let animationId = 0;
   let animationActive = false;
+  let heroInView = true;
+  let lastFrame = 0;
   const startedAt = performance.now();
 
   const seededRandom = () => {
@@ -290,39 +303,36 @@ if (heroVisual && fractalCanvas && fractalContext) {
   const buildFractal = () => {
     branchSegments.length = 0;
     tipNodes.length = 0;
-    seed = 314159;
+    seed = 314159 + glyphState * 991;
+    const profile = profiles[glyphState];
     const grow = (x, y, length, angle, width, depth, level = 0) => {
-      const bend = (seededRandom() - .5) * .15;
-      const branchAngle = angle + bend;
+      const branchAngle = angle + (seededRandom() - .5) * profile.bend;
       const endX = x + Math.cos(branchAngle) * length;
       const endY = y + Math.sin(branchAngle) * length;
       const normal = branchAngle + Math.PI / 2;
-      const curve = (seededRandom() - .5) * length * .34;
-      branchSegments.push({ x, y, endX, endY, controlX: (x + endX) / 2 + Math.cos(normal) * curve, controlY: (y + endY) / 2 + Math.sin(normal) * curve, width, depth, level });
+      const curve = profile.angular ? 0 : (seededRandom() - .5) * length * .34;
+      branchSegments.push({ x, y, endX, endY, controlX: (x + endX) / 2 + Math.cos(normal) * curve, controlY: (y + endY) / 2 + Math.sin(normal) * curve, width, depth, level, angular: profile.angular });
       if (depth <= 0) {
         tipNodes.push({ x: endX, y: endY, level });
         return;
       }
-      const nextLength = length * (.665 + seededRandom() * .055);
+      const nextLength = length * (profile.ratio + seededRandom() * .055);
       const nextWidth = Math.max(.006, width * (.64 + seededRandom() * .06));
-      const split = .42 + seededRandom() * .1;
-      const asymmetry = (seededRandom() - .5) * .12;
+      const split = profile.split + seededRandom() * .08;
+      const asymmetry = (seededRandom() - .5) * (profile.angular ? .045 : .12);
       grow(endX, endY, nextLength, branchAngle - split + asymmetry, nextWidth, depth - 1, level + 1);
       grow(endX, endY, nextLength * (.97 + seededRandom() * .05), branchAngle + split + asymmetry, nextWidth, depth - 1, level + 1);
+      if (glyphState === 3 && depth > 2 && seededRandom() > .78) {
+        grow(endX, endY, nextLength * .7, branchAngle + (seededRandom() - .5) * 1.4, nextWidth * .72, depth - 2, level + 2);
+      }
     };
-    grow(.5, .82, .24, -Math.PI / 2, .07, 8);
+    grow(.5, .82, .24, -Math.PI / 2, .07, profile.depth);
   };
 
   const resizeFractal = () => {
     const rect = heroVisual.getBoundingClientRect();
-    const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    dimensions = {
-      width: rect.width,
-      height: rect.height,
-      scale: Math.min(rect.width, rect.height) * .96,
-      centerX: rect.width / 2,
-      centerY: rect.height * .53,
-    };
+    const ratio = Math.min(window.devicePixelRatio || 1, powerSave ? 1.5 : 2);
+    dimensions = { width: rect.width, height: rect.height, scale: Math.min(rect.width, rect.height) * .96, centerX: rect.width / 2, centerY: rect.height * .53 };
     fractalCanvas.width = Math.max(1, Math.round(rect.width * ratio));
     fractalCanvas.height = Math.max(1, Math.round(rect.height * ratio));
     fractalCanvas.style.width = `${rect.width}px`;
@@ -331,108 +341,177 @@ if (heroVisual && fractalCanvas && fractalContext) {
     if (reduceMotion) drawFrame(performance.now());
   };
 
-  const mapPoint = (x, y, offsetX = 0, offsetY = 0) => ({
-    x: dimensions.centerX + (x - .5) * dimensions.scale + offsetX,
-    y: dimensions.centerY + (y - .53) * dimensions.scale + offsetY,
-  });
-
+  const mapPoint = (x, y, offsetX = 0, offsetY = 0) => ({ x: dimensions.centerX + (x - .5) * dimensions.scale + offsetX, y: dimensions.centerY + (y - .53) * dimensions.scale + offsetY });
   const orbitPoint = (orbit, theta) => {
     const rawX = Math.cos(theta) * orbit.rx * dimensions.scale;
     const rawY = Math.sin(theta) * orbit.ry * dimensions.scale;
-    return {
-      x: dimensions.centerX + rawX * Math.cos(orbit.rotation) - rawY * Math.sin(orbit.rotation),
-      y: dimensions.centerY + rawX * Math.sin(orbit.rotation) + rawY * Math.cos(orbit.rotation),
-    };
+    return { x: dimensions.centerX + rawX * Math.cos(orbit.rotation) - rawY * Math.sin(orbit.rotation), y: dimensions.centerY + rawX * Math.sin(orbit.rotation) + rawY * Math.cos(orbit.rotation) };
   };
 
   const drawOrbit = (orbit, time, dark) => {
-    const color = dark ? 'rgba(218,183,124,.38)' : 'rgba(142,101,53,.34)';
     fractalContext.save();
     fractalContext.translate(dimensions.centerX, dimensions.centerY);
     fractalContext.rotate(orbit.rotation);
     fractalContext.beginPath();
     fractalContext.ellipse(0, 0, orbit.rx * dimensions.scale, orbit.ry * dimensions.scale, 0, 0, Math.PI * 2);
-    fractalContext.strokeStyle = color;
+    fractalContext.strokeStyle = dark ? 'rgba(218,183,124,.38)' : 'rgba(142,101,53,.34)';
     fractalContext.lineWidth = .7;
     fractalContext.setLineDash(orbit.front ? [] : [1.4, 5]);
     fractalContext.stroke();
     fractalContext.restore();
     orbit.particles.forEach((particle, index) => {
-      const theta = particle.phase + time * orbit.speed;
-      const point = orbitPoint(orbit, theta);
-      const pulse = 1 + Math.sin(time * 1.8 + index) * .18;
+      const point = orbitPoint(orbit, particle.phase + time * orbit.speed);
       fractalContext.beginPath();
-      fractalContext.arc(point.x, point.y, particle.size * pulse, 0, Math.PI * 2);
+      fractalContext.arc(point.x, point.y, particle.size * (1 + Math.sin(time * 1.8 + index) * .18), 0, Math.PI * 2);
       fractalContext.fillStyle = dark ? 'rgba(238,208,155,.92)' : 'rgba(153,108,57,.85)';
-      fractalContext.shadowColor = dark ? 'rgba(238,208,155,.75)' : 'rgba(185,137,77,.55)';
-      fractalContext.shadowBlur = 7;
       fractalContext.fill();
-      fractalContext.shadowBlur = 0;
     });
   };
 
   const drawTree = (time, growth, dark) => {
-    const treeOffsetX = pointer.x * dimensions.scale * .015;
-    const treeOffsetY = pointer.y * dimensions.scale * .008;
+    const offsetX = pointer.x * dimensions.scale * .015;
+    const offsetY = pointer.y * dimensions.scale * .008;
     const baseRed = dark ? 224 : 132;
     const baseGreen = dark ? 190 : 91;
     const baseBlue = dark ? 132 : 47;
     branchSegments.forEach((segment) => {
-      const segmentGrowth = Math.max(0, Math.min(1, (growth * 1.25) - segment.level * .08));
-      if (segmentGrowth <= 0) return;
-      const start = mapPoint(segment.x, segment.y, treeOffsetX, treeOffsetY);
-      const end = mapPoint(segment.endX, segment.endY, treeOffsetX, treeOffsetY);
-      const control = mapPoint(segment.controlX, segment.controlY, treeOffsetX, treeOffsetY);
+      const segmentGrowth = Math.max(0, Math.min(1, growth * 1.25 - segment.level * .08));
+      if (!segmentGrowth) return;
+      const start = mapPoint(segment.x, segment.y, offsetX, offsetY);
+      const end = mapPoint(segment.endX, segment.endY, offsetX, offsetY);
+      const control = mapPoint(segment.controlX, segment.controlY, offsetX, offsetY);
       const partialEnd = { x: start.x + (end.x - start.x) * segmentGrowth, y: start.y + (end.y - start.y) * segmentGrowth };
       const partialControl = { x: start.x + (control.x - start.x) * segmentGrowth, y: start.y + (control.y - start.y) * segmentGrowth };
-      const alpha = .3 + (8 - segment.level) * .065;
       fractalContext.beginPath();
       fractalContext.moveTo(start.x, start.y);
-      fractalContext.quadraticCurveTo(partialControl.x, partialControl.y, partialEnd.x, partialEnd.y);
-      fractalContext.strokeStyle = `rgba(${baseRed},${baseGreen},${baseBlue},${Math.min(.9, alpha)})`;
+      if (segment.angular) {
+        fractalContext.lineTo(partialControl.x, start.y);
+        fractalContext.lineTo(partialEnd.x, partialEnd.y);
+      } else {
+        fractalContext.quadraticCurveTo(partialControl.x, partialControl.y, partialEnd.x, partialEnd.y);
+      }
+      fractalContext.strokeStyle = `rgba(${baseRed},${baseGreen},${baseBlue},${Math.min(.9, .3 + (8 - segment.level) * .065)})`;
       fractalContext.lineWidth = Math.max(.45, segment.width * dimensions.scale * .18);
-      fractalContext.lineCap = 'round';
+      fractalContext.lineCap = segment.angular ? 'square' : 'round';
       fractalContext.stroke();
     });
     if (growth > .78) {
       tipNodes.forEach((tip, index) => {
-        const point = mapPoint(tip.x, tip.y, treeOffsetX, treeOffsetY);
-        const pulse = 1 + Math.sin(time * 1.35 + index) * .16;
+        const point = mapPoint(tip.x, tip.y, offsetX, offsetY);
         fractalContext.beginPath();
-        fractalContext.arc(point.x, point.y, (tip.level % 3 ? .8 : 1.25) * pulse, 0, Math.PI * 2);
+        fractalContext.arc(point.x, point.y, tip.level % 3 ? .8 : 1.25, 0, Math.PI * 2);
         fractalContext.fillStyle = dark ? 'rgba(238,208,155,.7)' : 'rgba(185,137,77,.58)';
         fractalContext.fill();
       });
     }
   };
 
+  const roundedSquare = (size, radius) => {
+    const x = -size; const y = -size; const w = size * 2;
+    fractalContext.moveTo(x + radius, y);
+    fractalContext.lineTo(x + w - radius, y);
+    fractalContext.quadraticCurveTo(x + w, y, x + w, y + radius);
+    fractalContext.lineTo(x + w, y + w - radius);
+    fractalContext.quadraticCurveTo(x + w, y + w, x + w - radius, y + w);
+    fractalContext.lineTo(x + radius, y + w);
+    fractalContext.quadraticCurveTo(x, y + w, x, y + w - radius);
+    fractalContext.lineTo(x, y + radius);
+    fractalContext.quadraticCurveTo(x, y, x + radius, y);
+  };
+
+  const polygon = (radius, sides, rotation = 0) => {
+    for (let index = 0; index <= sides; index += 1) {
+      const angle = rotation + (index / sides) * Math.PI * 2;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius;
+      if (index === 0) fractalContext.moveTo(x, y); else fractalContext.lineTo(x, y);
+    }
+  };
+
+  const drawSignatureO = (state, alpha, dark) => {
+    const center = mapPoint(.5, .53, pointer.x * dimensions.scale * .015, pointer.y * dimensions.scale * .008);
+    const size = dimensions.scale * .115;
+    const line = dark ? 'rgba(245,222,181,.98)' : 'rgba(157,108,49,.92)';
+    fractalContext.save();
+    fractalContext.translate(center.x, center.y);
+    fractalContext.globalAlpha = alpha;
+    fractalContext.strokeStyle = line;
+    fractalContext.lineWidth = Math.max(2.5, dimensions.scale * .012);
+    fractalContext.lineCap = state === 1 || state === 4 ? 'square' : 'round';
+    fractalContext.lineJoin = state === 1 || state === 4 ? 'miter' : 'round';
+    fractalContext.shadowColor = dark ? 'rgba(235,200,145,.28)' : 'rgba(115,83,51,.2)';
+    fractalContext.shadowBlur = 5;
+    if (state === 0) {
+      fractalContext.beginPath();
+      fractalContext.ellipse(0, 0, size * .72, size, -.18, 0, Math.PI * 2);
+      fractalContext.stroke();
+    } else if (state === 1) {
+      fractalContext.beginPath();
+      roundedSquare(size * .78, size * .1);
+      roundedSquare(size * .38, size * .055);
+      fractalContext.stroke();
+    } else if (state === 2) {
+      fractalContext.beginPath();
+      fractalContext.ellipse(0, 0, size * .74, size, .45, 0, Math.PI * 2);
+      fractalContext.stroke();
+      fractalContext.beginPath();
+      fractalContext.ellipse(0, 0, size * .95, size * .3, -.45, 0, Math.PI * 2);
+      fractalContext.stroke();
+    } else if (state === 3) {
+      fractalContext.beginPath();
+      fractalContext.ellipse(0, 0, size * .7, size, -.12, 0, Math.PI * 2);
+      fractalContext.stroke();
+      for (let index = 0; index < 8; index += 1) {
+        const angle = index * Math.PI / 4;
+        fractalContext.beginPath();
+        fractalContext.moveTo(Math.cos(angle) * size * .64, Math.sin(angle) * size * .9);
+        fractalContext.lineTo(Math.cos(angle) * size * 1.02, Math.sin(angle) * size * 1.28);
+        fractalContext.stroke();
+      }
+    } else {
+      fractalContext.beginPath();
+      polygon(size * .8, 8, Math.PI / 8);
+      polygon(size * .38, 8, Math.PI / 8);
+      fractalContext.stroke();
+    }
+    fractalContext.restore();
+  };
+
   function drawFrame(now) {
-    if (!dimensions.width || !dimensions.height) return;
+    if (!dimensions.width || !dimensions.height || !heroInView) return;
+    if (!reduceMotion && now - lastFrame < frameInterval) {
+      animationId = requestAnimationFrame(drawFrame);
+      return;
+    }
+    lastFrame = now;
     const time = reduceMotion ? 0 : (now - startedAt) / 1000;
     const growth = reduceMotion ? 1 : Math.min(1, Math.max(0, (now - startedAt) / 1400));
+    const transition = reduceMotion ? 1 : Math.min(1, (now - glyphTransitionStart) / 620);
     const dark = body.classList.contains('dark');
     fractalContext.clearRect(0, 0, dimensions.width, dimensions.height);
     orbitConfig.filter((orbit) => !orbit.front).forEach((orbit) => drawOrbit(orbit, time, dark));
     drawTree(time, growth, dark);
+    drawSignatureO(previousGlyphState, 1 - transition, dark);
+    drawSignatureO(glyphState, transition, dark);
     orbitConfig.filter((orbit) => orbit.front).forEach((orbit) => drawOrbit(orbit, time, dark));
-    if (!reduceMotion && !document.hidden) {
-      animationId = requestAnimationFrame(drawFrame);
-    } else {
-      animationActive = false;
-    }
+    if (!reduceMotion && !document.hidden && heroInView) animationId = requestAnimationFrame(drawFrame);
+    else animationActive = false;
   }
 
   const startHeroAnimation = () => {
-    if (reduceMotion || animationActive) return;
+    if (reduceMotion || animationActive || !heroInView) return;
     animationActive = true;
     animationId = requestAnimationFrame(drawFrame);
   };
 
   const updateGlyph = () => {
+    previousGlyphState = glyphState;
+    glyphTransitionStart = performance.now();
     signatureGlyph.dataset.state = String(glyphState);
-    signatureGlyph.setAttribute('aria-label', `Change the central O signature. Current style: ${glyphNames[glyphState]}.`);
-    if (glyphLetter) glyphLetter.textContent = 'O';
+    signatureGlyph.setAttribute('aria-label', `Change the central O signature. Current style: ${glyphNames[glyphState]}. The O is drawn as part of the fractal tree.`);
+    buildFractal();
     if (reduceMotion) drawFrame(performance.now());
+    else startHeroAnimation();
   };
 
   const advanceGlyph = () => {
@@ -445,19 +524,24 @@ if (heroVisual && fractalCanvas && fractalContext) {
   startHeroAnimation();
   window.addEventListener('resize', resizeFractal, { passive: true });
   if ('ResizeObserver' in window) new ResizeObserver(resizeFractal).observe(heroVisual);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      heroInView = entries[0]?.isIntersecting ?? true;
+      if (!heroInView && animationId) {
+        cancelAnimationFrame(animationId);
+        animationActive = false;
+      } else {
+        startHeroAnimation();
+      }
+    }, { threshold: .05 }).observe(heroVisual);
+  }
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       if (animationId) cancelAnimationFrame(animationId);
       animationActive = false;
-    } else {
-      startHeroAnimation();
-    }
+    } else startHeroAnimation();
   });
-
-  heroVisual.addEventListener('pointerenter', () => {
-    heroVisual.classList.add('is-hovered');
-    pointer.intensity = 1;
-  });
+  heroVisual.addEventListener('pointerenter', () => heroVisual.classList.add('is-hovered'));
   heroVisual.addEventListener('pointermove', (event) => {
     const rect = heroVisual.getBoundingClientRect();
     pointer.x = (event.clientX - rect.left) / rect.width - .5;
@@ -468,7 +552,6 @@ if (heroVisual && fractalCanvas && fractalContext) {
     heroVisual.classList.remove('is-hovered');
     pointer.x = 0;
     pointer.y = 0;
-    pointer.intensity = 0;
     if (reduceMotion) drawFrame(performance.now());
   });
   signatureGlyph?.addEventListener('click', advanceGlyph);
@@ -479,3 +562,9 @@ if (heroVisual && fractalCanvas && fractalContext) {
     }
   });
 }
+
+
+/* Keep the canvas palette in sync with the existing light/dark toggle. */
+themeToggle?.addEventListener('click', () => {
+  if (reduceMotion) window.requestAnimationFrame(() => document.querySelector('#fractalCanvas') && window.dispatchEvent(new Event('resize')));
+});

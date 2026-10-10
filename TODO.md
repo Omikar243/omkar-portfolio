@@ -14,3 +14,5 @@
 - [x] Add a dark/light mode toggle with coordinated Renaissance-inspired themes.
 - [x] Add an interactive particle background, scroll progress indicator, and visible crumbling-ball loading animation with orbiting dust ring.
 - [x] Replace only the hero’s right-side planet/orb with a procedurally generated Canvas 2D fractal tree, four time-based elliptical orbital paths with moving particles, pointer response, restrained growth animation, reduced-motion behavior, and a keyboard/touch-accessible central O with five visual states.
+- [x] Draw the O directly into the fractal tree canvas instead of using a separate image-like orb; make tree geometry and O geometry shift across all five signatures, including a square-edged state.
+- [x] Add the O mark as an SVG favicon and apple-touch icon, synchronize canvas colors with light/dark mode, and reduce mobile canvas cost with capped pixel ratio, lower branch depth, 30fps gating, and visibility pausing.

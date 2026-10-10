@@ -50,3 +50,16 @@
 @media(prefers-reduced-motion:reduce){.hero-visual-glow,.signature-glyph,.signature-glyph:before,.signature-glyph:after,.glyph-letter,.glyph-core{transition:none}.hero-visual-shell.is-hovered .hero-visual-glow{transform:none}}
 
 @media(max-width:640px){.glyph-hint{bottom:7%}.hero-visual-shell .art-caption{bottom:-1%;right:-1%;font-size:7px;gap:7px}.hero-visual-shell .art-caption span:first-child{font-size:15px}}
+
+/* The O is now painted into the fractal canvas, not rendered as a separate orb. */
+.signature-glyph{background:transparent!important;border:0;box-shadow:none!important;width:clamp(126px,18vw,188px);color:transparent}
+.signature-glyph:before,.signature-glyph:after,.glyph-sheen,.glyph-core{display:none}
+.signature-glyph:hover,.signature-glyph:focus-visible,.hero-visual-shell.is-hovered .signature-glyph{transform:translate(-50%,-50%) scale(1.04);background:transparent!important;box-shadow:none!important}
+.signature-glyph:focus-visible{outline:2px solid var(--gold-light);outline-offset:8px}
+.glyph-letter{opacity:0;color:transparent;text-shadow:none;font-size:1px!important;pointer-events:none}
+.hero-visual-glow{inset:30%;opacity:.38;filter:blur(20px)}
+body.dark .hero-visual-glow{background:radial-gradient(circle,rgba(209,171,112,.16),rgba(185,137,77,.04) 42%,transparent 74%);opacity:.62}
+.hero-visual-shell.is-hovered .hero-visual-glow{opacity:.7}
+@media(max-width:640px){.signature-glyph{width:clamp(116px,34vw,150px)}.hero-visual-glow{inset:28%}}
+
+.signature-glyph{touch-action:manipulation;-webkit-tap-highlight-color:transparent}

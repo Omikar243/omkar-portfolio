@@ -141,7 +141,7 @@
       <p class="orbit-kicker">PLAYGROUND / EXPERIMENT 01</p>
       <h2 class="orbit-title" id="signal-orbit-title">SIGNAL <span>//</span> ORBIT</h2>
     </div>
-    <p class="orbit-deck">Experiments in motion, physics &amp; interaction. Keep the signal alive for 90 seconds.</p>
+    <p class="orbit-deck">Experiments in motion, physics &amp; interaction. Collect power-ups as the field levels up. Keep the signal alive for 90 seconds.</p>
   </header>
   <div class="orbit-stage">
     <div class="orbit-canvas-shell">
@@ -157,6 +157,7 @@
       <div class="orbit-stat"><span class="orbit-stat-label">combo</span><strong class="orbit-stat-value" data-orbit-combo>×0</strong></div>
       <div class="orbit-stat"><span class="orbit-stat-label">lives</span><strong class="orbit-stat-value" data-orbit-lives aria-label="3 lives">●●●</strong></div>
       <div class="orbit-stat"><span class="orbit-stat-label">window / level</span><strong class="orbit-stat-value"><span data-orbit-timer>90s</span> · <span data-orbit-level>01</span></strong></div>
+      <div class="orbit-powerup-status" data-orbit-powerup aria-live="polite"><span class="orbit-stat-label">power-up</span><strong>none</strong></div>
     </div>
     <div class="orbit-controls">
       <div class="orbit-button-row">
@@ -164,8 +165,14 @@
         <button class="orbit-button" data-orbit-pause type="button" disabled>pause</button>
         <button class="orbit-button" data-orbit-restart type="button">restart</button>
         <button class="orbit-button" data-orbit-sound type="button" aria-pressed="false">sound off</button>
+        <div class="orbit-theme-picker" role="group" aria-label="Orbit visual theme">
+          <span>field</span>
+          <button class="orbit-theme-button is-active" data-orbit-theme="ember" type="button" aria-pressed="true">ember</button>
+          <button class="orbit-theme-button" data-orbit-theme="moon" type="button" aria-pressed="false">moon</button>
+          <button class="orbit-theme-button" data-orbit-theme="verdigris" type="button" aria-pressed="false">verdigris</button>
+        </div>
       </div>
-      <details class="orbit-howto"><summary>how to play</summary><p><strong>Move:</strong> arrows / WASD, or aim with pointer or touch. <strong>Collect:</strong> ivory dots to build a combo. <strong>Avoid:</strong> rust-red unstable nodes. You have three lives; the signal window closes after 90 seconds.</p></details>
+      <details class="orbit-howto"><summary>how to play</summary><p><strong>Move:</strong> arrows / WASD, or aim with pointer or touch. <strong>Collect:</strong> ivory dots to build a combo. <strong>Power-ups:</strong> shield, magnet, slow-field and overdrive appear as you level up. <strong>Avoid:</strong> unstable nodes. You have three lives; the signal window closes after 90 seconds.</p></details>
     </div>
   </div>
   <footer class="orbit-footer"><span>procedural field · no assets · no autoplay</span><a data-orbit-source href="https://github.com/Omikar243/omkar-portfolio" target="_blank" rel="noreferrer">view source ↗</a></footer>

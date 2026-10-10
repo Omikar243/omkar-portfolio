@@ -14,6 +14,12 @@ const MAX_DPR = 2;
 const SOURCE_URL = 'https://github.com/Omikar243/omkar-portfolio';
 const BEST_KEY = 'signal-orbit-best';
 const TAU = Math.PI * 2;
+const THEMES = {
+  ember: { ink: '#f3eadc', soft: '#cdbda8', gold: '#d1ab70', bronze: '#9b7042', red: '#bd6c53', redLight: '#e4a07a', bg: ['#38281d', '#211813', '#120e0b'], line: 'rgba(209,171,112,.28)', player: '#fff0c2' },
+  moon: { ink: '#e7eef2', soft: '#aebdca', gold: '#9fc4d5', bronze: '#65899b', red: '#c77d86', redLight: '#efb0a9', bg: ['#263746', '#172632', '#0b121a'], line: 'rgba(159,196,213,.3)', player: '#e8f7ff' },
+  verdigris: { ink: '#e7efe4', soft: '#b4c6b0', gold: '#a9c59d', bronze: '#638b76', red: '#c48a66', redLight: '#edbd8b', bg: ['#26382f', '#17251f', '#0b1511'], line: 'rgba(169,197,157,.3)', player: '#efffe9' },
+};
+const POWERUP_LABELS = { shield: 'shield', magnet: 'magnet', slow: 'slow-field', boost: 'overdrive' };
 
 const readBest = () => {
   try { return Math.max(0, Number(window.localStorage.getItem(BEST_KEY)) || 0); } catch { return 0; }
@@ -32,6 +38,8 @@ export const initOrbitGame = (element) => {
   const pauseButton = element.querySelector('[data-orbit-pause]');
   const restartButton = element.querySelector('[data-orbit-restart]');
   const soundButton = element.querySelector('[data-orbit-sound]');
+  const themeButtons = [...element.querySelectorAll('[data-orbit-theme]')];
+  const powerupLabel = element.querySelector('[data-orbit-powerup] strong');
   const stateLabel = element.querySelector('[data-orbit-state]');
   const scoreLabel = element.querySelector('[data-orbit-score]');
   const bestLabel = element.querySelector('[data-orbit-best]');
@@ -71,7 +79,26 @@ export const initOrbitGame = (element) => {
   let audioContext = null;
   let soundEnabled = false;
   let lastSoundLevel = 1;
+  let themeName = 'ember';
+  let theme = THEMES[themeName];
 
+  const applyTheme = (name) => {
+    if (!THEMES[name]) return;
+    themeName = name;
+    theme = THEMES[name];
+    element.style.setProperty('--orbit-ink', theme.ink);
+    element.style.setProperty('--orbit-soft', theme.soft);
+    element.style.setProperty('--orbit-gold', theme.gold);
+    element.style.setProperty('--orbit-bronze', theme.bronze);
+    element.style.setProperty('--orbit-red', theme.red);
+    element.style.setProperty('--orbit-red-light', theme.redLight);
+    themeButtons.forEach((button) => {
+      const active = button.dataset.orbitTheme === themeName;
+      button.classList.toggle('is-active', active);
+      button.setAttribute('aria-pressed', String(active));
+    });
+    announce(`${name} visual field selected.`);
+  };
   const announce = (message) => {
     if (liveRegion) liveRegion.textContent = message;
   };
@@ -101,6 +128,10 @@ export const initOrbitGame = (element) => {
     if (livesLabel) livesLabel.textContent = '●'.repeat(summary.lives) + '○'.repeat(state.maxLives - summary.lives);
     if (levelLabel) levelLabel.textContent = String(summary.level).padStart(2, '0');
     if (timerLabel) timerLabel.textContent = `${Math.ceil(summary.remaining)}s`;
+    if (powerupLabel) {
+      const active = Object.entries(summary.effects).find(([, seconds]) => seconds > 0);
+      powerupLabel.textContent = active ? `${POWERUP_LABELS[active[0]]} · ${active[1].toFixed(1)}s` : (summary.powerups.length ? `${POWERUP_LABELS[summary.powerups[0].type]} ready` : 'none');
+    }
     if (pauseButton) {
       pauseButton.disabled = state.status === 'idle' || state.status === 'gameover';
       pauseButton.textContent = state.status === 'paused' ? 'resume' : 'pause';
@@ -179,6 +210,11 @@ export const initOrbitGame = (element) => {
     } else if (name === 'hit') {
       playTone({ frequency: 180, slideTo: 74, duration: .24, type: 'sawtooth', volume: .045 });
       playTone({ frequency: 92, slideTo: 48, duration: .28, type: 'triangle', volume: .025, delay: .035 });
+    } else if (name === 'powerup') {
+      playTone({ frequency: 660, duration: .1, volume: .024 });
+      playTone({ frequency: 990, duration: .18, volume: .026, delay: .08 });
+    } else if (name === 'shield') {
+      playTone({ frequency: 120, slideTo: 420, duration: .22, type: 'square', volume: .025 });
     } else if (name === 'gameover') {
       playTone({ frequency: 330, slideTo: 196, duration: .24, type: 'triangle', volume: .03 });
       playTone({ frequency: 247, slideTo: 147, duration: .3, type: 'triangle', volume: .026, delay: .18 });
@@ -204,6 +240,9 @@ export const initOrbitGame = (element) => {
         announce(`Collected. ${event.points} points. Combo times ${event.combo}.`);
         if (state.level > lastSoundLevel) { playSound('level', event); lastSoundLevel = state.level; }
       }
+      if (event.type === 'level_up') announce(`Level ${event.level}. ${POWERUP_LABELS[event.powerup]} power-up deployed.`);
+      if (event.type === 'powerup') { announce(`${POWERUP_LABELS[event.powerup]} activated for ${event.duration} seconds.`); playSound('powerup'); }
+      if (event.type === 'shield_break') { announce('Shield absorbed the hull hit.'); playSound('shield'); }
       if (event.type === 'hit') announce(`Hull hit. ${event.lives} lives remaining.`);
       if (event.type === 'gameover') {
         if (state.score > state.best) { state.best = state.score; writeBest(state.best); }
@@ -229,23 +268,23 @@ export const initOrbitGame = (element) => {
     context.rotate(orbital.rotation + Math.sin(time * 0.22 + orbital.phase) * 0.025);
     context.beginPath();
     context.ellipse(0, 0, orbital.rx, orbital.ry, 0, 0, TAU);
-    context.strokeStyle = `rgba(203, 163, 99, ${alpha})`;
+    context.strokeStyle = theme.line;
     context.lineWidth = 0.8;
     context.stroke();
     context.restore();
   };
   const draw = (time) => {
     const gradient = context.createRadialGradient(width * 0.5, height * 0.48, 4, width * 0.5, height * 0.5, Math.max(width, height) * 0.75);
-    gradient.addColorStop(0, '#38281d');
-    gradient.addColorStop(0.55, '#211813');
-    gradient.addColorStop(1, '#120e0b');
+    gradient.addColorStop(0, theme.bg[0]);
+    gradient.addColorStop(0.55, theme.bg[1]);
+    gradient.addColorStop(1, theme.bg[2]);
     context.fillStyle = gradient;
     context.fillRect(0, 0, width, height);
     context.save();
     stars.forEach((star, index) => {
       const drift = reducedMotion ? 0 : Math.sin(time * 0.00015 + index) * 2;
       context.globalAlpha = star.alpha;
-      context.fillStyle = index % 4 === 0 ? '#d7b77b' : '#b79873';
+      context.fillStyle = index % 4 === 0 ? theme.gold : theme.soft;
       context.beginPath();
       context.arc(star.x * width + drift, star.y * height, star.radius, 0, TAU);
       context.fill();
@@ -253,9 +292,9 @@ export const initOrbitGame = (element) => {
     context.restore();
     const seconds = reducedMotion ? 0 : time / 1000;
     state.orbitals.forEach((orbital, index) => drawPath(orbital, seconds, 0.35 + index * 0.08 + Math.min(state.combo,8)*.018));
-    waves.forEach(wave=>{context.beginPath();context.arc(wave.x,wave.y,wave.radius,0,TAU);context.strokeStyle=`rgba(230,200,143,${Math.max(0,wave.life)*.45})`;context.lineWidth=1;context.stroke();});
+    waves.forEach(wave=>{context.beginPath();context.arc(wave.x,wave.y,wave.radius,0,TAU);context.strokeStyle=theme.line;context.lineWidth=1;context.stroke();});
     context.save();
-    context.strokeStyle = 'rgba(189, 141, 83, .18)';
+    context.strokeStyle = theme.line;
     context.lineWidth = 0.6;
     context.setLineDash([2, 8]);
     context.beginPath();
@@ -267,28 +306,49 @@ export const initOrbitGame = (element) => {
       if (!pickup.active) return;
       const pulse = reducedMotion ? 1 : 1 + Math.sin(pickup.pulse) * 0.18;
       context.save();
-      context.shadowColor = '#e6c88f';
+      context.shadowColor = theme.gold;
       context.shadowBlur = reducedMotion ? 0 : 13;
-      context.fillStyle = '#e6c88f';
+      context.fillStyle = theme.gold;
       context.beginPath();
       context.arc(pickup.x, pickup.y, pickup.radius * pulse, 0, TAU);
       context.fill();
       context.shadowBlur = 0;
-      context.strokeStyle = 'rgba(255,243,207,.75)';
+      context.strokeStyle = theme.ink;
       context.lineWidth = 1;
       context.beginPath();
       context.arc(pickup.x, pickup.y, pickup.radius * 2.05, 0, TAU);
       context.stroke();
       context.restore();
     });
+    state.powerups.forEach((powerup) => {
+      if (!powerup.active) return;
+      const color = powerup.type === 'shield' ? theme.gold : powerup.type === 'magnet' ? theme.bronze : powerup.type === 'slow' ? theme.soft : theme.ink;
+      const pulse = reducedMotion ? 1 : 1 + Math.sin(powerup.pulse) * .16;
+      context.save();
+      context.translate(powerup.x, powerup.y);
+      context.rotate(powerup.pulse * .25);
+      context.shadowColor = color;
+      context.shadowBlur = reducedMotion ? 0 : 12;
+      context.fillStyle = color;
+      context.strokeStyle = theme.ink;
+      context.lineWidth = 1;
+      context.beginPath();
+      context.moveTo(0, -powerup.radius * pulse);
+      context.lineTo(powerup.radius * pulse, 0);
+      context.lineTo(0, powerup.radius * pulse);
+      context.lineTo(-powerup.radius * pulse, 0);
+      context.closePath();
+      context.fill(); context.stroke();
+      context.restore();
+    });
     state.hazards.forEach((hazard) => {
       context.save();
       context.translate(hazard.x, hazard.y);
       context.rotate(seconds * hazard.speed + hazard.phase);
-      context.shadowColor = '#a84f3e';
+      context.shadowColor = theme.red;
       context.shadowBlur = reducedMotion ? 0 : 10;
-      context.fillStyle = '#a84f3e';
-      context.strokeStyle = '#e4a07a';
+      context.fillStyle = theme.red;
+      context.strokeStyle = theme.redLight;
       context.lineWidth = 1;
       context.beginPath();
       for (let index = 0; index < 8; index += 1) {
@@ -306,7 +366,7 @@ export const initOrbitGame = (element) => {
     if (!reducedMotion && state.status === 'playing') {
       context.save();
       context.globalAlpha = 0.16;
-      context.strokeStyle = '#e6c88f';
+      context.strokeStyle = theme.gold;
       context.lineWidth = 8;
       context.beginPath();
       context.moveTo(state.player.x - state.player.vx * 0.045, state.player.y - state.player.vy * 0.045);
@@ -332,7 +392,7 @@ export const initOrbitGame = (element) => {
     context.fill();
     context.shadowColor = '#f2d39a';
     context.shadowBlur = reducedMotion ? 0 : 18;
-    context.fillStyle = state.player.hitCooldown > 0 ? '#f0b29b' : '#fff0c2';
+    context.fillStyle = state.player.hitCooldown > 0 ? theme.redLight : theme.player;
     context.beginPath();
     context.arc(state.player.x, state.player.y, state.player.radius, 0, TAU);
     context.fill();
@@ -400,6 +460,7 @@ export const initOrbitGame = (element) => {
     setOrbitAim(state, { x: event.clientX - rect.left, y: event.clientY - rect.top });
   };
 
+  themeButtons.forEach((button) => button.addEventListener('click', () => applyTheme(button.dataset.orbitTheme), { signal }));
   startButton?.addEventListener('click', start, { signal });
   pauseButton?.addEventListener('click', togglePause, { signal });
   restartButton?.addEventListener('click', restart, { signal });
@@ -441,6 +502,7 @@ export const initOrbitGame = (element) => {
   }, { threshold: 0.08 }) : null;
   intersectionObserver?.observe(element);
   element.querySelector('[data-orbit-source]')?.setAttribute('href', SOURCE_URL);
+  applyTheme(themeName);
   resize();
   updateUI();
   draw(0);

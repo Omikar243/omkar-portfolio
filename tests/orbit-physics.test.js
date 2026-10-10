@@ -136,3 +136,38 @@ test('keyboard steering takes priority over stale pointer aim', () => {
   advanceOrbit(state, .15, { right: true });
   assert.ok(state.player.vx > 0);
 });
+
+test('leveling up deploys a deterministic power-up and collecting it activates the effect', () => {
+  const state = createOrbitState({ width: 600, height: 400, seed: 22 });
+  startOrbit(state);
+  state.score = 488;
+  const pickup = state.pickups.find((item) => item.active);
+  state.player.x = pickup.x;
+  state.player.y = pickup.y;
+  const events = advanceOrbit(state, 1 / 60);
+  assert.equal(state.level, 2);
+  assert.ok(events.some((event) => event.type === 'level_up' && event.powerup === 'shield'));
+  const powerup = state.powerups.find((item) => item.active);
+  assert.ok(powerup);
+  state.player.x = powerup.x;
+  state.player.y = powerup.y;
+  const powerEvents = advanceOrbit(state, 1 / 60);
+  assert.ok(powerEvents.some((event) => event.type === 'powerup' && event.powerup === 'shield'));
+  assert.ok(state.effects.shield > 0);
+});
+test('shield absorbs one hazard hit without consuming a life', () => {
+  const state = createOrbitState({ width: 600, height: 400, seed: 23 });
+  startOrbit(state);
+  state.effects.shield = 8;
+  const hazard = state.hazards[0];
+  hazard.orbitRadius = 0;
+  hazard.angle = 0;
+  hazard.phase = 0;
+  state.player.x = state.orbitals[0].cx;
+  state.player.y = state.orbitals[0].cy;
+  const lives = state.lives;
+  const events = advanceOrbit(state, 1 / 60);
+  assert.equal(state.lives, lives);
+  assert.equal(state.effects.shield, 0);
+  assert.ok(events.some((event) => event.type === 'shield_break'));
+});

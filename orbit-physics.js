@@ -32,6 +32,8 @@ const makeOrbitalNetwork = (width, height) => {
   ];
 };
 
+const POWERUP_TYPES = ['shield', 'magnet', 'slow', 'boost'];
+const POWERUP_DURATION = { shield: 8, magnet: 8, slow: 6, boost: 6 };
 const safePoint = (state, random, index, hazard = false) => {
   const margin = 38;
   const width = state.bounds.width;
@@ -51,6 +53,7 @@ const buildField = (state) => {
     const point = safePoint(state, random, index);
     return { id: index, x: point.x, y: point.y, radius: 6, active: true, pulse: random() * TAU };
   });
+  state.powerups = [];
   state.hazards = Array.from({ length: hazardCount }, (_, index) => {
     const point = safePoint(state, random, index + 4, true);
     return {
@@ -86,6 +89,8 @@ const createOrbitState = ({ width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT, seed
     hazards: [],
     orbitals: [],
     respawnQueue: [],
+    powerups: [],
+    effects: { shield: 0, magnet: 0, slow: 0, boost: 0 },
     spawnClock: 0,
     lastEvent: null,
   };
@@ -112,6 +117,8 @@ const resetOrbitState = (state, { width = state.bounds.width, height = state.bou
   state.orbitals = makeOrbitalNetwork(state.bounds.width, state.bounds.height);
   state.baseOrbitals = makeOrbitalNetwork(state.bounds.width, state.bounds.height);
   state.respawnQueue = [];
+  state.powerups = [];
+  state.effects = { shield: 0, magnet: 0, slow: 0, boost: 0 };
   state.spawnClock = 0;
   state.lastEvent = null;
   state.aim = null;
@@ -133,6 +140,7 @@ const setOrbitBounds = (state, width, height) => {
   state.player.y *= sy;
   state.pickups.forEach((pickup) => { pickup.x *= sx; pickup.y *= sy; });
   state.hazards.forEach((hazard) => { hazard.x *= sx; hazard.y *= sy; hazard.orbitRadius *= Math.min(nextWidth,nextHeight)/Math.min(oldWidth,oldHeight); });
+  state.powerups.forEach((powerup) => { powerup.x *= sx; powerup.y *= sy; });
   if (state.aim) { state.aim.x *= sx; state.aim.y *= sy; }
   state.orbitals = makeOrbitalNetwork(nextWidth, nextHeight);
   state.baseOrbitals = makeOrbitalNetwork(nextWidth, nextHeight);
@@ -174,6 +182,14 @@ const setOrbitAim = (state, aim) => {
 
 const emit = (events, type, payload = {}) => events.push({ type, ...payload });
 
+const spawnPowerup = (state, level) => {
+  const random = seeded((state.seed + level * 1877 + state.score * 3) | 0);
+  const point = safePoint(state, random, level + 12);
+  const type = POWERUP_TYPES[(level - 2) % POWERUP_TYPES.length];
+  const powerup = { id: level, type, x: point.x, y: point.y, radius: 8, pulse: random() * TAU, active: true };
+  state.powerups.push(powerup);
+  return powerup;
+};
 const respawnPickup = (state, pickup, index) => {
   const random = seeded((state.seed + state.score + state.elapsed * 1000 + index * 991) | 0);
   const point = safePoint(state, random, index + state.level);
@@ -188,6 +204,8 @@ const updateSubstep = (state, dt, input, events) => {
   state.elapsed += dt;
   state.spawnClock += dt;
   state.lastEvent = null;
+  Object.keys(state.effects).forEach((key) => { state.effects[key] = Math.max(0, state.effects[key] - dt); });
+  state.powerups.forEach((powerup) => { powerup.pulse += dt * 1.8; });
   player.hitCooldown = Math.max(0, player.hitCooldown - dt);
 
   const left = Boolean(input.left || input.a);
@@ -217,13 +235,14 @@ const updateSubstep = (state, dt, input, events) => {
     orbital.rotation += (base.rotation + Math.sin(state.elapsed*.15 + index)*.05 + Math.min(state.combo,8)*.015-orbital.rotation)*respond;
   });
   const acceleration = 390 + state.level * 18;
-  player.vx += ax * acceleration * dt;
-  player.vy += ay * acceleration * dt;
+  const boost = state.effects.boost > 0 ? 1.25 : 1;
+  player.vx += ax * acceleration * boost * dt;
+  player.vy += ay * acceleration * boost * dt;
   const damping = Math.pow(0.82, dt);
   player.vx *= damping;
   player.vy *= damping;
   const speed = Math.hypot(player.vx, player.vy);
-  const maxSpeed = 245 + state.level * 18;
+  const maxSpeed = (245 + state.level * 18) * (state.effects.boost > 0 ? 1.15 : 1);
   if (speed > maxSpeed) {
     player.vx = (player.vx / speed) * maxSpeed;
     player.vy = (player.vy / speed) * maxSpeed;
@@ -236,7 +255,7 @@ const updateSubstep = (state, dt, input, events) => {
   if (player.y > bounds.height - player.radius) { player.y = bounds.height - player.radius; player.vy = -Math.abs(player.vy) * 0.68; }
 
   state.hazards.forEach((hazard) => {
-    hazard.angle += hazard.speed * (1 + state.level * 0.055) * dt;
+    hazard.angle += hazard.speed * (1 + state.level * 0.055) * (state.effects.slow > 0 ? .46 : 1) * dt;
     const target = state.orbitals[hazard.id % state.orbitals.length];
     hazard.orbitRadius = Math.min(hazard.orbitRadius,Math.min(bounds.width,bounds.height)*.38);
     const wobble = Math.sin(state.elapsed * 1.1 + hazard.phase) * 12;
@@ -247,6 +266,11 @@ const updateSubstep = (state, dt, input, events) => {
       player.hitCooldown = 1.25;
       player.vx *= -0.58;
       player.vy *= -0.58;
+      if (state.effects.shield > 0) {
+        state.effects.shield = 0;
+        emit(events, 'shield_break', { x: player.x, y: player.y });
+        return;
+      }
       state.lives -= 1;
       state.combo = 0;
       state.comboTimer = 0;
@@ -263,7 +287,7 @@ const updateSubstep = (state, dt, input, events) => {
   state.pickups.forEach((pickup, index) => {
     if (!pickup.active) return;
     pickup.pulse += dt * (1.5 + state.level * 0.08);
-    const collectDistance = player.radius + pickup.radius + 3;
+    const collectDistance = (player.radius + pickup.radius + 3) * (state.effects.magnet > 0 ? 2.25 : 1);
     if (distanceSquared(player, pickup) < collectDistance * collectDistance) {
       pickup.active = false;
       state.combo = state.comboTimer > 0 ? state.combo + 1 : 1;
@@ -271,7 +295,13 @@ const updateSubstep = (state, dt, input, events) => {
       const multiplier = 1 + Math.min(4, state.combo - 1) * 0.25;
       const points = Math.round((100 + state.level * 12) * multiplier);
       state.score += points;
+      const previousLevel = state.level;
       state.level = Math.min(12, 1 + Math.floor(state.score / 500));
+      if (state.level > previousLevel) {
+        const powerup = spawnPowerup(state, state.level);
+        emit(events, 'level_up', { level: state.level, powerup: powerup.type });
+        emit(events, 'powerup_spawn', { powerup: powerup.type, x: powerup.x, y: powerup.y });
+      }
       const route = Math.floor(state.elapsed/20);
       if (route > state.highestRoute) {
         state.highestRoute=route;
@@ -284,6 +314,15 @@ const updateSubstep = (state, dt, input, events) => {
     }
   });
 
+  state.powerups.forEach((powerup) => {
+    if (!powerup.active) return;
+    const distance = player.radius + powerup.radius + 4;
+    if (distanceSquared(player, powerup) < distance * distance) {
+      powerup.active = false;
+      state.effects[powerup.type] = POWERUP_DURATION[powerup.type];
+      emit(events, 'powerup', { powerup: powerup.type, duration: POWERUP_DURATION[powerup.type], x: player.x, y: player.y });
+    }
+  });
   if (state.comboTimer > 0) {
     state.comboTimer = Math.max(0, state.comboTimer - dt);
     if (state.comboTimer === 0) state.combo = 0;
@@ -321,6 +360,8 @@ const getOrbitSummary = (state) => ({
   combo: state.combo,
   lives: state.lives,
   level: state.level,
+  effects: { ...state.effects },
+  powerups: state.powerups.filter((powerup) => powerup.active).map(({ type, x, y }) => ({ type, x, y })),
   remaining: Math.max(0, 90 - state.elapsed),
 });
 

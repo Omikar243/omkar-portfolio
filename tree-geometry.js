@@ -1,11 +1,11 @@
 // Fixed topology: the O is a bifurcation of the trunk, not an added ring.
 // Nodes are shared by every adjoining edge, including during delayed morphs.
 export const TREE_PROFILES = [
-  { name: 'rounded growth', spread: .48, length: .13, ratio: .69, curvature: .16, lean: -.025, loopWidth: .067, loopHeight: .172, square: 0, crown: 0 },
-  { name: 'squared growth', spread: .64, length: .126, ratio: .67, curvature: .015, lean: .018, loopWidth: .075, loopHeight: .153, square: .9, crown: -.035 },
-  { name: 'wide asymmetric growth', spread: .64, length: .147, ratio: .66, curvature: .2, lean: -.052, loopWidth: .087, loopHeight: .162, square: .1, crown: .008 },
-  { name: 'botanical growth', spread: .38, length: .145, ratio: .69, curvature: .24, lean: .036, loopWidth: .06, loopHeight: .186, square: 0, crown: -.025 },
-  { name: 'compact geometric growth', spread: .62, length: .109, ratio: .68, curvature: .04, lean: -.01, loopWidth: .066, loopHeight: .143, square: .98, crown: -.004 },
+  { name: 'rounded growth', spread: .48, length: .13, ratio: .69, curvature: .16, lean: -.04, tilt: -.018, loopWidth: .067, loopHeight: .182, square: 0, crown: 0 },
+  { name: 'squared growth', spread: .64, length: .126, ratio: .67, curvature: .015, lean: .05, tilt: .026, loopWidth: .078, loopHeight: .151, square: .96, crown: -.035 },
+  { name: 'wide asymmetric growth', spread: .64, length: .147, ratio: .66, curvature: .2, lean: -.06, tilt: -.025, loopWidth: .086, loopHeight: .166, square: .1, crown: .008 },
+  { name: 'botanical growth', spread: .38, length: .145, ratio: .69, curvature: .24, lean: .06, tilt: .03, loopWidth: .06, loopHeight: .19, square: 0, crown: -.025 },
+  { name: 'compact geometric growth', spread: .62, length: .109, ratio: .68, curvature: .04, lean: -.06, tilt: -.027, loopWidth: .072, loopHeight: .143, square: .98, crown: -.004 },
 ];
 
 const lerp = (a, b, t) => t === 0 ? a : t === 1 ? b : a + (b - a) * t;
@@ -47,11 +47,12 @@ export function buildTree(state = 0, depth = 7) {
   const shoulder = lerp(.22, .16, p.square);
   const root = node(centerX, .832, 0);
   const split = node(centerX - p.lean * .12, bottomY, 1);
-  const leftLower = node(centerX - p.loopWidth, bottomY - p.loopHeight * shoulder, 2);
-  const leftUpper = node(centerX - p.loopWidth * (.99 - p.lean * .25), topY + p.loopHeight * shoulder, 2);
-  const reunion = node(centerX + p.lean * .12, topY, 1);
-  const rightUpper = node(centerX + p.loopWidth * (1 + p.lean * .16), topY + p.loopHeight * shoulder, 2);
-  const rightLower = node(centerX + p.loopWidth * (.99 + p.lean * .2), bottomY - p.loopHeight * shoulder, 2);
+  const topCenter = centerX + p.tilt;
+  const leftLower = node(centerX - p.loopWidth + p.tilt * .2, bottomY - p.loopHeight * shoulder, 2);
+  const leftUpper = node(topCenter - p.loopWidth * (.99 - p.lean * .25), topY + p.loopHeight * shoulder, 2);
+  const reunion = node(topCenter + p.lean * .12, topY, 1);
+  const rightUpper = node(topCenter + p.loopWidth * (1 + p.lean * .16), topY + p.loopHeight * shoulder, 2);
+  const rightLower = node(centerX + p.loopWidth * (.99 + p.lean * .2) + p.tilt * .2, bottomY - p.loopHeight * shoulder, 2);
 
   const trunkWidth = .0084;
   edge(root, split, .028 + p.lean * .2, -.079, 0, .058, trunkWidth, 0);

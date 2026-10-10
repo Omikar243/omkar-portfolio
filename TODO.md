@@ -1,8 +1,8 @@
 
-## Clean O, organic-circuit canopy and roots
+## O profile variation and device-resolution smoke check
 
-- [x] Refine the shared tree graph into a cleaner intentional capital O with stable shared junctions, smooth trunk entry/exit, stronger central hierarchy, and no accidental side intersections.
-- [x] Preserve approximately 60–70% organic fractal character while using selective 45-degree circuit continuations and circular pads toward outer canopy and root endpoints; keep orbit paths, particles, themes, interactions and responsive behavior intact.
-- [x] Add four connected primary roots that split into eight finer endpoints, with graceful organic curves, selected circuit terminals, asymmetric balance, negative space and mobile-safe bounds inside the existing orbit.
+- [x] Increase visible O variation through explicit shared-graph tilt and profile geometry: rounded left lean, squared right lean, wide asymmetric left lean, taller botanical right lean, and compact geometric left lean.
+- [x] Preserve shared topology, morph continuity, orbit composition, roots, themes and touch behavior while making the five center signatures visibly distinct.
+- [x] Verify touch targets, five cyclic O transitions, haptic path, leaf-sound toggle path, theme switching, no horizontal overflow and no browser errors on iPhone SE, iPhone 14, iPad mini, compact Android and large Android viewport profiles.
 
-Evidence: graph topology, node bounds, continuous morphs, desktop/mobile captures and renderer syntax checks passed.
+Evidence: geometry tests passed; visual captures show distinct forms 1–5; all five device profiles passed with 44px+ touch targets and the existing mobile interaction contract.

@@ -29,10 +29,17 @@ jobs:
         with:
           enablement: true
 
+      - name: Assemble public website only
+        run: |
+          mkdir -p site-dist
+          cp index.html *.css *.js manus-routes.json site-dist/
+          cp -R public site-dist/public
+          touch site-dist/.nojekyll
+
       - name: Upload static portfolio
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: site-dist
 
       - name: Deploy to GitHub Pages
         id: deployment

@@ -12,6 +12,7 @@
     <link rel="icon" href="public/mark.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="public/mark.svg" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="orbit-game.css" />
   </head>
   <body class="is-loading">
     <div class="loader" id="loader" aria-hidden="true">
@@ -148,6 +149,43 @@
             <div class="game-footer"><span>score <strong id="gameScore">0</strong></span><button class="text-button" id="gameReset" type="button">reset game ↻</button></div>
           </article>
         </div>
+<article class="orbit-article" data-orbit-game aria-labelledby="signal-orbit-title">
+  <header class="orbit-header">
+    <div>
+      <p class="orbit-kicker">PLAYGROUND / EXPERIMENT 01</p>
+      <h2 class="orbit-title" id="signal-orbit-title">SIGNAL <span>//</span> ORBIT</h2>
+    </div>
+    <p class="orbit-deck">Experiments in motion, physics &amp; interaction. Keep the signal alive for 90 seconds.</p>
+  </header>
+  <div class="orbit-stage">
+    <div class="orbit-canvas-shell">
+      <canvas class="orbit-canvas" data-orbit-canvas tabindex="0" role="application" aria-label="SIGNAL // ORBIT game. Use arrow keys or WASD, or aim with pointer or touch."></canvas>
+      <div class="orbit-overlay" data-orbit-overlay>
+        <div><h3 data-orbit-overlay-title>A living signal field</h3><p data-orbit-overlay-copy>Guide the gold signal through the orbitals. Collect ivory nodes; avoid the red unstable nodes.</p></div>
+      </div>
+    </div>
+    <div class="orbit-hud" aria-label="Experiment status">
+      <div class="orbit-stat"><span class="orbit-stat-label">state</span><strong class="orbit-stat-value orbit-status" data-orbit-state>idle</strong></div>
+      <div class="orbit-stat"><span class="orbit-stat-label">score</span><strong class="orbit-stat-value" data-orbit-score>0000</strong></div>
+      <div class="orbit-stat"><span class="orbit-stat-label">best</span><strong class="orbit-stat-value" data-orbit-best>0000</strong></div>
+      <div class="orbit-stat"><span class="orbit-stat-label">combo</span><strong class="orbit-stat-value" data-orbit-combo>×0</strong></div>
+      <div class="orbit-stat"><span class="orbit-stat-label">lives</span><strong class="orbit-stat-value" data-orbit-lives aria-label="3 lives">●●●</strong></div>
+      <div class="orbit-stat"><span class="orbit-stat-label">window / level</span><strong class="orbit-stat-value"><span data-orbit-timer>90s</span> · <span data-orbit-level>01</span></strong></div>
+    </div>
+    <div class="orbit-controls">
+      <div class="orbit-button-row">
+        <button class="orbit-button orbit-button-primary" data-orbit-start type="button">start experiment</button>
+        <button class="orbit-button" data-orbit-pause type="button" disabled>pause</button>
+        <button class="orbit-button" data-orbit-restart type="button">restart</button>
+        <button class="orbit-button" data-orbit-sound type="button" aria-pressed="false">sound off</button>
+      </div>
+      <details class="orbit-howto"><summary>how to play</summary><p><strong>Move:</strong> arrows / WASD, or aim with pointer or touch. <strong>Collect:</strong> ivory dots to build a combo. <strong>Avoid:</strong> rust-red unstable nodes. You have three lives; the signal window closes after 90 seconds.</p></details>
+    </div>
+  </div>
+  <footer class="orbit-footer"><span>procedural field · no assets · no autoplay</span><a data-orbit-source href="https://github.com/Omikar243/omkar-portfolio" target="_blank" rel="noreferrer">view source ↗</a></footer>
+  <p class="orbit-live-region" data-orbit-live role="status" aria-live="polite"></p>
+</article>
+
       </section>
 
       <section class="skills-section section-shell" id="skills">
@@ -161,7 +199,7 @@
 
       <section class="contact-section section-shell" id="contact">
         <div class="section-label reveal"><span>06</span><span>the invitation</span></div>
-        <div class="contact-grid"><div class="section-heading reveal"><p class="eyebrow">Contact</p><h2>Have a hard<br /><span class="script-word">problem?</span></h2><p class="heading-note">Good. Tell me what you’re building, what’s stuck, or what you can’t stop thinking about.</p><div class="contact-details"><a href="mailto:omikar243@gmail.com">omikar243@gmail.com</a><a href="https://www.linkedin.com/in/omkar-shettigar-43035737a" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/Omikar243" target="_blank" rel="noreferrer">GitHub ↗</a></div></div><form class="contact-form reveal reveal-delay-1" id="contactForm" novalidate><div class="form-row"><label><span>Your name</span><input type="text" name="name" placeholder="Jane Doe" autocomplete="name" required /></label><label><span>Your email</span><input type="email" name="email" placeholder="jane@company.com" autocomplete="email" required /></label></div><label><span>What are we solving?</span><textarea name="message" rows="5" placeholder="A model to stabilize, a product to imagine, a question to chase…" required></textarea></label><div class="form-footer"><button class="button button-primary" type="submit">Send message <span>↗</span></button><p class="form-status" id="formStatus" role="status" aria-live="polite"></p></div></form></div>
+        <div class="contact-grid"><div class="section-heading reveal"><p class="eyebrow">Contact</p><h2>Have a hard<br /><span class="script-word">problem?</span></h2><p class="heading-note">Good. Tell me what you’re building, what’s stuck, or what you can’t stop thinking about.</p><div class="contact-details"><a href="mailto:omikar243@gmail.com">omikar243@gmail.com</a><a href="https://www.linkedin.com/in/omkar-shettigar-43035737a" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/Omikar243" target="_blank" rel="noreferrer">GitHub ↗</a></div></div><form class="contact-form reveal reveal-delay-1" id="contactForm" action="https://formsubmit.co/omikar243@gmail.com" method="POST" novalidate><div class="form-row"><label><span>Your name</span><input type="text" name="name" maxlength="120" placeholder="Jane Doe" autocomplete="name" required /></label><label><span>Your email</span><input type="email" name="email" maxlength="240" placeholder="jane@company.com" autocomplete="email" required /></label></div><label><span>What are we solving?</span><textarea name="message" maxlength="5000" rows="5" placeholder="A model to stabilize, a product to imagine, a question to chase…" required></textarea></label><label class="contact-honeypot" aria-hidden="true"><span>Leave this field blank</span><input name="_honey" type="text" tabindex="-1" autocomplete="off" /></label><input type="hidden" name="_subject" value="New enquiry from my portfolio" /><input type="hidden" name="_template" value="table" /><p class="contact-delivery-note">Delivered by FormSubmit after owner activation. Include your email so I can reply. <a href="mailto:omikar243@gmail.com">Prefer email directly?</a></p><div class="form-footer"><button class="button button-primary" type="submit">Send message <span>↗</span></button><p class="form-status" id="formStatus" role="status" aria-live="polite"></p></div></form></div>
       </section>
     </main>
 

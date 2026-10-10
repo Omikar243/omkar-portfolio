@@ -1,10 +1,10 @@
 import { createServer } from 'node:http';
-import { appendFile, mkdir, readFile } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
+import { forwardContact } from './contact-delivery.js';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
-const dataDir = join(root, 'data');
 const port = Number(process.env.PORT || 3000);
 const types = {
   '.html': 'text/html; charset=utf-8',
@@ -50,25 +50,23 @@ const handler = async (req, res) => {
         sendJson(res, 400, { ok: false, message: 'Please send a name, a valid email, and a message under 5,000 characters.' });
         return;
       }
-      const record = {
-        name,
-        email,
-        message,
-        submittedAt: new Date().toISOString(),
-        userAgent: req.headers['user-agent'] || '',
-      };
-      await mkdir(dataDir, { recursive: true });
-      await appendFile(join(dataDir, 'contact-submissions.ndjson'), `${JSON.stringify(record)}\n`, 'utf8');
-      console.log(`[contact] ${name} <${email}>`);
-      sendJson(res, 201, { ok: true, message: 'Your note is in. I’ll get back to you soon.' });
+      if (String(body._honey || '').trim()) {
+        sendJson(res, 400, { ok: false, message: 'Unable to accept this submission.' });
+        return;
+      }
+      const result = await forwardContact({ name, email, message }, fetch, {
+        Origin: 'https://omkar-v-shettigar.vercel.app',
+        Referer: 'https://omkar-v-shettigar.vercel.app/',
+      });
+      sendJson(res, result.ok ? 200 : result.code === 'activation_required' ? 503 : 502, result);
     } catch (error) {
-      const status = error.message === 'payload_too_large' ? 413 : 400;
-      sendJson(res, status, { ok: false, message: status === 413 ? 'That note is too large to send.' : 'I could not read that note. Please try again.' });
+      const status = error.message === 'payload_too_large' ? 413 : error instanceof SyntaxError ? 400 : 502;
+      sendJson(res, status, { ok: false, message: status === 413 ? 'That note is too large to send.' : 'Email delivery could not be confirmed. Your note has not been marked as sent. Please try again or email omikar243@gmail.com directly.' });
     }
     return;
   }
 
-  if (pathname === '/data' || pathname.startsWith('/data/') || pathname.startsWith('/api/')) {
+  if (pathname === '/data' || pathname.startsWith('/data/') || pathname.startsWith('/api/') || pathname.split('/').some(part => part.startsWith('.')) || ['/server.mjs', '/vercel.json'].includes(pathname)) {
     sendJson(res, 404, { ok: false, message: 'Not found' });
     return;
   }

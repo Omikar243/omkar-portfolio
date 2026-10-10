@@ -19,7 +19,8 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - **Model Playground:** tune rules certainty, retrieval match, and LLM confidence to see the next decision route and confidence meter update live.
 - **Merchant Match:** a three-round P2P/P2M classification game based on transaction narration routing.
 - Downloadable original resume PDF.
-- Contact form with client validation and a live `POST api/contact` backend.
+- Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation is required.
+- **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound.
 
 ### Living fractal tree
 
@@ -38,7 +39,7 @@ The server listens on `0.0.0.0:3000` by default. Override the port with `PORT=30
 ## Backend API
 
 - `GET api/health` — readiness check.
-- `POST api/contact` — accepts `{ "name": "…", "email": "…", "message": "…" }`, validates the payload, and records accepted messages in a server-side NDJSON file under `data/`. The data directory is intentionally not exposed as a public route.
+- `POST api/contact` — accepts `{ "name": "…", "email": "…", "message": "…" }`, validates the payload, and forwards through FormSubmit. A failed or activation-required provider response is never shown as successful delivery. The website calls the provider directly from the browser so contact also works on the static Pages backup; server-side forwarding can be rejected by provider anti-abuse rules. No new messages are saved to ephemeral local files. See [contact setup](contact-setup.md) for the owner activation requirement.
 - `GET Omkar_Shettigar_Resume.pdf` — downloads the original resume with PDF content and attachment headers.
 
 ## Project structure
@@ -46,7 +47,11 @@ The server listens on `0.0.0.0:3000` by default. Override the port with `PORT=30
 ```text
 index.html                         Portfolio page and resume-grounded copy
 styles.css                         Renaissance design system and responsive layout
-app.js                             Theme, timeline, playground, game, particles, and form logic
+app.js                             Portfolio interaction and module lifecycle
+contact-delivery.js                Shared forwarding payload and response interpretation
+orbit-game.js                      Canvas arcade rendering/input/UI/lifecycle
+orbit-physics.js                   Testable delta-time physics, score and state
+orbit-game.css                     Responsive espresso-and-gold game styling
 fractal-tree.js                    Canvas timeline, input handling and lifecycle
 tree-geometry.js                   Fixed connected graph and parameter interpolation
 tests/tree-geometry.test.js        Connectivity, morph continuity and retargeting tests
@@ -65,7 +70,17 @@ manus-routes.json                  Managed Webdev route declaration
 
 ### GitHub Pages
 
-The included `pages.yml` workflow publishes the browser-only portfolio from `main` through GitHub Pages. GitHub Pages cannot execute Node or `api/contact`; use Vercel or another server-capable host for the complete live contact experience. The relative asset paths keep the visual portfolio and resume download working under the project-site path.
+The included `pages.yml` workflow publishes the browser-only portfolio from `main` through GitHub Pages. GitHub Pages cannot execute Node or `api/contact`, so the contact form uses FormSubmit directly from the browser on both hosts, after owner activation. The workflow assembles only browser assets, excluding backend files, secrets and local enquiry data. The relative asset paths keep the visual portfolio and resume download working under the project-site path.
+
+## Contact activation and checks
+
+The recipient is `omikar243@gmail.com`. Open the FormSubmit activation email sent during setup, click **Activate Form**, then send a clearly labelled test from the website. Confirm receipt in the inbox or Spam and check that Reply addresses the visitor. Provider acceptance is not a guarantee of inbox placement.
+
+```bash
+node tests/contact-delivery.test.js
+node tests/tree-geometry.test.js
+node --test tests/orbit-physics.test.js
+```
 
 ## Personalization
 

@@ -12,7 +12,11 @@
           "fractal-tree.js",
           "tree-geometry.js",
           "manus-routes.json",
-          "public/**"
+          "public/**",
+          "contact-delivery.js",
+          "orbit-game.js",
+          "orbit-physics.js",
+          "orbit-game.css"
         ]
       }
     }

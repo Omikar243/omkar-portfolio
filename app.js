@@ -1,3 +1,5 @@
+import { initOrbitGame } from './orbit-game.js';
+import { forwardContact, CONTACT_RECIPIENT } from './contact-delivery.js';
 import { initFractalTree } from './fractal-tree.js';
 
 const body = document.body;
@@ -195,15 +197,15 @@ form?.addEventListener('submit', async (event) => {
   }
   if (submitButton) submitButton.disabled = true;
   try {
-    const response = await fetch('api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.message || 'The note could not be sent.');
+    // The same email backend works from Vercel and the static GitHub Pages backup.
+    const result = await forwardContact(payload);
+    if (!result.ok) throw new Error(result.message);
     form.reset();
-    if (status) status.textContent = result.message || 'Your note is in. I’ll get back to you soon.';
+    if (status) status.textContent = result.message;
   } catch (error) {
     if (status) {
       status.style.color = '#a34f35';
-      status.textContent = error.message || 'I could not send that note. Please try again.';
+      status.textContent = error.message || `Email delivery could not be confirmed. Your text is still here. Please email ${CONTACT_RECIPIENT} directly.`;
     }
   } finally {
     if (submitButton) submitButton.disabled = false;
@@ -273,11 +275,12 @@ window.addEventListener('pointermove', (event) => {
 });
 
 
+const destroyOrbitGame = initOrbitGame(document.querySelector('[data-orbit-game]'));
 const destroyFractalTree = initFractalTree(document.querySelector('#heroVisual'), document.querySelector('#fractalCanvas'), document.querySelector('#signatureGlyph'));
 
 window.addEventListener('pagehide', (event) => {
   cancelAnimationFrame(particleFrame);
-  if (!event.persisted) destroyFractalTree();
+  if (!event.persisted) { destroyFractalTree(); destroyOrbitGame(); }
 });
 window.addEventListener('pageshow', () => {
   if (!particleFrame && !document.hidden) animateParticles();

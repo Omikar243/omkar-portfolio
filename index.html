@@ -62,7 +62,7 @@
             <canvas id="fractalCanvas" aria-hidden="true"></canvas>
             <div class="hero-visual-glow" aria-hidden="true"></div>
             <button class="signature-glyph" id="signatureGlyph" type="button" data-state="0" aria-label="Morph the fractal tree. Current form: rounded growth." aria-describedby="glyphHint"></button>
-            <div class="tree-art-controls"><button class="tree-sound-toggle" id="treeSoundToggle" type="button" aria-label="Enable gentle tree sounds" aria-pressed="false"><span aria-hidden="true">♪</span><span data-tree-sound-label>Sound off</span></button><button class="tree-theme-toggle" id="treeThemeToggle" data-theme-toggle type="button" aria-label="Switch artwork and website to dark mode" aria-pressed="false"><span aria-hidden="true">◐</span><span data-theme-label>Dark canvas</span></button></div>
+            <div class="tree-art-controls"><button class="tree-sound-toggle" id="treeSoundToggle" type="button" aria-label="Enable wind-through-leaves sound" aria-pressed="false"><span aria-hidden="true">♪</span><span data-tree-sound-label>Leaves off</span></button><button class="tree-theme-toggle" id="treeThemeToggle" data-theme-toggle type="button" aria-label="Switch artwork and website to dark mode" aria-pressed="false"><span aria-hidden="true">◐</span><span data-theme-label>Dark canvas</span></button></div>
             <span class="glyph-hint" id="glyphHint">tap the tree · form 1 / 5</span>
             <span class="sr-only" id="treeStatus" role="status" aria-live="polite"></span>
             <div class="art-caption"><span>01</span><span>signal → system</span></div>
@@ -86,10 +86,16 @@
           <div class="section-heading reveal">
             <p class="eyebrow">About me</p>
             <h2>A little <span class="script-word">curious</span>,<br />a lot <span class="underline-word">rigorous.</span></h2>
+            <figure class="about-portrait">
+              <div class="portrait-frame"><img src="public/portrait.webp" width="900" height="1200" loading="lazy" decoding="async" alt="My portrait — Omkar V Shettigar, wearing glasses and a dark striped shirt." /></div>
+              <figcaption><span>the person behind the pipelines</span><span class="portrait-signature">O. V. Shettigar</span></figcaption>
+            </figure>
           </div>
           <div class="about-body reveal reveal-delay-1">
-            <p class="lead-copy">I’m a Data Scientist and AI/ML Engineer with two years spent taking ambitious ideas out of the notebook and into the wild.</p>
-            <p>My work lives at the intersection of semantic retrieval, agentic reasoning, and the unglamorous craft of making a model dependable. At Catalysk, I build intelligence systems for sustainable finance — systems that have to be fast, explainable, and useful to people making real decisions.</p>
+            <p class="lead-copy">I’m an AI/ML engineer and data scientist from Mumbai. I build things that turn a complicated question into something people can actually use.</p>
+            <div class="about-chapter"><h3>Who I am</h3><p>I work at Catalysk, where I build AI for sustainable finance. My foundation is in Artificial Intelligence &amp; Data Science, but my approach is practical: understand the problem, question the data, and keep working until the system holds up outside a notebook.</p></div>
+            <div class="about-chapter"><h3>What I build</h3><p>I build retrieval pipelines, agentic decision systems and production ML services that connect rules, evidence and reasoning. I also like taking an idea all the way to a product: from an AI-powered fashion platform with 3D previews to a medical-imaging model with a literature-grounded assistant.</p></div>
+            <div class="about-chapter about-ambition"><h3>What I’m working toward</h3><p>My ambition is to build AI that earns its place in everyday life — useful enough to solve a real problem, transparent enough to question, and dependable enough to trust. I want to keep growing from someone who builds models into someone who builds thoughtful, end-to-end intelligent products.</p></div>
             <div class="stat-row">
               <div class="stat"><strong>6.8×</strong><span>classification<br />speedup</span></div>
               <div class="stat"><strong>300k+</strong><span>records processed<br />at scale</span></div>

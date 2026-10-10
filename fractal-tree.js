@@ -37,14 +37,50 @@ export function initFractalTree(shell, canvas, button) {
   let soundEnabled = false;
   let audio = null;
   let feedbackAt = -Infinity;
-  const notes = [196, 220, 246.94, 261.63, 293.66];
+  let feedbackSequence = 0;
+  let leafBuffer = null;
+  const rustleVoices = new Set();
+  const leafProfiles = [
+    { low: 4300, high: 480, length: .84 },
+    { low: 4900, high: 650, length: .76 },
+    { low: 3900, high: 390, length: .94 },
+    { low: 5500, high: 730, length: .88 },
+    { low: 4600, high: 560, length: .72 },
+  ];
+
+  function fadeRustles() {
+    if (!audio || audio.state === 'closed') return;
+    for (const voice of rustleVoices) {
+      try {
+        voice.gain.gain.cancelScheduledValues(audio.currentTime);
+        voice.gain.gain.setTargetAtTime(.0001, audio.currentTime, .025);
+        voice.source.stop(audio.currentTime + .1);
+      } catch { /* A completed source may already be disconnected. */ }
+    }
+  }
+
+  function makeLeaves() {
+    // A cached mono noise texture, not a pitched note or downloaded recording.
+    const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * 1.15), audio.sampleRate);
+    const samples = buffer.getChannelData(0);
+    let breeze = 0;
+    for (let i = 0; i < samples.length; i++) {
+      const time = i / audio.sampleRate;
+      const white = Math.random() * 2 - 1;
+      breeze = .985 * breeze + .015 * white;
+      const flutter = .7 + .12 * Math.sin(time * 23) + .08 * Math.sin(time * 41 + .6);
+      samples[i] = (white * .7 + breeze * 1.4) * flutter;
+    }
+    return buffer;
+  }
 
   function setSound(enabled) {
     soundEnabled = enabled;
+    if (!enabled) { feedbackSequence += 1; fadeRustles(); }
     if (!soundButton) return;
     soundButton.setAttribute('aria-pressed', String(enabled));
-    soundButton.setAttribute('aria-label', enabled ? 'Mute gentle tree sounds' : 'Enable gentle tree sounds');
-    soundButton.querySelector('[data-tree-sound-label]').textContent = enabled ? 'Sound on' : 'Sound off';
+    soundButton.setAttribute('aria-label', enabled ? 'Mute wind-through-leaves sound' : 'Enable wind-through-leaves sound');
+    soundButton.querySelector('[data-tree-sound-label]').textContent = enabled ? 'Leaves on' : 'Leaves off';
   }
 
   async function signatureFeedback(event) {
@@ -55,25 +91,50 @@ export function initFractalTree(shell, canvas, button) {
       try { navigator.vibrate(8); } catch { /* Not supported on many iOS browsers. */ }
     }
     if (!soundEnabled) return;
+    const sequence = ++feedbackSequence;
+    const tappedState = state;
     try {
       const Audio = window.AudioContext || window.webkitAudioContext;
       if (!Audio) { setSound(false); return; }
-      if (!audio || audio.state === 'closed') audio = new Audio();
+      if (!audio || audio.state === 'closed') {
+        leafBuffer = null;
+        rustleVoices.clear();
+        audio = new Audio();
+      }
       if (audio.state === 'suspended') await audio.resume();
-      if (disposed || !soundEnabled || audio.state !== 'running') return;
-      const oscillator = audio.createOscillator();
+      if (disposed || !soundEnabled || sequence !== feedbackSequence || audio.state !== 'running') return;
+      if (!leafBuffer) leafBuffer = makeLeaves();
+      fadeRustles(); // New gust fades the previous one instead of stacking volume.
+      if (rustleVoices.size >= 2) return;
+      const profile = leafProfiles[tappedState];
+      const source = audio.createBufferSource();
+      const highPass = audio.createBiquadFilter();
+      const lowPass = audio.createBiquadFilter();
       const envelope = audio.createGain();
       const now = audio.currentTime;
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(notes[state], now);
-      oscillator.frequency.exponentialRampToValueAtTime(notes[state] * .97, now + .12);
+      source.buffer = leafBuffer;
+      source.playbackRate.value = .93 + tappedState * .025;
+      highPass.type = 'highpass';
+      highPass.frequency.setValueAtTime(profile.high, now);
+      highPass.Q.value = .55;
+      lowPass.type = 'lowpass';
+      lowPass.Q.value = .45;
+      lowPass.frequency.setValueAtTime(profile.low * .62, now);
+      lowPass.frequency.linearRampToValueAtTime(profile.low, now + .22);
+      lowPass.frequency.linearRampToValueAtTime(profile.low * .7, now + profile.length);
       envelope.gain.setValueAtTime(.0001, now);
-      envelope.gain.exponentialRampToValueAtTime(.025, now + .014);
-      envelope.gain.exponentialRampToValueAtTime(.0001, now + .14);
-      oscillator.connect(envelope).connect(audio.destination);
-      oscillator.onended = () => { oscillator.disconnect(); envelope.disconnect(); };
-      oscillator.start(now);
-      oscillator.stop(now + .16);
+      envelope.gain.exponentialRampToValueAtTime(.075, now + .13);
+      envelope.gain.exponentialRampToValueAtTime(.042, now + .34);
+      envelope.gain.exponentialRampToValueAtTime(.0001, now + profile.length);
+      source.connect(highPass).connect(lowPass).connect(envelope).connect(audio.destination);
+      const voice = { source, gain: envelope };
+      rustleVoices.add(voice);
+      source.onended = () => {
+        source.disconnect(); highPass.disconnect(); lowPass.disconnect(); envelope.disconnect();
+        rustleVoices.delete(voice);
+      };
+      source.start(now, .02 * tappedState);
+      source.stop(now + profile.length + .025);
     } catch { setSound(false); }
   }
   const orbitPaths = [
@@ -312,6 +373,8 @@ export function initFractalTree(shell, canvas, button) {
     listeners.abort();
     resizeObserver?.disconnect();
     visibilityObserver?.disconnect();
+    fadeRustles();
+    leafBuffer = null;
     if (audio && audio.state !== 'closed') audio.close().catch(() => {});
   }
   canvas.dataset.renderTier = lowPower ? 'mobile-30fps' : 'desktop-60fps';

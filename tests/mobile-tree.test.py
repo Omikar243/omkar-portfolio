@@ -14,6 +14,10 @@ OUTPUT = Path(os.environ.get("TREE_TEST_OUTPUT", "/tmp/omkar-mobile-tree"))
 OUTPUT.mkdir(parents=True, exist_ok=True)
 INSTRUMENT = """(() => {
   window.treePaints = [];
+  window.hapticRequests = [];
+  Object.defineProperty(navigator, 'vibrate', { configurable: true,
+    value: ms => { window.hapticRequests.push({ms, state:document.querySelector('#signatureGlyph')?.dataset.state}); return true; }
+  });
   const clear = CanvasRenderingContext2D.prototype.clearRect;
   CanvasRenderingContext2D.prototype.clearRect = function(...args) {
     if(this.canvas.id === 'fractalCanvas') {
@@ -60,6 +64,8 @@ with sync_playwright() as p:
             page.touchscreen.tap(x, y)
             assert page.locator("#signatureGlyph").get_attribute("data-state") == str(expected % 5)
             latency = round(page.evaluate("performance.now()") - start, 1)
+            assert page.evaluate("hapticRequests.at(-1).ms") == 8
+            assert page.evaluate("Number(hapticRequests.at(-1).state)") == expected % 5
             assert latency < 300, f"Touch state response too slow: {latency}ms"
             page.wait_for_function("document.querySelector('#heroVisual').dataset.morphing === 'false'", timeout=4000)
         view = snapshot()
@@ -72,6 +78,8 @@ with sync_playwright() as p:
             seen.add(state)
             page.locator("#heroVisual").screenshot(path=str(OUTPUT / f"form-{state}.png"))
     assert len(seen) == 5
+    assert len(page.evaluate("hapticRequests")) == 5
+    assert sorted(int(h["state"]) for h in page.evaluate("hapticRequests")) == list(range(5))
 
     page.evaluate("window.treePaints=[]")
     page.wait_for_timeout(1100)
@@ -129,7 +137,7 @@ with sync_playwright() as p:
     page.locator('[data-orbit-pause]').tap()
     assert not errors, errors
     report={"base":BASE,"touch_enabled":True,"viewport":[390,844],"device_pixel_ratio":3,
-      "forms":forms,"mobile_budget":budget,"paint_frames_per_1_1_seconds":frames,
+      "forms":forms,"haptic_requests_all_five":True,"haptics_method":"instrumented API requests; not physical vibration measurement","mobile_budget":budget,"paint_frames_per_1_1_seconds":frames,
       "themes":theme_changes,"rapid_retarget":True,"reduced_motion_immediate_repaint":True,
       "theme_persistence":True,"removed_demos_absent":True,"orbit_still_playable":True,"browser_errors":errors}
     print(json.dumps(report, indent=2))

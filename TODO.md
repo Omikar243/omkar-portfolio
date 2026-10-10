@@ -56,3 +56,12 @@ Mobile evidence: Chromium 390×844, touch enabled, device scale 3; actual taps c
 Privacy transport test: Vercel-scoped environment API remains403 and server-side FormSubmit forwarding returned502. Do not switch confirmed browser delivery to this failing backend. A provider anonymous form URL is still required to remove the current mailbox endpoint; original resume remains public by explicit choice.
 
 Anonymous transport verified on 10 October 2026: a labelled real submission to the provider-issued form identifier was accepted from the production portfolio origin. This confirms provider acceptance; no claim of new inbox receipt until the owner confirms.
+
+## Personal portrait, rustling leaves and mobile feedback
+
+- [x] Add the user's supplied real portrait to About, preserving the original identity and full frame, with responsive optimized WebP, alt text, light/dark framing, and no impact on the original resume or anonymous contact endpoint.
+- [x] Write a personal first-person About covering who I am, what I build and a forward-looking ambition grounded in the resume; do not invent personal hobbies, accolades or career events.
+- [x] Replace pitched O-signature tones with quiet wind-through-leaves rustle using filtered noise and a smooth gust envelope, varied subtly across the five states. Keep sound off initially with explicit enabling, no autoplay, brief haptics where supported, rapid-tap volume caps and cleanup.
+- [x] Retest all five mobile signature states with real browser touch events, haptic request instrumentation, sound start/mute/theme isolation, reduced-motion and unsupported vibration behavior. Distinguish requested API pulses in emulation from physical-device vibration that cannot be felt in the sandbox.
+
+Evidence: all five real touchscreen transitions in mobile Chromium requested8ms haptics and completed; noise audio used one cached buffer, five buffer sources, five high-/low-pass pairs and zero oscillators. Sound mute, missing vibration API and closed-context recovery passed. Portrait loaded900×1200 at390/768/1440 widths in both themes without overflow; no source mailbox address or resume changes. Physical handset vibration is not verified.

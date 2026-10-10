@@ -16,13 +16,14 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Renaissance-inspired responsive layout with beige, brown, and gold visual language.
 - Light/dark theme toggle, particle field, scroll progress, cursor glow, and a crumbling-ball loading animation.
 - Scroll-triggered experience timeline with expandable chapters for Catalysk, the internship, and education.
+- Personal first-person About story covering identity, projects and ambition, alongside the supplied real portrait (optimized WebP, full frame retained, lazy loading and light/dark editorial framing).
 - Downloadable original resume PDF.
 - Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation and received-inbox verification are complete.
 - **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound.
 
 ### Living fractal tree
 
-The hero artwork uses a single Canvas 2D renderer and fixed connected Bézier graph. The trunk splits into two limbs that form an organic O and rejoin below the canopy—there is no separate glyph or ring overlay. Use the header or **Dark canvas / Light canvas** control to switch both the artwork palette and site theme. Tap anywhere on the artwork to morph across five configurations; shared junctions, controls and stroke widths interpolate with quintic easing and staggered twig motion. Interrupted morphs retarget the exact interpolated geometry; orbit phases never reset on a tap. Trusted signature taps give an 8ms haptic cue where supported. The separate **Sound off / Sound on** control enables low-volume, 160ms procedural sine tones; sound is muted initially, theme changes are silent, fast repeated taps are throttled and unsupported feedback never blocks the artwork. iOS haptics may be unavailable. The renderer pauses offscreen/hidden, respects live reduced-motion changes, and caps mobile rendering at 30 FPS with a 1.5 pixel-ratio ceiling.
+The hero artwork uses a single Canvas 2D renderer and fixed connected Bézier graph. The trunk splits into two limbs that form an organic O and rejoin below the canopy—there is no separate glyph or ring overlay. Use the header or **Dark canvas / Light canvas** control to switch both the artwork palette and site theme. Tap anywhere on the artwork to morph across five configurations; shared junctions, controls and stroke widths interpolate with quintic easing and staggered twig motion. Interrupted morphs retarget the exact interpolated geometry; orbit phases never reset on a tap. Trusted signature taps give an 8ms haptic cue where supported. The separate **Leaves off / Leaves on** control enables a soft procedural wind-through-leaves rustle: one cached mono noise texture, high-/low-pass filters and a smooth 0.72–0.94 second gust envelope, subtly varied per signature. There are no pitched tones; overlapping gusts fade with a two-voice ceiling; sound is muted initially, theme changes are silent, fast repeated taps are throttled and unsupported feedback never blocks the artwork. iOS haptics may be unavailable. The renderer pauses offscreen/hidden, respects live reduced-motion changes, and caps mobile rendering at 30 FPS with a 1.5 pixel-ratio ceiling.
 
 Run the repeatable geometry tests with `node tests/tree-geometry.test.js`. Real-touch Chromium mobile checks are in `tests/mobile-tree.test.py` (Python Playwright and Chromium required): `python3 tests/mobile-tree.test.py`. This verifies all five forms, rapid retargets, coordinated themes, reduced-motion repaint, persistence, low-power budgets and that only SIGNAL // ORBIT remains.
 
@@ -54,6 +55,7 @@ fractal-tree.js                    Canvas timeline, input handling and lifecycle
 tree-geometry.js                   Fixed connected graph and parameter interpolation
 tests/tree-geometry.test.js        Connectivity, morph continuity and retargeting tests
 server.mjs                         Static server plus contact API
+public/portrait.webp               Supplied portrait, optimized without cropping
 public/Omkar_Shettigar_Resume.pdf  Original downloadable resume
 vercel.json                        Vercel Node runtime and route configuration
 .github/workflows/pages.yml        GitHub Pages deployment workflow
@@ -80,7 +82,11 @@ node tests/tree-geometry.test.js
 node --test tests/orbit-physics.test.js
 # Optional real-touch and timeline-style browser checks:
 python3 tests/feedback-timeline.test.py
+python3 tests/mobile-tree.test.py
+python3 tests/leaves-about.test.py
 ```
+
+Browser tests use real Chromium touchscreen events in mobile emulation. The vibration API is instrumented to verify 8ms requests for each signature; tests cannot confirm physical actuator sensation. Unsupported vibration and reduced-motion fallbacks are tested.
 
 ## Personalization
 

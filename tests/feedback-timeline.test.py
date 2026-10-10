@@ -16,7 +16,7 @@ with sync_playwright() as p:
       const Native=window.AudioContext;
       if(Native)window.AudioContext=class extends Native{
         constructor(...args){super(...args);feedbackTest.contexts++;}
-        createOscillator(){feedbackTest.tones++;return super.createOscillator();}
+        createBufferSource(){feedbackTest.tones++;return super.createBufferSource();}
       };
     })()""")
     page.goto(BASE,wait_until='networkidle')
@@ -74,5 +74,5 @@ with sync_playwright() as p:
     Path('/tmp/omkar-feedback-timeline').mkdir(exist_ok=True)
     page.locator('#experience').screenshot(path='/tmp/omkar-feedback-timeline/timeline.png')
     assert not errors, errors
-    print(json.dumps({'muted_initially':True,'haptics_on_real_tap':True,'opt_in_tone':True,'theme_does_not_play_sound':True,'reduced_motion_no_vibration':True,'timeline_controls':styles,'errors':errors},indent=2))
+    print(json.dumps({'muted_initially':True,'haptics_on_real_tap':True,'opt_in_leaf_rustle':True,'theme_does_not_play_sound':True,'reduced_motion_no_vibration':True,'timeline_controls':styles,'errors':errors},indent=2))
     browser.close()

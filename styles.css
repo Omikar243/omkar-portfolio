@@ -57,3 +57,16 @@ body.dark .hero-visual-glow{background:radial-gradient(circle,rgba(209,171,112,.
 .tree-sound-toggle[aria-pressed="true"],.tree-sound-toggle:hover{border-color:var(--gold);color:var(--ink)}
 .tree-sound-toggle:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 @media(max-width:640px){.tree-art-controls{top:0;right:0;gap:5px}.tree-sound-toggle{font-size:8px;padding:8px}}
+
+/* A real portrait and a personal story, within the existing editorial composition. */
+.about-portrait{margin:36px 0 0;width:min(100%,340px)}
+.portrait-frame{position:relative;padding:8px;border:1px solid var(--gold);background:var(--paper-2);box-shadow:var(--shadow)}
+.portrait-frame img{display:block;width:100%;height:auto;aspect-ratio:3/4;object-fit:contain}
+.about-portrait figcaption{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.about-portrait figcaption>span:first-child{color:var(--ink-soft);font:9px/1.6 var(--sans);letter-spacing:.12em;text-transform:uppercase;max-width:140px}
+.portrait-signature{color:var(--gold);font:27px/1.2 var(--script);white-space:nowrap}
+.about-chapter{padding:0 0 7px}
+.about-chapter h3{font:500 10px/1.4 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:26px 0 11px}
+.about-ambition{border-top:1px solid var(--line);padding-top:0}
+@media(min-width:641px) and (max-width:900px){.about-grid>.section-heading{display:grid;grid-template-columns:1fr 250px;gap:0 35px;align-items:start}.about-grid>.section-heading>.eyebrow{grid-column:1}.about-grid>.section-heading>h2{grid-column:1}.about-portrait{grid-column:2;grid-row:1 / span 2;margin-top:0}}
+@media(max-width:640px){.about-portrait{width:min(100%,310px);margin-top:30px}.about-grid{gap:36px}.about-body .lead-copy{font-size:23px}.about-body p{font-size:14px}}

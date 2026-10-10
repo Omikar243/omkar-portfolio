@@ -1,11 +1,11 @@
 // Fixed topology: the O is a bifurcation of the trunk, not an added ring.
 // Nodes are shared by every adjoining edge, including during delayed morphs.
 export const TREE_PROFILES = [
-  { name: 'rounded growth', spread: .48, length: .13, ratio: .69, curvature: .16, lean: -.04, tilt: -.018, loopWidth: .067, loopHeight: .182, square: 0, crown: 0 },
-  { name: 'squared growth', spread: .64, length: .126, ratio: .67, curvature: .015, lean: .05, tilt: .026, loopWidth: .078, loopHeight: .151, square: .96, crown: -.035 },
-  { name: 'wide asymmetric growth', spread: .64, length: .147, ratio: .66, curvature: .2, lean: -.06, tilt: -.025, loopWidth: .086, loopHeight: .166, square: .1, crown: .008 },
-  { name: 'botanical growth', spread: .38, length: .145, ratio: .69, curvature: .24, lean: .06, tilt: .03, loopWidth: .06, loopHeight: .19, square: 0, crown: -.025 },
-  { name: 'compact geometric growth', spread: .62, length: .109, ratio: .68, curvature: .04, lean: -.06, tilt: -.027, loopWidth: .072, loopHeight: .143, square: .98, crown: -.004 },
+  { name: 'rounded growth', spread: .48, length: .13, ratio: .69, curvature: .16, lean: -.04, tilt: -.018, loopWidth: .067, loopHeight: .182, square: 0, crown: 0, oLean: -.025, oLoopWidth: .067, oLoopHeight: .172, oSquare: 0 },
+  { name: 'squared growth', spread: .64, length: .126, ratio: .67, curvature: .015, lean: .05, tilt: .026, loopWidth: .078, loopHeight: .151, square: .96, crown: -.035, oLean: .018, oLoopWidth: .075, oLoopHeight: .153, oSquare: .9 },
+  { name: 'wide asymmetric growth', spread: .64, length: .147, ratio: .66, curvature: .2, lean: -.06, tilt: -.025, loopWidth: .086, loopHeight: .166, square: .1, crown: .008, oLean: -.052, oLoopWidth: .087, oLoopHeight: .162, oSquare: .1 },
+  { name: 'botanical growth', spread: .38, length: .145, ratio: .69, curvature: .24, lean: .06, tilt: .03, loopWidth: .06, loopHeight: .19, square: 0, crown: -.025, oLean: .036, oLoopWidth: .06, oLoopHeight: .186, oSquare: 0 },
+  { name: 'compact geometric growth', spread: .62, length: .109, ratio: .68, curvature: .04, lean: -.06, tilt: -.027, loopWidth: .072, loopHeight: .143, square: .98, crown: -.004, oLean: -.01, oLoopWidth: .066, oLoopHeight: .143, oSquare: .98 },
 ];
 
 const lerp = (a, b, t) => t === 0 ? a : t === 1 ? b : a + (b - a) * t;
@@ -38,28 +38,37 @@ export function buildTree(state = 0, depth = 7) {
       -dx / 3 - dy * bend, -dy / 3 + dx * bend, width, level);
   };
 
-  const centerX = .5 + p.lean * .32;
+  const oLean = p.oLean;
+  const oWidth = p.oLoopWidth;
+  const oHeight = p.oLoopHeight;
+  const oSquare = p.oSquare;
+  const centerX = .5 + oLean * .32;
   const bottomY = .636;
-  const topY = bottomY - p.loopHeight;
-  // The O anchor nodes remain available for exact SVG geometry and canopy
-  // junctions; the visible letterform is no longer a procedural edge graph.
-  const shoulder = lerp(.22, .16, p.square);
-  const root = node(centerX, .832, 0);
-  // Lean translates the O from bottom to top as one clean silhouette. The
-  // paired left/right nodes remain equal around their local center, so an O
-  // can slant without becoming crooked or accidentally pinched.
-  const split = node(centerX, bottomY, 1);
-  const topCenter = centerX + p.tilt;
-  const leftLower = node(centerX - p.loopWidth, bottomY - p.loopHeight * shoulder, 2);
-  const leftUpper = node(topCenter - p.loopWidth, topY + p.loopHeight * shoulder, 2);
-  const reunion = node(topCenter, topY, 1);
-  const rightUpper = node(topCenter + p.loopWidth, topY + p.loopHeight * shoulder, 2);
-  const rightLower = node(centerX + p.loopWidth, bottomY - p.loopHeight * shoulder, 2);
+  const topY = bottomY - oHeight;
+  const shoulder = lerp(.44, .065, oSquare);
+  const root = node(.493, .865, 0);
+  const split = node(centerX - oLean * .4, bottomY, 1);
+  const leftLower = node(centerX - oWidth, bottomY - oHeight * shoulder, 2);
+  const leftUpper = node(centerX - oWidth + oLean * .2, topY + oHeight * shoulder, 2);
+  const reunion = node(centerX + oLean * .7, topY, 1);
+  const rightUpper = node(centerX + oWidth * .94 + oLean * .2, topY + oHeight * shoulder * .93, 2);
+  const rightLower = node(centerX + oWidth * .94, bottomY - oHeight * shoulder * 1.05, 2);
 
   const trunkWidth = .0084;
   edge(root, split, .028 + p.lean * .2, -.079, 0, .058, trunkWidth, 0);
-  // Exact O outline is rendered by the synchronized SVG ellipse/rect below;
-  // no procedural curve, random point or Bezier edge is used for the letter.
+  const loopWidth = .0055;
+  const h = oHeight;
+  const w = oWidth;
+  // Historical O geometry: six shared trunk limbs preserve the smooth,
+  // deliberate lean and the rounded-to-squared profile language.
+  edge(split, leftLower, -w * .64, -h * .01, 0, h * .17, loopWidth, 1);
+  edge(leftLower, leftUpper, -w * (.24 * (1 - oSquare)), -h * .23,
+    -w * (.19 * (1 - oSquare)), h * .23, loopWidth * .86, 2);
+  edge(leftUpper, reunion, 0, -h * .17, -w * .64, h * .01, loopWidth * .82, 1);
+  edge(split, rightLower, w * .64, -h * .01, 0, h * .17, loopWidth * .91, 1);
+  edge(rightLower, rightUpper, w * (.2 * (1 - oSquare)), -h * .23,
+    w * (.23 * (1 - oSquare)), h * .23, loopWidth * .82, 2);
+  edge(rightUpper, reunion, 0, -h * .17, w * .64, h * .01, loopWidth * .82, 1);
 
   const crown = node(nodes[reunion].x + p.lean * .6, topY - .054 + p.crown, 3);
   edge(reunion, crown, p.lean * .13, -.019, -p.lean * .13, .019, .0048, 2);

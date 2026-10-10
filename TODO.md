@@ -16,3 +16,11 @@
 - [x] Replace only the hero’s right-side planet/orb with a procedurally generated Canvas 2D fractal tree, four time-based elliptical orbital paths with moving particles, pointer response, restrained growth animation, reduced-motion behavior, and a keyboard/touch-accessible central O with five visual states.
 - [x] Draw the O directly into the fractal tree canvas instead of using a separate image-like orb; make tree geometry and O geometry shift across all five signatures, including a square-edged state.
 - [x] Add the O mark as an SVG favicon and apple-touch icon, synchronize canvas colors with light/dark mode, and reduce mobile canvas cost with capped pixel ratio, lower branch depth, 30fps gating, and visibility pausing.
+
+## Living mathematical sculpture refinement
+
+- [x] Preserve the hero layout, editorial typography, warm cream and muted gold/brown palette, thin orbital ellipses and particles; change only the artwork implementation and its interaction hooks.
+- [x] Form the recognizable O from the trunk splitting into two connected Bézier branch paths and rejoining before the crown. Share coordinates, colors, thickness and procedural geometry with the tree; no circle, ellipse, independent icon or overlay for the O.
+- [x] Keep a fixed recursive branch hierarchy across five distinct configurations. Interpolate existing junctions, Bézier controls and thickness with quintic easing and depth-delayed growth; branches must remain connected with no topology popping or design crossfades. Retarget from the exact current interpolated geometry during an unfinished morph.
+- [x] Make the entire artwork tap/click and keyboard accessible, with gentle pointer leaning, calm hover feedback, uninterrupted time-based orbital motion, fine terminal twigs and gold tip particles.
+- [x] Preserve responsiveness, synchronize light/dark palettes, honor live reduced-motion changes, bound mobile pixel ratio/frame rate and branch count, pause when offscreen/hidden, and clean up observers, listeners and animation frames.

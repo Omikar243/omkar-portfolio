@@ -21,6 +21,12 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Downloadable original resume PDF.
 - Contact form with client validation and a live `POST api/contact` backend.
 
+### Living fractal tree
+
+The hero artwork uses a single Canvas 2D renderer and fixed connected Bézier graph. The trunk splits into two limbs that form an organic O and rejoin below the canopy—there is no separate glyph or ring overlay. Tap anywhere on the artwork to morph across five configurations; shared junctions, controls and stroke widths interpolate with quintic easing and staggered twig motion. Interrupted morphs retarget the exact interpolated geometry; orbit phases never reset on a tap. The renderer pauses offscreen/hidden, respects live reduced-motion changes, and caps mobile rendering at 30 FPS with a 1.5 pixel-ratio ceiling.
+
+Run the repeatable geometry tests with `node tests/tree-geometry.test.js`.
+
 ## Run locally
 
 ```bash
@@ -41,6 +47,9 @@ The server listens on `0.0.0.0:3000` by default. Override the port with `PORT=30
 index.html                         Portfolio page and resume-grounded copy
 styles.css                         Renaissance design system and responsive layout
 app.js                             Theme, timeline, playground, game, particles, and form logic
+fractal-tree.js                    Canvas timeline, input handling and lifecycle
+tree-geometry.js                   Fixed connected graph and parameter interpolation
+tests/tree-geometry.test.js        Connectivity, morph continuity and retargeting tests
 server.mjs                         Static server plus contact API
 public/Omkar_Shettigar_Resume.pdf  Original downloadable resume
 vercel.json                        Vercel Node runtime and route configuration

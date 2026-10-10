@@ -1,10 +1,9 @@
 import { initOrbitGame } from './orbit-game.js';
-import { forwardContact, CONTACT_RECIPIENT } from './contact-delivery.js';
+import { forwardContact } from './contact-delivery.js';
 import { initFractalTree } from './fractal-tree.js';
 
 const body = document.body;
 const loader = document.querySelector('#loader');
-const themeToggle = document.querySelector('#themeToggle');
 const menuToggle = document.querySelector('#menuToggle');
 const nav = document.querySelector('.main-nav');
 const progress = document.querySelector('#scrollProgress');
@@ -19,27 +18,27 @@ window.addEventListener('load', () => {
   }, 1250);
 });
 
+const themeControls = [...document.querySelectorAll('[data-theme-toggle]')];
+const applyTheme = (dark) => {
+  body.classList.toggle('dark', dark);
+  themeControls.forEach((control) => {
+    control.setAttribute('aria-pressed', String(dark));
+    const next = dark ? 'light' : 'dark';
+    control.setAttribute('aria-label', `Switch artwork and website to ${next} mode`);
+    const label = control.querySelector('[data-theme-label]');
+    if (label) label.textContent = dark ? 'Light canvas' : 'Dark canvas';
+  });
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#211a15' : '#f3eadc');
+  document.dispatchEvent(new CustomEvent('portfolio:themechange', { detail: { dark } }));
+};
 let savedTheme = null;
-try {
-  savedTheme = localStorage.getItem('omkar-theme');
-} catch {
-  savedTheme = null;
-}
-if (savedTheme === 'dark') {
-  body.classList.add('dark');
-  themeToggle?.setAttribute('aria-pressed', 'true');
-  themeToggle?.setAttribute('aria-label', 'Switch to light mode');
-}
-themeToggle?.addEventListener('click', () => {
-  const isDark = body.classList.toggle('dark');
-  try {
-    localStorage.setItem('omkar-theme', isDark ? 'dark' : 'light');
-  } catch {
-    // Private browsing can disable storage without affecting the toggle itself.
-  }
-  themeToggle.setAttribute('aria-pressed', String(isDark));
-  themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
-});
+try { savedTheme = localStorage.getItem('omkar-theme'); } catch { /* optional persistence */ }
+applyTheme(savedTheme === 'dark');
+themeControls.forEach((control) => control.addEventListener('click', () => {
+  const dark = !body.classList.contains('dark');
+  applyTheme(dark);
+  try { localStorage.setItem('omkar-theme', dark ? 'dark' : 'light'); } catch { /* optional persistence */ }
+}));
 
 menuToggle?.addEventListener('click', () => {
   const isOpen = nav?.classList.toggle('is-open');
@@ -92,87 +91,6 @@ document.querySelectorAll('[data-toast]').forEach((button) => button.addEventLis
   toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 3200);
 }));
 
-const rulesRange = document.querySelector('#rulesRange');
-const retrievalRange = document.querySelector('#retrievalRange');
-const llmRange = document.querySelector('#llmRange');
-const updateModelPlayground = () => {
-  if (!rulesRange || !retrievalRange || !llmRange) return;
-  const rules = Number(rulesRange.value);
-  const retrieval = Number(retrievalRange.value);
-  const llm = Number(llmRange.value);
-  const score = Math.round((rules * .35) + (retrieval * .35) + (llm * .30));
-  const route = rules >= 86 ? 'Deterministic rules → safe match' : retrieval >= 78 ? 'Dense retrieval → peer context' : 'Few-shot LLM → analyst review';
-  const reason = rules >= 86 ? 'The structured signals are decisive, so the fastest safe route wins.' : retrieval >= 78 ? 'The evidence is strong enough to retrieve a trusted comparison before reasoning.' : 'The model is uncertain; keep a human in the loop before the decision ships.';
-  document.querySelector('#rulesValue').textContent = `${rules}%`;
-  document.querySelector('#retrievalValue').textContent = `${retrieval}%`;
-  document.querySelector('#llmValue').textContent = `${llm}%`;
-  document.querySelector('#decisionRoute').textContent = route;
-  document.querySelector('#decisionReason').textContent = reason;
-  document.querySelector('#decisionScore').textContent = `${score}%`;
-  document.querySelector('#confidenceMeter').style.width = `${score}%`;
-};
-[rulesRange, retrievalRange, llmRange].forEach((range) => range?.addEventListener('input', updateModelPlayground));
-updateModelPlayground();
-
-const gameRounds = [
-  { prompt: 'UPI debit · FreshBasket Supermarket · monthly groceries', answer: 'P2M' },
-  { prompt: 'NEFT credit · Rahul S Shetty · monthly transfer', answer: 'P2P' },
-  { prompt: 'IMPS debit · Apex Cloud Services Pvt Ltd · annual renewal', answer: 'P2M' },
-];
-let gameRound = 0;
-let gameScore = 0;
-let roundLocked = false;
-const gamePrompt = document.querySelector('#gamePrompt');
-const gameFeedback = document.querySelector('#gameFeedback');
-const gameScoreLabel = document.querySelector('#gameScore');
-const roundCount = document.querySelector('#roundCount');
-const gameOptions = [...document.querySelectorAll('#gameOptions button')];
-const renderGameRound = () => {
-  const round = gameRounds[gameRound];
-  if (!round || !gamePrompt) return;
-  gamePrompt.textContent = round.prompt;
-  roundCount.textContent = `${String(gameRound + 1).padStart(2, '0')} / ${String(gameRounds.length).padStart(2, '0')}`;
-  gameFeedback.textContent = 'Choose a label to make the call.';
-  gameFeedback.className = 'game-feedback';
-  gameOptions.forEach((button) => {
-    button.disabled = false;
-    button.classList.remove('is-correct', 'is-wrong');
-  });
-  roundLocked = false;
-};
-gameOptions.forEach((button) => button.addEventListener('click', () => {
-  if (roundLocked) return;
-  roundLocked = true;
-  const correct = button.dataset.answer === gameRounds[gameRound].answer;
-  if (correct) {
-    gameScore += 1;
-    gameFeedback.textContent = 'Correct — the funnel would route this with confidence.';
-    gameFeedback.classList.add('is-correct');
-    button.classList.add('is-correct');
-  } else {
-    gameFeedback.textContent = `Not quite — the resume logic would call this ${gameRounds[gameRound].answer}.`;
-    gameFeedback.classList.add('is-wrong');
-    button.classList.add('is-wrong');
-  }
-  gameScoreLabel.textContent = String(gameScore);
-  gameOptions.forEach((option) => { option.disabled = true; });
-  window.setTimeout(() => {
-    if (gameRound < gameRounds.length - 1) {
-      gameRound += 1;
-      renderGameRound();
-    } else {
-      gameFeedback.textContent = `Round complete — ${gameScore}/${gameRounds.length}. Reset and try again.`;
-    }
-  }, 850);
-}));
-document.querySelector('#gameReset')?.addEventListener('click', () => {
-  gameRound = 0;
-  gameScore = 0;
-  gameScoreLabel.textContent = '0';
-  renderGameRound();
-});
-renderGameRound();
-
 const form = document.querySelector('#contactForm');
 const status = document.querySelector('#formStatus');
 const submitButton = form?.querySelector('button[type="submit"]');
@@ -205,7 +123,7 @@ form?.addEventListener('submit', async (event) => {
   } catch (error) {
     if (status) {
       status.style.color = '#a34f35';
-      status.textContent = error.message || `Email delivery could not be confirmed. Your text is still here. Please email ${CONTACT_RECIPIENT} directly.`;
+      status.textContent = error.message || 'Email delivery could not be confirmed. Your text is still here. Please try again later.';
     }
   } finally {
     if (submitButton) submitButton.disabled = false;
@@ -265,7 +183,7 @@ document.addEventListener('visibilitychange', () => {
   cancelAnimationFrame(particleFrame);
   if (!document.hidden) animateParticles();
 });
-themeToggle?.addEventListener('click', () => { if (reduceMotion) animateParticles(); });
+document.addEventListener('portfolio:themechange', () => { if (reduceMotion) animateParticles(); });
 
 window.addEventListener('pointermove', (event) => {
   if (window.innerWidth > 640 && cursorGlow) {

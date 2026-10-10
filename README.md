@@ -16,17 +16,15 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Renaissance-inspired responsive layout with beige, brown, and gold visual language.
 - Light/dark theme toggle, particle field, scroll progress, cursor glow, and a crumbling-ball loading animation.
 - Scroll-triggered experience timeline with expandable chapters for Catalysk, the internship, and education.
-- **Model Playground:** tune rules certainty, retrieval match, and LLM confidence to see the next decision route and confidence meter update live.
-- **Merchant Match:** a three-round P2P/P2M classification game based on transaction narration routing.
 - Downloadable original resume PDF.
-- Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation is required.
+- Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation and received-inbox verification are complete.
 - **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound.
 
 ### Living fractal tree
 
-The hero artwork uses a single Canvas 2D renderer and fixed connected Bézier graph. The trunk splits into two limbs that form an organic O and rejoin below the canopy—there is no separate glyph or ring overlay. Tap anywhere on the artwork to morph across five configurations; shared junctions, controls and stroke widths interpolate with quintic easing and staggered twig motion. Interrupted morphs retarget the exact interpolated geometry; orbit phases never reset on a tap. The renderer pauses offscreen/hidden, respects live reduced-motion changes, and caps mobile rendering at 30 FPS with a 1.5 pixel-ratio ceiling.
+The hero artwork uses a single Canvas 2D renderer and fixed connected Bézier graph. The trunk splits into two limbs that form an organic O and rejoin below the canopy—there is no separate glyph or ring overlay. Use the header or **Dark canvas / Light canvas** control to switch both the artwork palette and site theme. Tap anywhere on the artwork to morph across five configurations; shared junctions, controls and stroke widths interpolate with quintic easing and staggered twig motion. Interrupted morphs retarget the exact interpolated geometry; orbit phases never reset on a tap. The renderer pauses offscreen/hidden, respects live reduced-motion changes, and caps mobile rendering at 30 FPS with a 1.5 pixel-ratio ceiling.
 
-Run the repeatable geometry tests with `node tests/tree-geometry.test.js`.
+Run the repeatable geometry tests with `node tests/tree-geometry.test.js`. Real-touch Chromium mobile checks are in `tests/mobile-tree.test.py` (Python Playwright and Chromium required): `python3 tests/mobile-tree.test.py`. This verifies all five forms, rapid retargets, coordinated themes, reduced-motion repaint, persistence, low-power budgets and that only SIGNAL // ORBIT remains.
 
 ## Run locally
 
@@ -74,7 +72,7 @@ The included `pages.yml` workflow publishes the browser-only portfolio from `mai
 
 ## Contact activation and checks
 
-The recipient is `omikar243@gmail.com`. Open the FormSubmit activation email sent during setup, click **Activate Form**, then send a clearly labelled test from the website. Confirm receipt in the inbox or Spam and check that Reply addresses the visitor. Provider acceptance is not a guarantee of inbox placement.
+Activation completed on 10 October 2026. The owner confirmed receiving the live form test, and its visitor Reply-To payload was verified. The recipient mailbox is managed by the forwarding provider. For a fresh deployment or recipient change, open the FormSubmit activation email sent during setup, click **Activate Form**, then send a clearly labelled test from the website. Confirm receipt in the inbox or Spam and check that Reply addresses the visitor. Provider acceptance is not a guarantee of inbox placement.
 
 ```bash
 node tests/contact-delivery.test.js

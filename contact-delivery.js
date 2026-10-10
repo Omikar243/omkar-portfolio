@@ -18,7 +18,7 @@ export function interpretDelivery(result, httpOK = true) {
     return {
       ok: false,
       code: 'activation_required',
-      message: `Email delivery is awaiting owner activation. Your note has not been confirmed as sent. Please email ${CONTACT_RECIPIENT} directly. Your text is still here.`,
+      message: 'Email delivery is awaiting owner activation. Your note has not been confirmed as sent. Please try again later. Your text is still here.',
     };
   }
   if (httpOK && (result?.success === true || result?.success === 'true')) {
@@ -31,7 +31,7 @@ export function interpretDelivery(result, httpOK = true) {
   return {
     ok: false,
     code: 'delivery_failed',
-    message: `Email delivery could not be confirmed. Please try again or email ${CONTACT_RECIPIENT} directly. Your text is still here.`,
+    message: 'Email delivery could not be confirmed. Please try again later. Your text is still here.',
   };
 }
 

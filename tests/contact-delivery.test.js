@@ -23,5 +23,5 @@ assert.equal(sent.body._replyto, note.email);
 assert.match(sent.url, /formsubmit.co\/ajax\//);
 const transport = await forwardContact(note, async () => { throw new Error('network failure'); });
 assert.equal(transport.ok, false);
-assert.match(transport.message, /email.*directly/);
+assert.match(transport.message, /try again later/);
 console.log('PASS: activation is not success; provider acceptance, rejection, transport failure and Reply-To are handled correctly. No real emails sent by this test.');

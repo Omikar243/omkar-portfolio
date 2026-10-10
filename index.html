@@ -37,7 +37,7 @@
         <a href="#skills">skills</a>
         <a href="#contact">contact</a>
       </nav>
-      <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+      <button class="theme-toggle" id="themeToggle" data-theme-toggle type="button" aria-label="Switch to dark mode" aria-pressed="false">
         <span class="theme-icon theme-sun">☼</span><span class="theme-icon theme-moon">◐</span>
       </button>
       <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
@@ -62,7 +62,8 @@
             <canvas id="fractalCanvas" aria-hidden="true"></canvas>
             <div class="hero-visual-glow" aria-hidden="true"></div>
             <button class="signature-glyph" id="signatureGlyph" type="button" data-state="0" aria-label="Morph the fractal tree. Current form: rounded growth." aria-describedby="glyphHint"></button>
-            <span class="glyph-hint" id="glyphHint">tap the tree to reshape</span>
+            <button class="tree-theme-toggle" id="treeThemeToggle" data-theme-toggle type="button" aria-label="Switch artwork and website to dark mode" aria-pressed="false"><span aria-hidden="true">◐</span><span data-theme-label>Dark canvas</span></button>
+            <span class="glyph-hint" id="glyphHint">tap the tree · form 1 / 5</span>
             <span class="sr-only" id="treeStatus" role="status" aria-live="polite"></span>
             <div class="art-caption"><span>01</span><span>signal → system</span></div>
           </div>
@@ -127,28 +128,7 @@
 
       <section class="playground-section section-shell" id="playground">
         <div class="section-label reveal"><span>04</span><span>the lab</span></div>
-        <div class="playground-heading"><div class="section-heading reveal"><p class="eyebrow">Model playground</p><h2>Touch the <span class="script-word">decision engine.</span></h2></div><p class="heading-note reveal reveal-delay-1">I route evidence through rules, retrieval and reasoning. Tune the signals, then test your instincts in a tiny merchant-classification game.</p></div>
-        <div class="playground-grid">
-          <article class="model-panel reveal">
-            <div class="panel-top"><span>HYBRID CLASSIFIER / LIVE</span><span class="live-pill"><i></i>live</span></div>
-            <p class="panel-copy">Adjust the inputs to see which layer takes the next decision.</p>
-            <div class="range-stack">
-              <label class="range-row"><span>Rules certainty</span><input id="rulesRange" type="range" min="0" max="100" value="72" /><output id="rulesValue">72%</output></label>
-              <label class="range-row"><span>Retrieval match</span><input id="retrievalRange" type="range" min="0" max="100" value="86" /><output id="retrievalValue">86%</output></label>
-              <label class="range-row"><span>LLM confidence</span><input id="llmRange" type="range" min="0" max="100" value="68" /><output id="llmValue">68%</output></label>
-            </div>
-            <div class="decision-output"><div><span class="output-label">next route</span><strong id="decisionRoute">Dense retrieval → peer context</strong><p id="decisionReason">The evidence is strong enough to retrieve a trusted comparison before reasoning.</p></div><div class="score-ring"><strong id="decisionScore">77%</strong><span>confidence</span></div></div>
-            <div class="confidence-meter"><span id="confidenceMeter"></span></div>
-          </article>
-          <article class="game-panel reveal reveal-delay-1">
-            <div class="panel-top"><span>MERCHANT MATCH / MINI DEMO</span><span id="roundCount">01 / 03</span></div>
-            <p class="panel-copy">Classify the narration the way a progressive P2P / P2M funnel might.</p>
-            <div class="game-prompt" id="gamePrompt">UPI debit · FreshBasket Supermarket · monthly groceries</div>
-            <div class="game-options" id="gameOptions"><button type="button" data-answer="P2M">P2M / merchant</button><button type="button" data-answer="P2P">P2P / personal</button><button type="button" data-answer="review">send to review</button></div>
-            <p class="game-feedback" id="gameFeedback" role="status" aria-live="polite">Choose a label to make the call.</p>
-            <div class="game-footer"><span>score <strong id="gameScore">0</strong></span><button class="text-button" id="gameReset" type="button">reset game ↻</button></div>
-          </article>
-        </div>
+        <div class="playground-heading"><div class="section-heading reveal"><p class="eyebrow">Playground</p><h2>Follow the <span class="script-word">signal.</span></h2></div><p class="heading-note reveal reveal-delay-1">I explore motion, physics and interaction through a living orbital field. Step into SIGNAL // ORBIT and keep the signal alive.</p></div>
 <article class="orbit-article" data-orbit-game aria-labelledby="signal-orbit-title">
   <header class="orbit-header">
     <div>
@@ -199,7 +179,7 @@
 
       <section class="contact-section section-shell" id="contact">
         <div class="section-label reveal"><span>06</span><span>the invitation</span></div>
-        <div class="contact-grid"><div class="section-heading reveal"><p class="eyebrow">Contact</p><h2>Have a hard<br /><span class="script-word">problem?</span></h2><p class="heading-note">Good. Tell me what you’re building, what’s stuck, or what you can’t stop thinking about.</p><div class="contact-details"><a href="mailto:omikar243@gmail.com">omikar243@gmail.com</a><a href="https://www.linkedin.com/in/omkar-shettigar-43035737a" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/Omikar243" target="_blank" rel="noreferrer">GitHub ↗</a></div></div><form class="contact-form reveal reveal-delay-1" id="contactForm" action="https://formsubmit.co/omikar243@gmail.com" method="POST" novalidate><div class="form-row"><label><span>Your name</span><input type="text" name="name" maxlength="120" placeholder="Jane Doe" autocomplete="name" required /></label><label><span>Your email</span><input type="email" name="email" maxlength="240" placeholder="jane@company.com" autocomplete="email" required /></label></div><label><span>What are we solving?</span><textarea name="message" maxlength="5000" rows="5" placeholder="A model to stabilize, a product to imagine, a question to chase…" required></textarea></label><label class="contact-honeypot" aria-hidden="true"><span>Leave this field blank</span><input name="_honey" type="text" tabindex="-1" autocomplete="off" /></label><input type="hidden" name="_subject" value="New enquiry from my portfolio" /><input type="hidden" name="_template" value="table" /><p class="contact-delivery-note">Delivered by FormSubmit after owner activation. Include your email so I can reply. <a href="mailto:omikar243@gmail.com">Prefer email directly?</a></p><div class="form-footer"><button class="button button-primary" type="submit">Send message <span>↗</span></button><p class="form-status" id="formStatus" role="status" aria-live="polite"></p></div></form></div>
+        <div class="contact-grid"><div class="section-heading reveal"><p class="eyebrow">Contact</p><h2>Have a hard<br /><span class="script-word">problem?</span></h2><p class="heading-note">Good. Tell me what you’re building, what’s stuck, or what you can’t stop thinking about.</p><div class="contact-details"><span class="contact-private-note">Send me a note using the form.</span><a href="https://www.linkedin.com/in/omkar-shettigar-43035737a" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/Omikar243" target="_blank" rel="noreferrer">GitHub ↗</a></div></div><form class="contact-form reveal reveal-delay-1" id="contactForm" action="https://formsubmit.co/omikar243@gmail.com" method="POST" novalidate><div class="form-row"><label><span>Your name</span><input type="text" name="name" maxlength="120" placeholder="Jane Doe" autocomplete="name" required /></label><label><span>Your email</span><input type="email" name="email" maxlength="240" placeholder="jane@company.com" autocomplete="email" required /></label></div><label><span>What are we solving?</span><textarea name="message" maxlength="5000" rows="5" placeholder="A model to stabilize, a product to imagine, a question to chase…" required></textarea></label><label class="contact-honeypot" aria-hidden="true"><span>Leave this field blank</span><input name="_honey" type="text" tabindex="-1" autocomplete="off" /></label><input type="hidden" name="_subject" value="New enquiry from my portfolio" /><input type="hidden" name="_template" value="table" /><p class="contact-delivery-note">Sent to my inbox via FormSubmit. Include your email so I can reply.</p><div class="form-footer"><button class="button button-primary" type="submit">Send message <span>↗</span></button><p class="form-status" id="formStatus" role="status" aria-live="polite"></p></div></form></div>
       </section>
     </main>
 

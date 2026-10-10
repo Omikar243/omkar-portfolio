@@ -46,11 +46,12 @@ export function initFractalTree(shell, canvas, button) {
 
   function updatePalette() {
     const dark = document.body.classList.contains('dark');
+    shell.dataset.theme = canvas.dataset.theme = dark ? 'dark' : 'light';
     colors.branch = dark ? '213,175,119' : '130,92,49';
     colors.tip = dark ? 'rgba(225,194,141,.68)' : 'rgba(175,129,64,.53)';
     colors.orbit = dark ? '209,176,121' : '139,102,57';
     colors.particle = dark ? '#debd83' : '#aa814d';
-    if (motion.matches || !active) paint();
+    paint();
   }
 
   function sample(now) {
@@ -59,6 +60,7 @@ export function initFractalTree(shell, canvas, button) {
     if (now - morphStart >= totalDuration) {
       morphStart = -Infinity;
       shell.dataset.morphing = 'false';
+      announceForm(false);
     }
   }
 
@@ -182,6 +184,15 @@ export function initFractalTree(shell, canvas, button) {
     paint();
   }
 
+  function announceForm(morphing) {
+    const name = TREE_PROFILES[state].name;
+    button.setAttribute('aria-label', `Morph the fractal tree. ${morphing ? 'Transforming into' : 'Current form'}: ${name}.`);
+    const status = shell.querySelector('#treeStatus');
+    if (status) status.textContent = `${morphing ? 'Growing into' : 'Current form:'} ${name}. Form ${state + 1} of ${poses.length}.`;
+    const hint = shell.querySelector('#glyphHint');
+    if (hint) hint.textContent = `tap the tree · form ${state + 1} / ${poses.length}`;
+  }
+
   function advance() {
     const now = performance.now();
     sample(now); // Exact currently interpolated node/control geometry, even mid-morph.
@@ -191,13 +202,12 @@ export function initFractalTree(shell, canvas, button) {
     morphStart = now;
     shell.dataset.morphing = 'true';
     button.dataset.state = String(state);
-    button.setAttribute('aria-label', `Morph the fractal tree. Next form: ${TREE_PROFILES[state].name}.`);
-    const status = shell.querySelector('#treeStatus');
-    if (status) status.textContent = `Growing into ${TREE_PROFILES[state].name}.`;
+    announceForm(true);
     if (motion.matches) {
       current = cloneTree(target);
       morphStart = -Infinity;
       shell.dataset.morphing = 'false';
+      announceForm(false);
       paint();
     } else start();
   }
@@ -210,12 +220,13 @@ export function initFractalTree(shell, canvas, button) {
       pointer.x = 0; pointer.y = 0; pointer.hover = 0;
       pointer.targetX = 0; pointer.targetY = 0; pointer.targetHover = 0;
       shell.dataset.morphing = 'false';
+      announceForm(false);
       paint();
     } else start();
   }
   listen(button, 'click', advance);
   listen(button, 'keydown', (event) => {
-    if (['ArrowRight', 'ArrowDown'].includes(event.key)) {
+    if (!event.repeat && ['ArrowRight', 'ArrowDown'].includes(event.key)) {
       event.preventDefault();
       advance();
     }
@@ -230,7 +241,7 @@ export function initFractalTree(shell, canvas, button) {
   listen(shell, 'pointerleave', () => {
     pointer.targetX = 0; pointer.targetY = 0; pointer.targetHover = 0;
   });
-  listen(document.querySelector('#themeToggle'), 'click', updatePalette);
+  listen(document, 'portfolio:themechange', updatePalette);
   listen(motion, 'change', motionChanged);
   listen(mobileQuery, 'change', resize);
   listen(window, 'resize', resize, { passive: true });
@@ -259,6 +270,7 @@ export function initFractalTree(shell, canvas, button) {
   }
   canvas.dataset.renderTier = lowPower ? 'mobile-30fps' : 'desktop-60fps';
   canvas.dataset.branchCount = String(current.edges.length);
+  announceForm(false);
   updatePalette();
   resize();
   start();

@@ -61,7 +61,7 @@ const handler = async (req, res) => {
       sendJson(res, result.ok ? 200 : result.code === 'activation_required' ? 503 : 502, result);
     } catch (error) {
       const status = error.message === 'payload_too_large' ? 413 : error instanceof SyntaxError ? 400 : 502;
-      sendJson(res, status, { ok: false, message: status === 413 ? 'That note is too large to send.' : 'Email delivery could not be confirmed. Your note has not been marked as sent. Please try again or email omikar243@gmail.com directly.' });
+      sendJson(res, status, { ok: false, message: status === 413 ? 'That note is too large to send.' : 'Email delivery could not be confirmed. Your note has not been marked as sent. Please try again later. Your text has not been marked as delivered.' });
     }
     return;
   }

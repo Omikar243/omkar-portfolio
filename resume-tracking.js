@@ -24,11 +24,11 @@ function firstArrival() {
 export function initResumeTracking() {
   if (privacyRequested()) return () => {};
   // Safari can silently reject asynchronously initiated blob saves. Preserve
-  // its original trusted anchor action rather than claiming a tracked save.
+  // its original trusted anchor action; verify the PDF separately before alerts.
   const safari = /Safari/i.test(navigator.userAgent) && !/Chrome|Chromium|CriOS|Android/i.test(navigator.userAgent);
   const iOS = /iPad|iPhone|iPod/i.test(navigator.userAgent)
     || (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
-  if (safari || iOS) return () => {};
+  const nativeSave = safari || iOS;
   const attribution = firstArrival();
   const abort = new AbortController();
   let busy = false;
@@ -83,7 +83,7 @@ export function initResumeTracking() {
     const link = event.currentTarget;
     if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
     // Normal/right-click direct PDF navigation remains an untracked fallback.
-    event.preventDefault();
+    if (!nativeSave) event.preventDefault();
     if (busy) return;
     busy = true;
     link.setAttribute('aria-busy', 'true');
@@ -95,16 +95,18 @@ export function initResumeTracking() {
       const blob = await response.blob();
       const magic = new TextDecoder().decode(await blob.slice(0, 5).arrayBuffer());
       if (magic !== '%PDF-') throw new Error('Not the original PDF');
-      const objectURL = URL.createObjectURL(blob);
-      nativeDownload(objectURL, filename);
-      setTimeout(() => URL.revokeObjectURL(objectURL), 30000);
+      if (!nativeSave) {
+        const objectURL = URL.createObjectURL(blob);
+        nativeDownload(objectURL, filename);
+        setTimeout(() => URL.revokeObjectURL(objectURL), 30000);
+      }
       const downloadEvent = normalizeResumeEvent({
         ...attribution, host: location.hostname, time: new Date().toISOString(), eventId: crypto.randomUUID(),
       });
       if (event.isTrusted) void alertOwner(downloadEvent);
     } catch {
       // Failure of the enhancement must not take away the original file link.
-      nativeDownload(url, filename);
+      if (!nativeSave) nativeDownload(url, filename);
     } finally {
       busy = false;
       link.removeAttribute('aria-busy');

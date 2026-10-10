@@ -45,7 +45,7 @@ with sync_playwright() as pw:
         download=info.value
         assert download.failure() is None and Path(download.path()).read_bytes()==ORIGINAL
         assert download.suggested_filename=='Omkar_Shettigar_Resume.pdf'
-        if mode in ['accepted','provider-failure','no-storage']:
+        if mode in ['accepted','provider-failure','no-storage','native-safari']:
             page.wait_for_timeout(700)
             assert len(payloads)==1,payloads
             payload=payloads[0]

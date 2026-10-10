@@ -41,9 +41,8 @@ export function buildTree(state = 0, depth = 7) {
   const centerX = .5 + p.lean * .32;
   const bottomY = .636;
   const topY = bottomY - p.loopHeight;
-  // The O uses six shared junctions with a stable, intentional silhouette:
-  // the trunk enters at split, follows two clean limbs, then exits at reunion.
-  // Only the control handles become angular in the squared profiles.
+  // The O anchor nodes remain available for exact SVG geometry and canopy
+  // junctions; the visible letterform is no longer a procedural edge graph.
   const shoulder = lerp(.22, .16, p.square);
   const root = node(centerX, .832, 0);
   // Lean translates the O from bottom to top as one clean silhouette. The
@@ -59,20 +58,8 @@ export function buildTree(state = 0, depth = 7) {
 
   const trunkWidth = .0084;
   edge(root, split, .028 + p.lean * .2, -.079, 0, .058, trunkWidth, 0);
-  const loopWidth = .0064;
-  const h = p.loopHeight;
-  const w = p.loopWidth;
-  const curve = 1 - p.square;
-  // These six edges ARE the two trunk limbs. Their handles stay inside the
-  // silhouette, avoiding the old side protrusions and accidental crossings.
-  edge(split, leftLower, -w * (.58 + curve * .1), -h * .01, -w * .08, h * .12, loopWidth, 1);
-  edge(leftLower, leftUpper, -w * (.06 + curve * .18), -h * .26,
-    -w * (.06 + curve * .18), h * .26, loopWidth * .94, 2);
-  edge(leftUpper, reunion, w * .08, -h * .12, w * (.58 + curve * .1), h * .01, loopWidth * .9, 1);
-  edge(split, rightLower, w * (.58 + curve * .1), -h * .01, w * .08, h * .12, loopWidth, 1);
-  edge(rightLower, rightUpper, w * (.06 + curve * .18), -h * .26,
-    w * (.06 + curve * .18), h * .26, loopWidth * .94, 2);
-  edge(rightUpper, reunion, -w * .08, -h * .12, -w * (.58 + curve * .1), h * .01, loopWidth * .9, 1);
+  // Exact O outline is rendered by the synchronized SVG ellipse/rect below;
+  // no procedural curve, random point or Bezier edge is used for the letter.
 
   const crown = node(nodes[reunion].x + p.lean * .6, topY - .054 + p.crown, 3);
   edge(reunion, crown, p.lean * .13, -.019, -p.lean * .13, .019, .0048, 2);

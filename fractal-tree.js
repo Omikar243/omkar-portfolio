@@ -1,4 +1,4 @@
-import { buildTree, cloneTree, interpolateTree, TREE_PROFILES } from './tree-geometry.js';
+import { buildTree, cloneTree, interpolateTree, quintic, TREE_PROFILES } from './tree-geometry.js';
 
 export function initFractalTree(shell, canvas, button) {
   // An opaque, synchronized surface avoids transparent fast-path corruption on
@@ -37,10 +37,14 @@ export function initFractalTree(shell, canvas, button) {
   let resizeObserver;
   let visibilityObserver;
   const soundButton = shell.querySelector('#treeSoundToggle');
+  const geometricO = shell.querySelector('#geometricO');
+  const oRound = geometricO?.querySelector('[data-o-round]');
+  const oSquare = geometricO?.querySelector('[data-o-square]');
   let soundEnabled = false;
   let audio = null;
   let feedbackAt = -Infinity;
   let feedbackSequence = 0;
+  let fromState = 0;
   let leafBuffer = null;
   const rustleVoices = new Set();
   const leafProfiles = [
@@ -183,6 +187,44 @@ export function initFractalTree(shell, canvas, button) {
     };
   }
 
+  function syncGeometricO(now = performance.now()) {
+    if (!geometricO || !oRound || !oSquare || !width || !height) return;
+    geometricO.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    // Anchor nodes provide placement only. The letterform itself is always a
+    // true SVG ellipse or rect, never a procedural curve from the tree graph.
+    const lowerLeft = point(current.nodes[2]);
+    const lowerRight = point(current.nodes[6]);
+    const upperLeft = point(current.nodes[3]);
+    const upperRight = point(current.nodes[5]);
+    const split = point(current.nodes[1]);
+    const reunion = point(current.nodes[4]);
+    const cx = (split.x + reunion.x) * .5;
+    const cy = (split.y + reunion.y) * .5;
+    const rx = Math.max(1, ((lowerRight.x - lowerLeft.x) + (upperRight.x - upperLeft.x)) * .25);
+    const top = (upperLeft.y + upperRight.y) * .5;
+    const bottom = (lowerLeft.y + lowerRight.y) * .5;
+    const ry = Math.max(1, (bottom - top) * .5);
+    const shapeT = morphStart === -Infinity
+      ? (TREE_PROFILES[state].square >= .5 ? 1 : 0)
+      : quintic((now - morphStart - 32) / duration);
+    const fromSquare = TREE_PROFILES[fromState].square;
+    const toSquare = TREE_PROFILES[state].square;
+    const square = fromSquare + (toSquare - fromSquare) * shapeT;
+    const roundOpacity = toSquare >= fromSquare ? 1 - shapeT : shapeT;
+    const squareOpacity = toSquare >= fromSquare ? shapeT : 1 - shapeT;
+    oRound.setAttribute('cx', cx.toFixed(2));
+    oRound.setAttribute('cy', cy.toFixed(2));
+    oRound.setAttribute('rx', rx.toFixed(2));
+    oRound.setAttribute('ry', ry.toFixed(2));
+    oRound.style.opacity = String(Math.max(0, Math.min(1, roundOpacity)));
+    oSquare.setAttribute('x', (cx - rx).toFixed(2));
+    oSquare.setAttribute('y', top.toFixed(2));
+    oSquare.setAttribute('width', (rx * 2).toFixed(2));
+    oSquare.setAttribute('height', (bottom - top).toFixed(2));
+    oSquare.setAttribute('rx', Math.max(2.2, Math.min(rx * .32, ry * (.08 + (1 - square) * .28))).toFixed(2));
+    oSquare.style.opacity = String(Math.max(0, Math.min(1, squareOpacity)));
+  }
+
   function paintOrbits() {
     for (const orbit of orbitPaths) {
       const rx = orbit.rx * scale;
@@ -270,6 +312,7 @@ export function initFractalTree(shell, canvas, button) {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     paintOrbits();
+    syncGeometricO();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     const elapsed = performance.now() - morphStart;
@@ -278,7 +321,7 @@ export function initFractalTree(shell, canvas, button) {
       growthLight[level] = !motion.matches && morphStart !== -Infinity && progress > 0 && progress < 1
         ? Math.sin(progress * Math.PI) : 0;
     }
-    // All trunk, O-limb, canopy and twig edges use the same procedural graph.
+    // Trunk, canopy and twig edges remain procedural; the precise O is SVG.
     for (const edge of current.edges) {
       const a = current.nodes[edge.a];
       const b = current.nodes[edge.b];
@@ -387,6 +430,7 @@ export function initFractalTree(shell, canvas, button) {
     const now = performance.now();
     sample(now); // Exact currently interpolated node/control geometry, even mid-morph.
     source = cloneTree(current);
+    fromState = state;
     state = (state + 1) % poses.length;
     target = poses[state];
     morphStart = now;

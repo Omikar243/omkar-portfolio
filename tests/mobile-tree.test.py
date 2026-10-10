@@ -88,7 +88,7 @@ with sync_playwright() as p:
     assert 12 <= frames <= 38, f"Mobile frame budget unexpected: {frames} paints / 1.1s"
     budget = page.evaluate("""() => {const c=document.querySelector('#fractalCanvas'),r=c.getBoundingClientRect();return {tier:c.dataset.renderTier,branches:Number(c.dataset.branchCount),dpr:c.width/r.width}}""")
     assert budget["tier"] == "mobile-30fps"
-    assert budget["branches"] == 273
+    assert budget["branches"] == 267
     assert budget["dpr"] <= 1.51
 
     # Both real theme buttons must coordinate the canvas and saved global theme.

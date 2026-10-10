@@ -69,3 +69,12 @@ Evidence: all five real touchscreen transitions in mobile Chromium requested8ms 
 ## Project destinations
 
 - [x] Ancient Modern Apparel opens the owner-supplied live website; Knee Osteoarthritis Detection opens the owner-supplied GitHub repository. Replace placeholder notes buttons with clearly labelled accessible external links that open in a new tab, retaining existing project descriptions and design.
+
+## Mobile canvas compatibility and balanced About
+
+- [x] Preserve the living connected-O tree, all five forms, orbit lines and leaf rustles while replacing transparent desynchronized compositing with a fully painted, synchronized cream/espresso canvas; remove SVG turbulence from the paper grain to avoid filter/compositor artifacts. Repaint on theme changes, resizing and canvas context restoration.
+- [x] Refine About spacing and typographic rhythm around the full-frame portrait and compact Omkar caption at phone, tablet and desktop sizes without changing identity, personal copy or resume.
+- [x] Add a brief, integrated warm highlight travelling from the trunk to canopy during signature changes; keep connected geometry and calm continuous morphing, support rapid retargets and suppress extra animation for reduced motion.
+- [ ] Check the actual production project-card actions, portrait loading, all five touch states, muted/enabled leaf audio, haptic requests, canvas background pixels and theme switching. Report physical-phone limitations honestly.
+
+Local evidence: opaque cream/espresso corner pixels; all five touchscreen signatures with analysed leaf-rustle PCM and instrumented8ms haptics; mute/offscreen audio cleanup; context-recovery repaint; compact12px caption gap and metric bounds at320/390/768/900/1440; both real project popups and byte-identical resume download passed. Physical phone GPU, speaker and haptic actuator remain unverified.

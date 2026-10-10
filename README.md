@@ -27,6 +27,10 @@ The hero artwork uses a single Canvas 2D renderer and fixed connected Bézier gr
 
 Run the repeatable geometry tests with `node tests/tree-geometry.test.js`. Real-touch Chromium mobile checks are in `tests/mobile-tree.test.py` (Python Playwright and Chromium required): `python3 tests/mobile-tree.test.py`. This verifies all five forms, rapid retargets, coordinated themes, reduced-motion repaint, persistence, low-power budgets and that only SIGNAL // ORBIT remains.
 
+The artwork uses an **opaque, synchronized canvas**, filling every backing pixel with the current cream or espresso theme before drawing. This avoids dependence on transparent low-latency compositing on mobile GPUs; paper texture uses sparse CSS specks rather than an SVG turbulence filter. Context-restoration handlers repaint the active theme. Signature changes add a restrained brightness wave along the existing trunk and canopy, with a small status-dot pulse; reduced-motion mode skips both. The About layout balances the full-frame portrait, compact **Omkar** caption and personal story at phone, tablet and desktop widths.
+
+Run `python3 tests/live-portfolio.test.py https://omkar-v-shettigar.vercel.app/` for opaque light/dark pixel checks, all five touch/haptic requests, leaf-rustle PCM graph evidence, portrait/caption bounds, actual external project-button popups and original resume download. These are mobile-emulated browser checks, not validation of a physical phone’s GPU, loudspeaker or vibration actuator.
+
 ## Run locally
 
 ```bash
@@ -84,6 +88,7 @@ node --test tests/orbit-physics.test.js
 python3 tests/feedback-timeline.test.py
 python3 tests/mobile-tree.test.py
 python3 tests/leaves-about.test.py
+python3 tests/live-portfolio.test.py
 ```
 
 Browser tests use real Chromium touchscreen events in mobile emulation. The vibration API is instrumented to verify 8ms requests for each signature; tests cannot confirm physical actuator sensation. Unsupported vibration and reduced-motion fallbacks are tested.

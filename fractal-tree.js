@@ -1,7 +1,9 @@
 import { buildTree, cloneTree, interpolateTree, TREE_PROFILES } from './tree-geometry.js';
 
 export function initFractalTree(shell, canvas, button) {
-  const ctx = canvas?.getContext('2d', { alpha: true, desynchronized: true });
+  // An opaque, synchronized surface avoids transparent fast-path corruption on
+  // some mobile GPU/browser combinations. Every backing pixel is painted below.
+  const ctx = canvas?.getContext('2d', { alpha: false, desynchronized: false });
   if (!shell || !canvas || !button || !ctx) return () => {};
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobileQuery = window.matchMedia('(max-width: 640px)');
@@ -26,6 +28,7 @@ export function initFractalTree(shell, canvas, button) {
   let active = false;
   let visible = true;
   let disposed = false;
+  let contextLost = false;
   let lastFrame = -Infinity;
   let clock = 0;
   let lastTick = 0;
@@ -143,7 +146,8 @@ export function initFractalTree(shell, canvas, button) {
     { rx: .53, ry: .12, rotation: .08, speed: .1, alpha: .22, particles: [{ phase: 2.1, size: 1.25 }] },
     { rx: .3, ry: .44, rotation: -.9, speed: .075, alpha: .2, particles: [{ phase: .35, size: 1.05 }] },
   ];
-  const colors = { branch: '', tip: '', orbit: '', particle: '' };
+  const colors = { background: '', branch: '', tip: '', orbit: '', particle: '' };
+  const growthLight = new Float32Array(10);
   const listen = (element, event, handler, options = {}) => {
     element.addEventListener(event, handler, { ...options, signal: listeners.signal });
   };
@@ -151,6 +155,7 @@ export function initFractalTree(shell, canvas, button) {
   function updatePalette() {
     const dark = document.body.classList.contains('dark');
     shell.dataset.theme = canvas.dataset.theme = dark ? 'dark' : 'light';
+    colors.background = dark ? '#211a15' : '#f3eadc';
     colors.branch = dark ? '213,175,119' : '130,92,49';
     colors.tip = dark ? 'rgba(225,194,141,.68)' : 'rgba(175,129,64,.53)';
     colors.orbit = dark ? '209,176,121' : '139,102,57';
@@ -208,11 +213,21 @@ export function initFractalTree(shell, canvas, button) {
   }
 
   function paint() {
-    if (!width || !height || disposed) return;
-    ctx.clearRect(0, 0, width, height);
+    if (!width || !height || disposed || contextLost) return;
+    // Paint in physical pixels first, including rounded-DPR border pixels.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = colors.background;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     paintOrbits();
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
+    const elapsed = performance.now() - morphStart;
+    for (let level = 0; level < growthLight.length; level += 1) {
+      const progress = (elapsed - level * 45) / 760;
+      growthLight[level] = !motion.matches && morphStart !== -Infinity && progress > 0 && progress < 1
+        ? Math.sin(progress * Math.PI) : 0;
+    }
     // All trunk, O-limb, canopy and twig edges use the same procedural graph.
     for (const edge of current.edges) {
       const a = current.nodes[edge.a];
@@ -225,7 +240,8 @@ export function initFractalTree(shell, canvas, button) {
       ctx.moveTo(start.x, start.y);
       ctx.bezierCurveTo(control1.x, control1.y, control2.x, control2.y, end.x, end.y);
       ctx.lineWidth = Math.max(.38, edge.width * scale);
-      const alpha = Math.max(.31, .87 - edge.level * .055) + pointer.hover * .035;
+      const alpha = Math.min(1, Math.max(.31, .87 - edge.level * .055)
+        + pointer.hover * .035 + growthLight[Math.min(edge.level, 9)] * .13);
       ctx.strokeStyle = `rgba(${colors.branch},${alpha})`;
       ctx.stroke();
     }
@@ -233,8 +249,9 @@ export function initFractalTree(shell, canvas, button) {
     ctx.fillStyle = colors.tip;
     ctx.beginPath();
     for (let i = 0; i < current.tips.length; i += 1) {
-      const tip = point(current.nodes[current.tips[i]]);
-      const radius = i % 7 === 0 ? .9 : .55;
+      const node = current.nodes[current.tips[i]];
+      const tip = point(node);
+      const radius = (i % 7 === 0 ? .9 : .55) + growthLight[Math.min(node.level, 9)] * .3;
       ctx.moveTo(tip.x + radius, tip.y);
       ctx.arc(tip.x, tip.y, radius, 0, Math.PI * 2);
     }
@@ -259,7 +276,7 @@ export function initFractalTree(shell, canvas, button) {
   }
 
   function start() {
-    if (active || disposed || !visible || document.hidden || motion.matches) return;
+    if (active || disposed || contextLost || !visible || document.hidden || motion.matches) return;
     active = true;
     lastTick = 0;
     lastFrame = -Infinity;
@@ -270,6 +287,11 @@ export function initFractalTree(shell, canvas, button) {
     cancelAnimationFrame(raf);
     raf = 0;
     lastTick = 0;
+  }
+  function pause() {
+    stop();
+    feedbackSequence += 1;
+    fadeRustles();
   }
   function resize() {
     const bounds = shell.getBoundingClientRect();
@@ -351,9 +373,20 @@ export function initFractalTree(shell, canvas, button) {
   listen(motion, 'change', motionChanged);
   listen(mobileQuery, 'change', resize);
   listen(window, 'resize', resize, { passive: true });
-  listen(document, 'visibilitychange', () => { if (document.hidden) stop(); else start(); });
+  listen(canvas, 'contextlost', (event) => {
+    event.preventDefault();
+    contextLost = true;
+    pause();
+  });
+  listen(canvas, 'contextrestored', () => {
+    contextLost = false;
+    sample(performance.now());
+    updatePalette();
+    start();
+  });
+  listen(document, 'visibilitychange', () => { if (document.hidden) pause(); else start(); });
   // Page cache pauses instead of disposing; permanent navigation releases resources.
-  listen(window, 'pagehide', (event) => { if (event.persisted) stop(); else destroy(); });
+  listen(window, 'pagehide', (event) => { if (event.persisted) pause(); else destroy(); });
   listen(window, 'pageshow', start);
   if ('ResizeObserver' in window) {
     resizeObserver = new ResizeObserver(resize);
@@ -362,7 +395,7 @@ export function initFractalTree(shell, canvas, button) {
   if ('IntersectionObserver' in window) {
     visibilityObserver = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      if (visible) { sample(performance.now()); paint(); start(); } else stop();
+      if (visible) { sample(performance.now()); paint(); start(); } else pause();
     }, { threshold: .02 });
     visibilityObserver.observe(shell);
   }
@@ -379,6 +412,7 @@ export function initFractalTree(shell, canvas, button) {
   }
   canvas.dataset.renderTier = lowPower ? 'mobile-30fps' : 'desktop-60fps';
   canvas.dataset.branchCount = String(current.edges.length);
+  canvas.dataset.surface = 'opaque-synchronized';
   announceForm(false);
   updatePalette();
   resize();

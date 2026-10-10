@@ -58,6 +58,19 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.13 });
 reveals.forEach((element) => revealObserver.observe(element));
 
+document.querySelectorAll('.timeline-toggle').forEach((toggle) => {
+  const detail = document.getElementById(toggle.getAttribute('aria-controls'));
+  const item = toggle.closest('.timeline-item');
+  toggle.addEventListener('click', () => {
+    const willOpen = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(willOpen));
+    toggle.classList.toggle('is-open', willOpen);
+    toggle.querySelector('span').textContent = willOpen ? '−' : '+';
+    if (detail) detail.hidden = !willOpen;
+    item?.classList.toggle('is-expanded', willOpen);
+  });
+});
+
 const updateProgress = () => {
   const scrollable = document.documentElement.scrollHeight - window.innerHeight;
   if (progress) progress.style.width = `${scrollable ? (window.scrollY / scrollable) * 100 : 0}%`;

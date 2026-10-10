@@ -1,7 +1,7 @@
 # Portfolio outcomes
 
 - [x] Create a fully responsive personal portfolio for AI ENGINEER / ML ENGINEER / DATA SCIENTIST Omkar V Shettigar using a Modern Renaissance visual language, royal cursive handwriting, beige and brownish-gold accents, and a layout optimized for mobile, tablet, and desktop.
-- [x] Create a hero section featuring Omkar V Shettigar’s AI ENGINEER / ML ENGINEER / DATA SCIENTIST positioning and the tagline “DO YOUR BEST, SURPRISE ME”.
+- [x] Create a hero section featuring Omkar V Shettigar’s AI ENGINEER / ML ENGINEER / DATA SCIENTIST positioning; the phrase “DO YOUR BEST, SURPRISE ME” is not portfolio copy.
 - [x] Create an About Me section highlighting professional experience using the supplied resume, including measurable work in sustainable finance, production-grade LLM systems, agentic AI, RAG pipelines, and high-throughput ML systems.
 - [x] Create an animated experience timeline with scroll-triggered transitions covering Catalysk, SM Khannukar Associates, and the B.E. Artificial Intelligence & Data Science education timeline.
 - [x] Create a Projects gallery presenting the featured works from the resume, including Ancient Modern Apparel and Knee Osteoarthritis Detection using CNN, with project cards and case-study interaction feedback.

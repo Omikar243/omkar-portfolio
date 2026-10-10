@@ -31,7 +31,7 @@ const readRequestBody = (req) => new Promise((resolve, reject) => {
   req.on('error', reject);
 });
 
-createServer(async (req, res) => {
+const handler = async (req, res) => {
   const pathname = decodeURIComponent(new URL(req.url, `http://${req.headers.host}`).pathname);
 
   if (req.method === 'GET' && pathname === '/api/health') {
@@ -94,4 +94,10 @@ createServer(async (req, res) => {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('Not found');
   }
-}).listen(port, '0.0.0.0', () => console.log(`Omkar portfolio listening on ${port}`));
+};
+
+export default handler;
+
+if (!process.env.VERCEL) {
+  createServer(handler).listen(port, '0.0.0.0', () => console.log(`Omkar portfolio listening on ${port}`));
+}

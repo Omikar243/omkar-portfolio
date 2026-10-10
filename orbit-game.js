@@ -70,6 +70,7 @@ export const initOrbitGame = (element) => {
   let reducedMotion = Boolean(reducedMotionQuery?.matches);
   let audioContext = null;
   let soundEnabled = false;
+  let lastSoundLevel = 1;
 
   const announce = (message) => {
     if (liveRegion) liveRegion.textContent = message;
@@ -138,20 +139,56 @@ export const initOrbitGame = (element) => {
     if (audioContext.state === 'suspended') audioContext.resume().catch(()=>{soundEnabled=false; if(soundButton){soundButton.textContent='sound off';soundButton.setAttribute('aria-pressed','false');}});
     return audioContext;
   };
-  const blip = (event) => {
+  const playTone = ({ frequency, duration = 0.16, type = 'sine', volume = 0.035, slideTo = null, delay = 0 }) => {
     let audio;
-    try { audio=ensureAudio(); } catch { soundEnabled=false; return; }
+    try { audio = ensureAudio(); } catch { soundEnabled = false; return; }
     if (!audio || !soundEnabled) return;
+    const start = audio.currentTime + delay;
     const oscillator = audio.createOscillator();
     const gain = audio.createGain();
-    oscillator.type = 'sine';
-    oscillator.frequency.value = event.type === 'collect' ? 520 + Math.min(420, state.combo * 45) : 135;
-    gain.gain.setValueAtTime(0.0001, audio.currentTime);
-    gain.gain.exponentialRampToValueAtTime(event.type === 'collect' ? 0.035 : 0.05, audio.currentTime + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.16);
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, start);
+    if (slideTo) oscillator.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), start + duration);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(volume, start + Math.min(0.018, duration * 0.2));
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + duration);
     oscillator.connect(gain).connect(audio.destination);
-    oscillator.start();
-    oscillator.stop(audio.currentTime + 0.18);
+    oscillator.start(start);
+    oscillator.stop(start + duration + 0.015);
+  };
+  const playSound = (name, event = {}) => {
+    if (!soundEnabled) return;
+    if (name === 'start' || name === 'restart') {
+      playTone({ frequency: 262, duration: .12, volume: .028 });
+      playTone({ frequency: 392, duration: .16, volume: .032, delay: .085 });
+      playTone({ frequency: 523, duration: .22, volume: .026, delay: .17 });
+    } else if (name === 'pause') {
+      playTone({ frequency: 330, duration: .11, type: 'triangle', volume: .026 });
+      playTone({ frequency: 220, duration: .16, type: 'triangle', volume: .022, delay: .07 });
+    } else if (name === 'resume') {
+      playTone({ frequency: 220, duration: .11, type: 'triangle', volume: .022 });
+      playTone({ frequency: 330, duration: .16, type: 'triangle', volume: .026, delay: .07 });
+    } else if (name === 'collect') {
+      const base = 520 + Math.min(420, state.combo * 45);
+      playTone({ frequency: base, duration: .14, volume: .035 });
+      playTone({ frequency: base * 1.5, duration: .18, volume: .018, delay: .045 });
+    } else if (name === 'level') {
+      playTone({ frequency: 494, duration: .12, volume: .026 });
+      playTone({ frequency: 659, duration: .17, volume: .03, delay: .09 });
+      playTone({ frequency: 988, duration: .24, volume: .022, delay: .18 });
+    } else if (name === 'hit') {
+      playTone({ frequency: 180, slideTo: 74, duration: .24, type: 'sawtooth', volume: .045 });
+      playTone({ frequency: 92, slideTo: 48, duration: .28, type: 'triangle', volume: .025, delay: .035 });
+    } else if (name === 'gameover') {
+      playTone({ frequency: 330, slideTo: 196, duration: .24, type: 'triangle', volume: .03 });
+      playTone({ frequency: 247, slideTo: 147, duration: .3, type: 'triangle', volume: .026, delay: .18 });
+      playTone({ frequency: 165, slideTo: 82, duration: .42, type: 'sine', volume: .022, delay: .38 });
+    }
+    void event;
+  };
+  const blip = (event) => {
+    if (event.type === 'collect') playSound('collect', event);
+    if (event.type === 'hit') playSound('hit', event);
   };
   const handleEvents = (events) => {
     events.forEach((event) => {
@@ -163,11 +200,15 @@ export const initOrbitGame = (element) => {
         addParticles(event);
         blip(event);
       }
-      if (event.type === 'collect') announce(`Collected. ${event.points} points. Combo times ${event.combo}.`);
+      if (event.type === 'collect') {
+        announce(`Collected. ${event.points} points. Combo times ${event.combo}.`);
+        if (state.level > lastSoundLevel) { playSound('level', event); lastSoundLevel = state.level; }
+      }
       if (event.type === 'hit') announce(`Hull hit. ${event.lives} lives remaining.`);
       if (event.type === 'gameover') {
         if (state.score > state.best) { state.best = state.score; writeBest(state.best); }
         announce(`Experiment over. Final score ${state.score}. Best score ${state.best}.`);
+        playSound('gameover', event);
       }
     });
   };
@@ -327,6 +368,8 @@ export const initOrbitGame = (element) => {
     state.aim=null; Object.keys(input).forEach(k=>input[k]=false);
     particles.length=0; waves.length=0;
     lastTime = 0;
+    lastSoundLevel = 1;
+    playSound('start');
     announce('Experiment started. Use arrows or WASD, or aim with pointer or touch.');
     updateUI();
     canvas.focus({ preventScroll: true });
@@ -335,7 +378,8 @@ export const initOrbitGame = (element) => {
   const clearInput = () => {Object.keys(input).forEach(k=>input[k]=false);state.aim=null;};
   const togglePause = () => {
     clearInput();
-    if (state.status === 'playing') pauseOrbit(state); else if (state.status === 'paused') resumeOrbit(state);
+    if (state.status === 'playing') { pauseOrbit(state); playSound('pause'); }
+    else if (state.status === 'paused') { resumeOrbit(state); playSound('resume'); }
     updateUI();
     schedule();
   };
@@ -344,6 +388,8 @@ export const initOrbitGame = (element) => {
     state.aim=null; Object.keys(input).forEach(k=>input[k]=false);
     particles.length=0;waves.length=0;
     lastTime = 0;
+    lastSoundLevel = 1;
+    playSound('restart');
     announce('New experiment ready.');
     updateUI();
     canvas.focus({ preventScroll: true });

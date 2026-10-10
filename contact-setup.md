@@ -13,3 +13,7 @@ Official references: [FormSubmit documentation](https://formsubmit.co/documentat
 ## Verified activation
 
 On 10 October 2026 the owner activated forwarding to the owner’s inbox. A test submitted through the real production form returned HTTP 200 and `success: "true"`; the owner subsequently confirmed **Received**. Visitor Reply-To was verified in the submitted payload. This is the recorded end-to-end confirmation, not just provider acceptance.
+
+## Anonymous submission routing
+
+The provider-issued anonymous form identifier replaced the mailbox literal in JavaScript and the HTML action. A real labelled browser test from the production origin returned HTTP 200 with `success: "true"` (reference OMKAR-ANON-2155). The identifier is a public form action, not an archive/API credential. Current source does not contain the inbox address; the original public PDF retains it by the owner’s explicit choice. Previously published Git history is unchanged.

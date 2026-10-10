@@ -1,5 +1,6 @@
-export const CONTACT_RECIPIENT = 'omikar243@gmail.com';
-export const CONTACT_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT_RECIPIENT}`;
+// Public submission identifier issued by FormSubmit; not a mailbox or an archive/API key.
+export const CONTACT_FORM_ID = '34a6882bde5af629dd7f3dc5bcc89331';
+export const CONTACT_ENDPOINT = `https://formsubmit.co/ajax/${CONTACT_FORM_ID}`;
 
 export function deliveryPayload({ name, email, message, _honey = '' }) {
   return {

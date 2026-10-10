@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict';
-import { deliveryPayload, interpretDelivery, forwardContact } from '../contact-delivery.js';
+import { deliveryPayload, interpretDelivery, forwardContact, CONTACT_FORM_ID, CONTACT_ENDPOINT } from '../contact-delivery.js';
+
+assert.match(CONTACT_FORM_ID, /^[a-f0-9]{32}$/);
+assert.equal(CONTACT_ENDPOINT.includes('@'), false);
 
 const note = { name: 'A visitor', email: 'visitor@example.com', message: 'Hello, let us discuss a project.' };
 const payload = deliveryPayload(note);

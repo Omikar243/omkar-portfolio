@@ -72,7 +72,7 @@ The included `pages.yml` workflow publishes the browser-only portfolio from `mai
 
 ## Contact activation and checks
 
-Activation completed on 10 October 2026. The owner confirmed receiving the live form test, and its visitor Reply-To payload was verified. The recipient mailbox is managed by the forwarding provider. For a fresh deployment or recipient change, open the FormSubmit activation email sent during setup, click **Activate Form**, then send a clearly labelled test from the website. Confirm receipt in the inbox or Spam and check that Reply addresses the visitor. Provider acceptance is not a guarantee of inbox placement.
+Activation completed on 10 October 2026. The owner confirmed receiving the live form test, and its visitor Reply-To payload was verified. The recipient mailbox is managed privately by the forwarding provider. Current source uses the provider-issued anonymous submission identifier, not an email address; the original resume is an intentional public-email exception. Older Git commits are not rewritten. For a fresh deployment or recipient change, open the FormSubmit activation email sent during setup, click **Activate Form**, then send a clearly labelled test from the website. Confirm receipt in the inbox or Spam and check that Reply addresses the visitor. Provider acceptance is not a guarantee of inbox placement.
 
 ```bash
 node tests/contact-delivery.test.js

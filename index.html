@@ -30,6 +30,7 @@
       <nav class="main-nav" aria-label="Main navigation">
         <a href="#about">about</a>
         <a href="#work">work</a>
+        <a href="#playground">playground</a>
         <a href="#skills">skills</a>
         <a href="#contact">contact</a>
       </nav>
@@ -48,6 +49,7 @@
           <div class="hero-actions">
             <a class="button button-primary" href="#work">Explore the work <span>↘</span></a>
             <a class="text-link" href="#contact">Let’s talk <span>↗</span></a>
+            <a class="button button-secondary" href="/Omkar_Shettigar_Resume.pdf" download="Omkar_Shettigar_Resume.pdf">Download resume <span>↓</span></a>
           </div>
           <p class="hero-tagline">I turn noisy signals into decisions worth trusting.</p>
         </div>
@@ -118,8 +120,34 @@
         </div>
       </section>
 
+      <section class="playground-section section-shell" id="playground">
+        <div class="section-label reveal"><span>04</span><span>the lab</span></div>
+        <div class="playground-heading"><div class="section-heading reveal"><p class="eyebrow">Model playground</p><h2>Touch the <span class="script-word">decision engine.</span></h2></div><p class="heading-note reveal reveal-delay-1">I route evidence through rules, retrieval and reasoning. Tune the signals, then test your instincts in a tiny merchant-classification game.</p></div>
+        <div class="playground-grid">
+          <article class="model-panel reveal">
+            <div class="panel-top"><span>HYBRID CLASSIFIER / LIVE</span><span class="live-pill"><i></i>live</span></div>
+            <p class="panel-copy">Adjust the inputs to see which layer takes the next decision.</p>
+            <div class="range-stack">
+              <label class="range-row"><span>Rules certainty</span><input id="rulesRange" type="range" min="0" max="100" value="72" /><output id="rulesValue">72%</output></label>
+              <label class="range-row"><span>Retrieval match</span><input id="retrievalRange" type="range" min="0" max="100" value="86" /><output id="retrievalValue">86%</output></label>
+              <label class="range-row"><span>LLM confidence</span><input id="llmRange" type="range" min="0" max="100" value="68" /><output id="llmValue">68%</output></label>
+            </div>
+            <div class="decision-output"><div><span class="output-label">next route</span><strong id="decisionRoute">Dense retrieval → peer context</strong><p id="decisionReason">The evidence is strong enough to retrieve a trusted comparison before reasoning.</p></div><div class="score-ring"><strong id="decisionScore">77%</strong><span>confidence</span></div></div>
+            <div class="confidence-meter"><span id="confidenceMeter"></span></div>
+          </article>
+          <article class="game-panel reveal reveal-delay-1">
+            <div class="panel-top"><span>MERCHANT MATCH / MINI DEMO</span><span id="roundCount">01 / 03</span></div>
+            <p class="panel-copy">Classify the narration the way a progressive P2P / P2M funnel might.</p>
+            <div class="game-prompt" id="gamePrompt">UPI debit · FreshBasket Supermarket · monthly groceries</div>
+            <div class="game-options" id="gameOptions"><button type="button" data-answer="P2M">P2M / merchant</button><button type="button" data-answer="P2P">P2P / personal</button><button type="button" data-answer="review">send to review</button></div>
+            <p class="game-feedback" id="gameFeedback" role="status" aria-live="polite">Choose a label to make the call.</p>
+            <div class="game-footer"><span>score <strong id="gameScore">0</strong></span><button class="text-button" id="gameReset" type="button">reset game ↻</button></div>
+          </article>
+        </div>
+      </section>
+
       <section class="skills-section section-shell" id="skills">
-        <div class="section-label reveal"><span>04</span><span>the toolkit</span></div>
+        <div class="section-label reveal"><span>05</span><span>the toolkit</span></div>
         <div class="skills-layout"><div class="section-heading reveal"><p class="eyebrow">Skills</p><h2>Tools for <span class="script-word">meaningful</span><br />machine intelligence.</h2></div><div class="skills-cloud reveal reveal-delay-1"><div class="skill-group"><span class="skill-number">01</span><div><h3>Generative AI & LLMs</h3><p>LangChain · LangGraph · Agentic AI · RAG · Ollama · Hugging Face · MCP · LLaMA-3 · Gemma</p></div></div><div class="skill-group"><span class="skill-number">02</span><div><h3>Machine Learning & NLP</h3><p>SBERT · FAISS · PyTorch · Scikit-learn · XGBoost · classification · calibration · HITL</p></div></div><div class="skill-group"><span class="skill-number">03</span><div><h3>Production & Performance</h3><p>FastAPI · Docker · AWS EC2 / S3 / RDS · MLflow · monitoring · A/B testing · profiling</p></div></div><div class="skill-group"><span class="skill-number">04</span><div><h3>Languages & Data</h3><p>Python · TypeScript · JavaScript · Java · C# · PostgreSQL · MySQL · Supabase · Turso</p></div></div></div></div>
       </section>
 
@@ -128,8 +156,8 @@
       </section>
 
       <section class="contact-section section-shell" id="contact">
-        <div class="section-label reveal"><span>05</span><span>the invitation</span></div>
-        <div class="contact-grid"><div class="section-heading reveal"><p class="eyebrow">Contact</p><h2>Have a hard<br /><span class="script-word">problem?</span></h2><p class="heading-note">Good. Tell me what you’re building, what’s stuck, or what you can’t stop thinking about.</p><div class="contact-details"><a href="mailto:omikar243@gmail.com">omikar243@gmail.com</a><a href="https://www.linkedin.com/in/omkar-shettigar-43035737a" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/Omikar243" target="_blank" rel="noreferrer">GitHub ↗</a></div></div><form class="contact-form reveal reveal-delay-1" id="contactForm" novalidate><div class="form-row"><label><span>Your name</span><input type="text" name="name" placeholder="Jane Doe" autocomplete="name" required /></label><label><span>Your email</span><input type="email" name="email" placeholder="jane@company.com" autocomplete="email" required /></label></div><label><span>What are we solving?</span><textarea name="message" rows="5" placeholder="A model to stabilize, a product to imagine, a question to chase…" required></textarea></label><div class="form-footer"><button class="button button-primary" type="submit">Open email draft <span>↗</span></button><p class="form-status" id="formStatus" role="status" aria-live="polite"></p></div></form></div>
+        <div class="section-label reveal"><span>06</span><span>the invitation</span></div>
+        <div class="contact-grid"><div class="section-heading reveal"><p class="eyebrow">Contact</p><h2>Have a hard<br /><span class="script-word">problem?</span></h2><p class="heading-note">Good. Tell me what you’re building, what’s stuck, or what you can’t stop thinking about.</p><div class="contact-details"><a href="mailto:omikar243@gmail.com">omikar243@gmail.com</a><a href="https://www.linkedin.com/in/omkar-shettigar-43035737a" target="_blank" rel="noreferrer">LinkedIn ↗</a><a href="https://github.com/Omikar243" target="_blank" rel="noreferrer">GitHub ↗</a></div></div><form class="contact-form reveal reveal-delay-1" id="contactForm" novalidate><div class="form-row"><label><span>Your name</span><input type="text" name="name" placeholder="Jane Doe" autocomplete="name" required /></label><label><span>Your email</span><input type="email" name="email" placeholder="jane@company.com" autocomplete="email" required /></label></div><label><span>What are we solving?</span><textarea name="message" rows="5" placeholder="A model to stabilize, a product to imagine, a question to chase…" required></textarea></label><div class="form-footer"><button class="button button-primary" type="submit">Send message <span>↗</span></button><p class="form-status" id="formStatus" role="status" aria-live="polite"></p></div></form></div>
       </section>
     </main>
 

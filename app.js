@@ -88,9 +88,91 @@ document.querySelectorAll('[data-toast]').forEach((button) => button.addEventLis
   toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 3200);
 }));
 
+const rulesRange = document.querySelector('#rulesRange');
+const retrievalRange = document.querySelector('#retrievalRange');
+const llmRange = document.querySelector('#llmRange');
+const updateModelPlayground = () => {
+  if (!rulesRange || !retrievalRange || !llmRange) return;
+  const rules = Number(rulesRange.value);
+  const retrieval = Number(retrievalRange.value);
+  const llm = Number(llmRange.value);
+  const score = Math.round((rules * .35) + (retrieval * .35) + (llm * .30));
+  const route = rules >= 86 ? 'Deterministic rules → safe match' : retrieval >= 78 ? 'Dense retrieval → peer context' : 'Few-shot LLM → analyst review';
+  const reason = rules >= 86 ? 'The structured signals are decisive, so the fastest safe route wins.' : retrieval >= 78 ? 'The evidence is strong enough to retrieve a trusted comparison before reasoning.' : 'The model is uncertain; keep a human in the loop before the decision ships.';
+  document.querySelector('#rulesValue').textContent = `${rules}%`;
+  document.querySelector('#retrievalValue').textContent = `${retrieval}%`;
+  document.querySelector('#llmValue').textContent = `${llm}%`;
+  document.querySelector('#decisionRoute').textContent = route;
+  document.querySelector('#decisionReason').textContent = reason;
+  document.querySelector('#decisionScore').textContent = `${score}%`;
+  document.querySelector('#confidenceMeter').style.width = `${score}%`;
+};
+[rulesRange, retrievalRange, llmRange].forEach((range) => range?.addEventListener('input', updateModelPlayground));
+updateModelPlayground();
+
+const gameRounds = [
+  { prompt: 'UPI debit · FreshBasket Supermarket · monthly groceries', answer: 'P2M' },
+  { prompt: 'NEFT credit · Rahul S Shetty · monthly transfer', answer: 'P2P' },
+  { prompt: 'IMPS debit · Apex Cloud Services Pvt Ltd · annual renewal', answer: 'P2M' },
+];
+let gameRound = 0;
+let gameScore = 0;
+let roundLocked = false;
+const gamePrompt = document.querySelector('#gamePrompt');
+const gameFeedback = document.querySelector('#gameFeedback');
+const gameScoreLabel = document.querySelector('#gameScore');
+const roundCount = document.querySelector('#roundCount');
+const gameOptions = [...document.querySelectorAll('#gameOptions button')];
+const renderGameRound = () => {
+  const round = gameRounds[gameRound];
+  if (!round || !gamePrompt) return;
+  gamePrompt.textContent = round.prompt;
+  roundCount.textContent = `${String(gameRound + 1).padStart(2, '0')} / ${String(gameRounds.length).padStart(2, '0')}`;
+  gameFeedback.textContent = 'Choose a label to make the call.';
+  gameFeedback.className = 'game-feedback';
+  gameOptions.forEach((button) => {
+    button.disabled = false;
+    button.classList.remove('is-correct', 'is-wrong');
+  });
+  roundLocked = false;
+};
+gameOptions.forEach((button) => button.addEventListener('click', () => {
+  if (roundLocked) return;
+  roundLocked = true;
+  const correct = button.dataset.answer === gameRounds[gameRound].answer;
+  if (correct) {
+    gameScore += 1;
+    gameFeedback.textContent = 'Correct — the funnel would route this with confidence.';
+    gameFeedback.classList.add('is-correct');
+    button.classList.add('is-correct');
+  } else {
+    gameFeedback.textContent = `Not quite — the resume logic would call this ${gameRounds[gameRound].answer}.`;
+    gameFeedback.classList.add('is-wrong');
+    button.classList.add('is-wrong');
+  }
+  gameScoreLabel.textContent = String(gameScore);
+  gameOptions.forEach((option) => { option.disabled = true; });
+  window.setTimeout(() => {
+    if (gameRound < gameRounds.length - 1) {
+      gameRound += 1;
+      renderGameRound();
+    } else {
+      gameFeedback.textContent = `Round complete — ${gameScore}/${gameRounds.length}. Reset and try again.`;
+    }
+  }, 850);
+}));
+document.querySelector('#gameReset')?.addEventListener('click', () => {
+  gameRound = 0;
+  gameScore = 0;
+  gameScoreLabel.textContent = '0';
+  renderGameRound();
+});
+renderGameRound();
+
 const form = document.querySelector('#contactForm');
 const status = document.querySelector('#formStatus');
-form?.addEventListener('submit', (event) => {
+const submitButton = form?.querySelector('button[type="submit"]');
+form?.addEventListener('submit', async (event) => {
   event.preventDefault();
   const fields = [...form.elements].filter((field) => field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement);
   fields.forEach((field) => field.removeAttribute('aria-invalid'));
@@ -104,24 +186,26 @@ form?.addEventListener('submit', (event) => {
     }
     return;
   }
-  const data = new FormData(form);
-  const name = String(data.get('name') || '').trim();
-  const email = String(data.get('email') || '').trim();
-  const message = String(data.get('message') || '').trim();
-  if (!name || !email || !message) {
-    if (status) {
-      status.textContent = 'Please fill in all three fields.';
-      status.style.color = '#a34f35';
-    }
-    return;
-  }
+  const payload = Object.fromEntries(new FormData(form).entries());
   if (status) {
     status.style.color = 'var(--gold)';
-    status.textContent = 'Opening an email draft with your note…';
+    status.textContent = 'Sending your note…';
   }
-  const subject = encodeURIComponent(`Portfolio note from ${name}`);
-  const bodyText = encodeURIComponent(`${message}\n\nReply to: ${email}`);
-  window.location.href = `mailto:omikar243@gmail.com?subject=${subject}&body=${bodyText}`;
+  if (submitButton) submitButton.disabled = true;
+  try {
+    const response = await fetch('/api/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'The note could not be sent.');
+    form.reset();
+    if (status) status.textContent = result.message || 'Your note is in. I’ll get back to you soon.';
+  } catch (error) {
+    if (status) {
+      status.style.color = '#a34f35';
+      status.textContent = error.message || 'I could not send that note. Please try again.';
+    }
+  } finally {
+    if (submitButton) submitButton.disabled = false;
+  }
 });
 
 const resizeCanvas = () => {

@@ -9,6 +9,8 @@
           "index.html",
           "styles.css",
           "app.js",
+          "fractal-tree.js",
+          "tree-geometry.js",
           "manus-routes.json",
           "public/**"
         ]

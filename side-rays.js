@@ -91,24 +91,24 @@ const initSideRays = () => {
     targetCtx.fill();
   };
 
-  const paintRays = (targetCtx, targetWidth, targetHeight, targetRatio, target, spread, strength, palette, time) => {
+  const paintRays = (targetCtx, targetWidth, targetHeight, targetRatio, target, spread, strength, palette, time, originOverride, angleOverride) => {
     targetCtx.setTransform(targetRatio, 0, 0, targetRatio, 0, 0);
     targetCtx.clearRect(0, 0, targetWidth, targetHeight);
     const dark = document.body.classList.contains('dark');
     targetCtx.globalCompositeOperation = dark ? 'screen' : 'multiply';
 
-    const originX = targetWidth * (.98 - (pointer.x - .5) * .045);
-    const originY = -targetHeight * (.04 + (pointer.y - .5) * .025);
+    const originX = originOverride?.x ?? targetWidth * (.98 - (pointer.x - .5) * .045);
+    const originY = originOverride?.y ?? -targetHeight * (.04 + (pointer.y - .5) * .025);
     const glowRadius = Math.max(targetWidth, targetHeight) * (target.isHero ? .64 : .52);
     const glow = targetCtx.createRadialGradient(originX, originY, 0, originX, originY, glowRadius);
-    const glowAlpha = target.isHero ? (dark ? .24 : .12) : (dark ? .11 : .07);
+    const glowAlpha = dark ? .17 : .11;
     glow.addColorStop(0, `rgba(${palette.glow.join(',')},${glowAlpha + pulse * .11})`);
     glow.addColorStop(.16, `rgba(${palette.first.join(',')},${glowAlpha * .34 + pulse * .04})`);
     glow.addColorStop(1, `rgba(${palette.first.join(',')},0)`);
     targetCtx.fillStyle = glow;
     targetCtx.fillRect(0, 0, targetWidth, targetHeight);
 
-    const centerAngle = Math.atan2(target.targetY - originY, target.targetX - originX);
+    const centerAngle = angleOverride ?? Math.atan2(target.targetY - originY, target.targetX - originX);
     const length = Math.hypot(targetWidth, targetHeight) * (target.isHero ? 1.3 : 1.42);
     raySeeds.forEach((ray, index) => {
       const normalized = raySeeds.length === 1 ? 0 : index / (raySeeds.length - 1) - .5;
@@ -141,13 +141,22 @@ const initSideRays = () => {
     const heroRect = heroShell?.getBoundingClientRect();
     const heroTargetX = heroRect?.width ? clamp(heroRect.left + heroRect.width * .52, width * .2, width * .8) : width * .52;
     const heroTargetY = heroRect?.height ? clamp(heroRect.top + heroRect.height * .44, height * .22, height * .68) : height * .46;
-    paintRays(ctx, width, height, ratio, { targetX: heroTargetX, targetY: heroTargetY, isHero: false }, mobile.matches ? .82 : .98, 1, palette, time);
+    const pageOrigin = {
+      x: width * (.98 - (pointer.x - .5) * .045),
+      y: -height * (.04 + (pointer.y - .5) * .025),
+    };
+    const sharedAngle = Math.atan2(heroTargetY - pageOrigin.y, heroTargetX - pageOrigin.x);
+    paintRays(ctx, width, height, ratio, { targetX: heroTargetX, targetY: heroTargetY, isHero: false }, mobile.matches ? .82 : .98, 1, palette, time, pageOrigin, sharedAngle);
     if (heroCanvas && heroCtx && heroWidth && heroHeight && (reduceMotion.matches || time - lastHeroPaint >= 1000 / 24)) {
+      const rect = heroShell.getBoundingClientRect();
       paintRays(heroCtx, heroWidth, heroHeight, heroRatio, {
         targetX: heroWidth * .52,
         targetY: heroHeight * .43,
         isHero: true,
-      }, mobile.matches ? .46 : .52, 1.12, palette, time);
+      }, mobile.matches ? .82 : .98, 1, palette, time, {
+        x: pageOrigin.x - rect.left,
+        y: pageOrigin.y - rect.top,
+      }, sharedAngle);
       lastHeroPaint = time;
     }
     if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);

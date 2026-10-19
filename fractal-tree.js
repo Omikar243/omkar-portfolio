@@ -1,9 +1,9 @@
 import { buildTree, cloneTree, interpolateTree, TREE_PROFILES } from './tree-geometry.js';
 
 export function initFractalTree(shell, canvas, button) {
-  // An opaque, synchronized surface avoids transparent fast-path corruption on
-  // some mobile GPU/browser combinations. Every backing pixel is painted below.
-  const ctx = canvas?.getContext('2d', { alpha: false, desynchronized: false });
+  // Keep the artwork transparent so the shared page surface and sun rays flow
+  // continuously through the tree instead of stopping at a canvas rectangle.
+  const ctx = canvas?.getContext('2d', { alpha: true, desynchronized: false });
   if (!shell || !canvas || !button || !ctx) return () => {};
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobileQuery = window.matchMedia('(max-width: 640px)');
@@ -270,8 +270,9 @@ export function initFractalTree(shell, canvas, button) {
       ctx.globalAlpha = 1;
       ctx.beginPath();
       ctx.arc(pad.x, pad.y, Math.max(.55, scale * .0018), 0, Math.PI * 2);
-      ctx.fillStyle = colors.background;
+      ctx.globalCompositeOperation = 'destination-out';
       ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
       drawn += 1;
     }
     ctx.restore();
@@ -279,10 +280,9 @@ export function initFractalTree(shell, canvas, button) {
 
   function paint() {
     if (!width || !height || disposed || contextLost) return;
-    // Paint in physical pixels first, including rounded-DPR border pixels.
+    // Clear in physical pixels so the shared page surface remains visible.
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = colors.background;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     paintOrbits();
     ctx.lineCap = 'round';
@@ -500,7 +500,7 @@ export function initFractalTree(shell, canvas, button) {
   }
   canvas.dataset.renderTier = lowPower ? 'mobile-30fps' : 'desktop-60fps';
   canvas.dataset.branchCount = String(current.edges.length);
-  canvas.dataset.surface = 'opaque-synchronized';
+  canvas.dataset.surface = 'transparent-shared-background';
   announceForm(false);
   updatePalette();
   resize();

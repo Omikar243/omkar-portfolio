@@ -89,7 +89,7 @@ a.project-link:hover{color:var(--gold)}
 a.project-link:focus-visible{outline:2px solid var(--gold);outline-offset:5px}
 
 /* Opaque mobile-safe artwork: no transparent canvas or GPU-filtered texture. */
-.hero-visual-shell,#fractalCanvas{background-color:var(--paper);mix-blend-mode:normal;filter:none}
+.hero-visual-shell,#fractalCanvas{background-color:transparent;mix-blend-mode:normal;filter:none}
 .hero-visual-shell{border-color:transparent}
 .hero-visual-glow{display:none}
 .glyph-hint{transition:color .25s ease}

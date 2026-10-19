@@ -61,11 +61,11 @@ with sync_playwright() as pw:
             page.locator('#treeThemeToggle').tap()
         page.wait_for_timeout(550)
         pixels = page.evaluate(PIXELS)
-        expected = [33,26,21,255] if dark else [245,235,221,255]
-        assert pixels['attributes']['alpha'] is False
+        expected = [0,0,0,0]
+        assert pixels['attributes']['alpha'] is True
         assert pixels['attributes']['desynchronized'] is False
         assert all(color == expected for color in pixels['corners']), pixels
-        assert pixels['surface'] == 'opaque-synchronized'
+        assert pixels['surface'] == 'transparent-shared-background'
         assert 'svg' not in pixels['grain'] and 'feTurbulence' not in pixels['grain']
         themes.append(pixels)
         page.locator('#heroVisual').screenshot(path=str(OUT/f'tree-{"dark" if dark else "light"}.png'))
@@ -117,7 +117,7 @@ with sync_playwright() as pw:
     page.evaluate("document.querySelector('#fractalCanvas').dispatchEvent(new Event('contextlost',{cancelable:true}))")
     page.evaluate("document.querySelector('#fractalCanvas').dispatchEvent(new Event('contextrestored'))")
     page.wait_for_timeout(100)
-    assert page.evaluate(PIXELS)['corners'][0] == [245,235,221,255]
+    assert page.evaluate(PIXELS)['corners'][0] == [0,0,0,0]
     layouts = []
     for width,height in [(320,800),(390,844),(768,1024),(900,1024),(1440,1000)]:
         page.set_viewport_size({'width':width,'height':height})
@@ -165,7 +165,7 @@ with sync_playwright() as pw:
     original = Path('public/Omkar_Shettigar_Resume.pdf').read_bytes()
     assert Path(download.path()).read_bytes() == original
     assert not errors,errors
-    result = {'base':BASE,'opaque_themes':themes,'five_states_audio_and_haptic_requests':states,
+    result = {'base':BASE,'transparent_themes':themes,'five_states_audio_and_haptic_requests':states,
               'muting_works':True,'offscreen_rustle_stopped':True,'reduced_motion_immediate':True,'recovery_handler_repaints':True,
               'portrait_layouts':layouts,'project_actions':projects,'original_resume_bytes_match':True,
               'browser_errors':errors,

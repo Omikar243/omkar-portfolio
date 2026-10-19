@@ -23,12 +23,20 @@ INSTRUMENT = """(() => {
     value: ms => { window.hapticRequests.push({ms, state:document.querySelector('#signatureGlyph')?.dataset.state}); return true; }
   });
   const fill = CanvasRenderingContext2D.prototype.fillRect;
+  const clear = CanvasRenderingContext2D.prototype.clearRect;
   CanvasRenderingContext2D.prototype.fillRect = function(...args) {
     if(this.canvas.id === 'fractalCanvas' && args[0] === 0 && args[1] === 0 && args[2] === this.canvas.width && args[3] === this.canvas.height) {
       window.treePaints.push(performance.now());
       if(window.treePaints.length > 240)window.treePaints.shift();
     }
     return fill.apply(this,args);
+  };
+  CanvasRenderingContext2D.prototype.clearRect = function(...args) {
+    if(this.canvas.id === 'fractalCanvas' && args[0] === 0 && args[1] === 0 && args[2] === this.canvas.width && args[3] === this.canvas.height) {
+      window.treePaints.push(performance.now());
+      if(window.treePaints.length > 240)window.treePaints.shift();
+    }
+    return clear.apply(this,args);
   };
 })()"""
 

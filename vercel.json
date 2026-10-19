@@ -21,6 +21,7 @@
           "orbit-game.css",
           "motion-system.js",
           "side-rays.js",
+          "frame-scheduler.js",
           "ambient-theme.js",
           "cinematic-stage.js"
         ]

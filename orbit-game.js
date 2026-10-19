@@ -33,6 +33,8 @@ export const initOrbitGame = (element) => {
   if (!element) return () => {};
   const canvas = element.querySelector('[data-orbit-canvas]');
   const context = canvas?.getContext('2d', { alpha: false });
+  const shaderCanvas = element.querySelector('[data-orbit-shader]');
+  const gl = shaderCanvas?.getContext('webgl', { alpha: true, antialias: false, powerPreference: 'low-power' });
   if (!canvas || !context) return () => {};
   const startButton = element.querySelector('[data-orbit-start]');
   const pauseButton = element.querySelector('[data-orbit-pause]');
@@ -81,6 +83,45 @@ export const initOrbitGame = (element) => {
   let lastSoundLevel = 1;
   let themeName = 'ember';
   let theme = THEMES[themeName];
+  let shader = null;
+
+  const hexToRgb = (hex) => {
+    const value = hex.replace('#', '');
+    return [parseInt(value.slice(0, 2), 16) / 255, parseInt(value.slice(2, 4), 16) / 255, parseInt(value.slice(4, 6), 16) / 255];
+  };
+  const setupShader = () => {
+    if (!gl || !shaderCanvas) return;
+    const vertexSource = `attribute vec2 position; void main(){gl_Position=vec4(position,0.0,1.0);}`;
+    const fragmentSource = `precision mediump float;
+      uniform vec2 resolution; uniform vec2 pointer; uniform float time; uniform float level; uniform vec3 tint;
+      void main(){
+        vec2 uv=gl_FragCoord.xy/resolution; vec2 p=uv*2.0-1.0; p.x*=resolution.x/resolution.y;
+        vec2 target=vec2(pointer.x*2.0-1.0,1.0-pointer.y*2.0); target.x*=resolution.x/resolution.y;
+        float distanceToPlayer=length(p-target); float ring=sin(distanceToPlayer*19.0-time*1.35);
+        float ripple=smoothstep(0.12,0.0,abs(ring)*0.08+abs(distanceToPlayer-0.42-time*0.015));
+        float beam=pow(max(0.0,cos(atan(p.y,p.x)+time*0.16)),12.0);
+        float halo=smoothstep(0.78,0.0,distanceToPlayer);
+        float intensity=(level-1.0)/4.0*(ripple*0.16+beam*0.035+halo*0.018);
+        gl_FragColor=vec4(tint*intensity,intensity);
+      }`;
+    const compile = (type, source) => { const result = gl.createShader(type); gl.shaderSource(result, source); gl.compileShader(result); return gl.getShaderParameter(result, gl.COMPILE_STATUS) ? result : null; };
+    const vertex = compile(gl.VERTEX_SHADER, vertexSource);
+    const fragment = compile(gl.FRAGMENT_SHADER, fragmentSource);
+    if (!vertex || !fragment) return;
+    const program = gl.createProgram(); gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+    shader = { program, buffer, position: gl.getAttribLocation(program, 'position'), resolution: gl.getUniformLocation(program, 'resolution'), pointer: gl.getUniformLocation(program, 'pointer'), time: gl.getUniformLocation(program, 'time'), level: gl.getUniformLocation(program, 'level'), tint: gl.getUniformLocation(program, 'tint') };
+    gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.clearColor(0, 0, 0, 0);
+  };
+  const renderShader = (time) => {
+    if (!gl || !shader || !shaderCanvas) return;
+    const active = state.status === 'playing' && state.level >= 2 && !reducedMotion;
+    gl.viewport(0, 0, shaderCanvas.width, shaderCanvas.height); gl.clear(gl.COLOR_BUFFER_BIT);
+    if (!active) return;
+    gl.useProgram(shader.program); gl.bindBuffer(gl.ARRAY_BUFFER, shader.buffer); gl.enableVertexAttribArray(shader.position); gl.vertexAttribPointer(shader.position, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform2f(shader.resolution, shaderCanvas.width, shaderCanvas.height); gl.uniform2f(shader.pointer, state.player.x / width, state.player.y / height); gl.uniform1f(shader.time, time / 1000); gl.uniform1f(shader.level, state.level); gl.uniform3fv(shader.tint, hexToRgb(theme.gold)); gl.drawArrays(gl.TRIANGLES, 0, 6);
+  };
 
   const applyTheme = (name) => {
     if (!THEMES[name]) return;
@@ -128,6 +169,7 @@ export const initOrbitGame = (element) => {
     if (livesLabel) livesLabel.setAttribute('aria-label', `${summary.lives} lives remaining`);
     if (livesLabel) livesLabel.textContent = '●'.repeat(summary.lives) + '○'.repeat(state.maxLives - summary.lives);
     if (levelLabel) levelLabel.textContent = String(summary.level).padStart(2, '0');
+    element.querySelector('.orbit-canvas-shell')?.setAttribute('data-level', String(summary.level));
     if (timerLabel) timerLabel.textContent = `${Math.ceil(summary.remaining)}s`;
     if (powerupLabel) {
       const active = Object.entries(summary.effects).find(([, seconds]) => seconds > 0);
@@ -148,18 +190,19 @@ export const initOrbitGame = (element) => {
     dpr = Math.min(window.devicePixelRatio || 1, width < 500 ? 1.5 : MAX_DPR);
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
+    if (shaderCanvas) { shaderCanvas.width = canvas.width; shaderCanvas.height = canvas.height; }
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     setOrbitBounds(state, width, height);
   };
   const addParticles = (event) => {
     if (reducedMotion) return;
-    const count = event.type === 'collect' ? 16 : 24;
+    const count = (event.type === 'collect' ? 16 : 24) + Math.min(36, Math.max(0, state.level - 1) * 6);
     for (let index = 0; index < count; index += 1) {
       const angle = (index / count) * TAU + Math.random() * 0.25;
       const speed = event.type === 'collect' ? 28 + Math.random() * 70 : 45 + Math.random() * 90;
-      particles.push({ x: event.x, y: event.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 0.5 + Math.random() * 0.45, maxLife: 0.9, color: event.type === 'collect' ? '#e6c88f' : '#bd6c53' });
+      particles.push({ x: event.x, y: event.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 0.5 + Math.random() * 0.45, maxLife: 0.9, size: 1.5 + Math.random() * Math.min(2.8, state.level * .35), color: event.type === 'collect' ? theme.gold : theme.redLight, twist: (Math.random() - .5) * 2 });
     }
-    if (particles.length > 180) particles.splice(0, particles.length - 180);
+    if (particles.length > 300) particles.splice(0, particles.length - 300);
   };
   const ensureAudio = () => {
     if (!soundEnabled) return null;
@@ -364,6 +407,24 @@ export const initOrbitGame = (element) => {
       context.stroke();
       context.restore();
     });
+    if (!reducedMotion && state.level >= 2 && state.status === 'playing') {
+      const intensity = Math.min(1, (state.level - 1) / 4);
+      context.save();
+      context.globalCompositeOperation = 'screen';
+      context.globalAlpha = 0.08 + intensity * 0.06;
+      context.strokeStyle = theme.gold;
+      context.lineWidth = 1;
+      for (let ring = 0; ring < state.level - 1; ring += 1) {
+        const radius = 42 + ring * 27 + Math.sin(seconds * 1.8 + ring) * 4;
+        context.beginPath(); context.arc(state.player.x, state.player.y, radius, 0, TAU); context.stroke();
+      }
+      context.globalAlpha = 0.035 + intensity * 0.025;
+      for (let beam = 0; beam < 4 + state.level; beam += 1) {
+        const angle = seconds * 0.12 + (beam / (4 + state.level)) * TAU;
+        context.beginPath(); context.moveTo(state.player.x, state.player.y); context.lineTo(state.player.x + Math.cos(angle) * width, state.player.y + Math.sin(angle) * height); context.stroke();
+      }
+      context.restore();
+    }
     if (!reducedMotion && state.status === 'playing') {
       context.save();
       context.globalAlpha = 0.16;
@@ -379,8 +440,9 @@ export const initOrbitGame = (element) => {
       context.globalAlpha = clamp(particle.life / particle.maxLife, 0, 1);
       context.fillStyle = particle.color;
       context.beginPath();
-      context.arc(particle.x, particle.y, 2.1, 0, TAU);
+      context.arc(particle.x, particle.y, particle.size || 2.1, 0, TAU);
       context.fill();
+      if (state.level >= 3) { context.globalAlpha *= .35; context.beginPath(); context.arc(particle.x - particle.vx * .045, particle.y - particle.vy * .045, (particle.size || 2) * 1.8, 0, TAU); context.fill(); }
     });
     context.globalAlpha = 1;
     context.save();
@@ -398,6 +460,7 @@ export const initOrbitGame = (element) => {
     context.arc(state.player.x, state.player.y, state.player.radius, 0, TAU);
     context.fill();
     context.restore();
+    renderShader(time);
     updateOverlay();
   };
   const loop = (time) => {
@@ -505,6 +568,7 @@ export const initOrbitGame = (element) => {
   element.querySelector('[data-orbit-source]')?.setAttribute('href', SOURCE_URL);
   applyTheme(themeName);
   resize();
+  setupShader();
   updateUI();
   draw(0);
   schedule();

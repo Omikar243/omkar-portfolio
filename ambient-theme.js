@@ -1,9 +1,9 @@
 const AMBIENT_PROFILES = {
-  light: { frequencies: [196, 293.66], waveforms: ['sine', 'triangle'], level: 0.018, cutoff: 1450 },
-  dark: { frequencies: [110, 164.81], waveforms: ['triangle', 'sine'], level: 0.021, cutoff: 980 },
-  ember: { frequencies: [146.83, 220], waveforms: ['sine', 'triangle'], level: 0.019, cutoff: 1180 },
-  moon: { frequencies: [174.61, 261.63], waveforms: ['sine', 'sine'], level: 0.017, cutoff: 1680 },
-  verdigris: { frequencies: [130.81, 196], waveforms: ['triangle', 'sine'], level: 0.018, cutoff: 1320 },
+  light: { frequencies: [196, 293.66], detune: [0, -2], waveforms: ['sine', 'triangle'], level: 0.016, cutoff: 1320 },
+  dark: { frequencies: [110, 164.81], detune: [0, -3], waveforms: ['triangle', 'sine'], level: 0.019, cutoff: 900 },
+  ember: { frequencies: [146.83, 220], detune: [0, 4], waveforms: ['sine', 'triangle'], level: 0.020, cutoff: 1260 },
+  moon: { frequencies: [164.81, 246.94], detune: [0, 5], waveforms: ['sine', 'sine'], level: 0.018, cutoff: 1760 },
+  verdigris: { frequencies: [130.81, 196], detune: [0, -4], waveforms: ['triangle', 'sine'], level: 0.019, cutoff: 1380 },
 };
 
 // Section scenes keep the portfolio feeling like one authored world while
@@ -13,7 +13,7 @@ const SECTION_SCENES = {
   about: { ratio: 1.125, level: 0.86, cutoff: 1.18, waveforms: ['sine', 'triangle'] },
   experience: { ratio: 0.84, level: 0.92, cutoff: 0.82, waveforms: ['triangle', 'sine'] },
   work: { ratio: 1.26, level: 1.04, cutoff: 1.28, waveforms: ['sine', 'sine'] },
-  playground: { ratio: 1.42, level: 1.12, cutoff: 1.42, waveforms: ['triangle', 'square'] },
+  playground: { ratio: 1.34, level: 1.08, cutoff: 1.32, waveforms: ['triangle', 'square'] },
   skills: { ratio: 0.94, level: 0.82, cutoff: 0.9, waveforms: ['sine', 'triangle'] },
   testimonials: { ratio: 0.72, level: 0.76, cutoff: 0.68, waveforms: ['sine', 'sine'] },
   contact: { ratio: 1.08, level: 0.88, cutoff: 1.12, waveforms: ['triangle', 'sine'] },
@@ -47,6 +47,7 @@ const initAmbientTheme = () => {
     const current = scene();
     return {
       frequencies: base.frequencies.map((frequency) => frequency * current.ratio),
+      detune: base.detune || [0, 0],
       waveforms: current.waveforms || base.waveforms,
       level: base.level * current.level,
       cutoff: base.cutoff * current.cutoff,
@@ -62,6 +63,7 @@ const initAmbientTheme = () => {
     filter?.frequency.setTargetAtTime(next.cutoff, now, Math.max(0.35, timeConstant));
     voices.forEach((voice, index) => {
       voice.oscillator.frequency.setTargetAtTime(next.frequencies[index], now, Math.max(0.45, timeConstant + 0.25));
+      voice.oscillator.detune.setTargetAtTime(next.detune[index] || 0, now, Math.max(0.45, timeConstant + 0.25));
       voice.oscillator.type = next.waveforms[index];
       voice.gain.gain.setTargetAtTime(index ? next.level * 0.46 : next.level * 0.7, now, Math.max(0.4, timeConstant));
     });
@@ -72,7 +74,7 @@ const initAmbientTheme = () => {
     if (next === activeScene) return;
     activeScene = next;
     setLabel();
-    applyProfile(0.7);
+    applyProfile(0.88);
     document.dispatchEvent(new CustomEvent('portfolio:ambientsection', { detail: { scene: activeScene } }));
   };
 
@@ -107,6 +109,7 @@ const initAmbientTheme = () => {
           const gain = audio.createGain();
           oscillator.type = profile().waveforms[index];
           oscillator.frequency.value = frequency;
+          oscillator.detune.value = profile().detune[index] || 0;
           gain.gain.value = 0.0001;
           oscillator.connect(gain).connect(filter);
           oscillator.start();
@@ -161,11 +164,11 @@ const initAmbientTheme = () => {
 
   const onTheme = (event) => {
     currentTheme = event.detail?.theme || currentTheme;
-    applyProfile(0.72);
+    applyProfile(0.95);
   };
   const onPageTheme = (event) => {
     currentTheme = event.detail?.dark ? 'dark' : 'light';
-    applyProfile(0.72);
+    applyProfile(1.05);
   };
   const onVisibility = () => {
     if (!audio || !enabled) return;

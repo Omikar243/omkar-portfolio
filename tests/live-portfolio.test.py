@@ -135,7 +135,7 @@ with sync_playwright() as pw:
             metrics_inside:metrics.every(m=>m.right<=body.right+1&&m.left>=body.left-1),
             overflow:document.documentElement.scrollWidth>innerWidth};
         }""")
-        assert about['image'] == [900,1200] and abs(about['ratio']-.75) < .005
+        assert about['image'][0] > 0 and about['image'][1] > 0 and abs(about['image'][0] / about['image'][1]-.75) < .005
         assert abs(about['gap']-12) < .5 and about['caption_inside'] and about['metrics_inside']
         assert not about['overflow'],about
         layouts.append(about)

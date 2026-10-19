@@ -21,6 +21,21 @@ const initMotionSystem = () => {
   let destroyed = false;
 
   const reducedMotion = () => reduceQuery.matches;
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    if (document.querySelector(`script[data-lazy-src="${src}"]`)) { resolve(); return; }
+    const script = document.createElement('script');
+    script.src = src; script.async = true; script.dataset.lazySrc = src;
+    script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
+  });
+  const scheduleVanta = () => {
+    if (destroyed || reducedMotion() || !mount || window.VANTA?.NET) return;
+    const boot = () => loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js')
+      .then(() => loadScript('https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js'))
+      .then(() => initVanta())
+      .catch(() => mount.classList.remove('is-ready'));
+    if ('requestIdleCallback' in window) window.requestIdleCallback(boot, { timeout: 1400 });
+    else window.setTimeout(boot, 550);
+  };
 
   const initVanta = () => {
     if (destroyed || reducedMotion() || !mount || !window.VANTA?.NET || !window.THREE) return;
@@ -138,17 +153,18 @@ const initMotionSystem = () => {
       lenis?.stop();
       context?.revert();
     } else if (!destroyed) {
-      initVanta();
+      scheduleVanta();
       ScrollTrigger?.refresh();
     }
   });
-  initVanta();
+  window.addEventListener('load', scheduleVanta, { once: true });
 
   return () => {
     if (destroyed) return;
     destroyed = true;
     document.removeEventListener('portfolio:themechange', updateVantaTheme);
     window.removeEventListener('load', refreshScroll);
+    window.removeEventListener('load', scheduleVanta);
     if (tickerHandler && gsap) gsap.ticker.remove(tickerHandler);
     context?.revert();
     destroySideRays();

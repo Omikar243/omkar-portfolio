@@ -95,19 +95,24 @@ const initSideRays = () => {
     const length = Math.hypot(targetWidth, targetHeight) * (target.isHero ? 1.3 : 1.42);
     raySeeds.forEach((ray, index) => {
       const normalized = raySeeds.length === 1 ? 0 : index / (raySeeds.length - 1) - .5;
-      // Two slow waves make the fan breathe and radiate without looking like a scanline.
+      // Layered, deterministic noise makes each shaft flow like light through water
+      // while the shared origin/axis keeps the composition aligned with the tree.
+      const flow = reduceMotion.matches ? 0 : Math.sin(time * .00062 + ray.phase * 1.7) * .012
+        + Math.sin(time * .00031 + ray.phase * 2.9) * .008
+        + Math.sin(time * .0011 + ray.phase * .43) * .003;
       const sway = reduceMotion.matches ? 0 : Math.sin(time * .00018 + ray.phase) * .034
-        + Math.sin(time * .000095 + ray.phase * .7) * .018;
+        + Math.sin(time * .000095 + ray.phase * .7) * .018 + flow;
       const angle = centerAngle + normalized * spread + sway + (pointer.y - .5) * .035;
       const focus = 1 - clamp(Math.abs(index / (raySeeds.length - 1) - pointer.x) * 1.6, 0, 1);
-      drawRay(targetCtx, originX, originY, angle, length, ray, focus, palette, strength);
+      const flowingRay = { ...ray, width: ray.width * (1 + flow * 1.8), alpha: ray.alpha * (1 + flow * 2.2) };
+      drawRay(targetCtx, originX, originY, angle, length * (1 + flow * .8), flowingRay, focus, palette, strength);
     });
     targetCtx.globalCompositeOperation = 'source-over';
   };
 
   function draw(time) {
     if (disposed || !width || !height) return;
-    const frameBudget = 1000 / 30;
+    const frameBudget = mobile.matches ? 1000 / 30 : 1000 / 60;
     if (!reduceMotion.matches && time - lastDraw < frameBudget) {
       frame = requestAnimationFrame(draw);
       return;

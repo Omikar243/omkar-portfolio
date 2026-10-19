@@ -21,8 +21,8 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Quiet owner-only resume-download email alerts with first-landing source/referrer, campaign tags, UTC time, device category and country when available; no public activity feed or exposed recipient address.
 - Included Vercel Hobby pageview analytics, visible only in the signed-in project dashboard. Historical sources are unavailable because tracking was previously disabled; paid custom download events are not enabled.
 - Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation and received-inbox verification are complete.
-- **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound.
-- Lenis smooth scrolling with native anchor links, GSAP Core + ScrollTrigger reveal/parallax choreography, a low-contrast Vanta interactive network, and a React Bits Side Rays–style sunbeam layer that falls across the tree and page with reduced-motion and fallback handling.
+- **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound. From level 2 onward, a bounded transparent WebGL field, reactive rings/beams and denser particle bursts respond to the player and selected palette without changing the physics layer.
+- Lenis smooth scrolling with native anchor links, GSAP Core + ScrollTrigger reveal/parallax choreography, a low-contrast lazy-loaded Vanta interactive network, and a React Bits Side Rays–style sunbeam layer that falls across the tree and page with deterministic water-like drift at 60 FPS on desktop and a bounded mobile fallback.
 - An explicit ambient theme-sound toggle with quiet procedural soundscapes that crossfade across page sections, website light/dark modes and SIGNAL // ORBIT Ember, Moon and Verdigris palettes; audio never autoplays. Opt-in interface chimes reuse the same filtered sound field.
 - A cinematic depth stage inspired by high-end Three UI experiences: the precise tree/O remains central while pointer light, parallax rings, draggable orbit objects, reactive particles, scroll scene states and interactive 3D project-card tilt add depth without a second WebGL renderer. SIGNAL // ORBIT keeps its mechanics and gains the same perspective-light treatment.
 
@@ -67,6 +67,7 @@ resume-attribution.js              Privacy-limited attribution normalization
 resume-alerts.md                   Owner-only notification and traffic-reporting guide
 orbit-game.js                      Canvas arcade rendering/input/UI/lifecycle
 orbit-physics.js                   Testable delta-time physics, score and state
+public/portrait-450.webp            Proportional mobile portrait source
 orbit-game.css                     Responsive espresso-and-gold game styling
 fractal-tree.js                    Canvas timeline, input handling and lifecycle
 tree-geometry.js                   Fixed connected graph and parameter interpolation

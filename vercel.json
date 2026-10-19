@@ -22,6 +22,7 @@
           "motion-system.js",
           "side-rays.js",
           "frame-scheduler.js",
+          "desktop-bloom.js",
           "ambient-theme.js",
           "cinematic-stage.js"
         ]

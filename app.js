@@ -20,7 +20,7 @@ window.addEventListener('load', () => {
   window.setTimeout(() => {
     loader?.classList.add('is-done');
     body.classList.remove('is-loading');
-  }, 1250);
+  }, 450);
 });
 
 const themeControls = [...document.querySelectorAll('[data-theme-toggle]')];

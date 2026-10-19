@@ -41,6 +41,7 @@ export function initFractalTree(shell, canvas, button) {
   let audio = null;
   let feedbackAt = -Infinity;
   let feedbackSequence = 0;
+  let lastTouchActivation = -Infinity;
   let leafBuffer = null;
   const rustleVoices = new Set();
   const leafProfiles = [
@@ -62,6 +63,19 @@ export function initFractalTree(shell, canvas, button) {
     }
   }
 
+  async function primeAudio() {
+    const Audio = window.AudioContext || window.webkitAudioContext;
+    if (!Audio || disposed || !soundEnabled) return;
+    try {
+      if (!audio || audio.state === 'closed') {
+        leafBuffer = null;
+        rustleVoices.clear();
+        audio = new Audio();
+      }
+      if (audio.state === 'suspended') await audio.resume();
+    } catch { setSound(false); }
+  }
+
   function makeLeaves() {
     // A cached mono noise texture, not a pitched note or downloaded recording.
     const buffer = audio.createBuffer(1, Math.ceil(audio.sampleRate * 1.15), audio.sampleRate);
@@ -80,13 +94,14 @@ export function initFractalTree(shell, canvas, button) {
   function setSound(enabled) {
     soundEnabled = enabled;
     if (!enabled) { feedbackSequence += 1; fadeRustles(); }
+    if (enabled) void primeAudio();
     if (!soundButton) return;
     soundButton.setAttribute('aria-pressed', String(enabled));
     soundButton.setAttribute('aria-label', enabled ? 'Mute wind-through-leaves sound' : 'Enable wind-through-leaves sound');
     soundButton.querySelector('[data-tree-sound-label]').textContent = enabled ? 'Leaves on' : 'Leaves off';
   }
 
-  async function signatureFeedback(event) {
+  function signatureFeedback(event) {
     // Only real visitor gestures produce feedback. No autoplay or synthetic tests.
     if (!event?.isTrusted || disposed || performance.now() - feedbackAt < 110) return;
     feedbackAt = performance.now();
@@ -104,8 +119,8 @@ export function initFractalTree(shell, canvas, button) {
         rustleVoices.clear();
         audio = new Audio();
       }
-      if (audio.state === 'suspended') await audio.resume();
-      if (disposed || !soundEnabled || sequence !== feedbackSequence || audio.state !== 'running') return;
+      if (audio.state === 'suspended') void audio.resume().catch(() => setSound(false));
+      if (disposed || !soundEnabled || sequence !== feedbackSequence) return;
       if (!leafBuffer) leafBuffer = makeLeaves();
       fadeRustles(); // New gust fades the previous one instead of stacking volume.
       if (rustleVoices.size >= 2) return;
@@ -416,7 +431,16 @@ export function initFractalTree(shell, canvas, button) {
     } else start();
   }
   if (soundButton) listen(soundButton, 'click', () => { setSound(!soundEnabled); });
-  listen(button, 'click', advance);
+  listen(button, 'pointerup', (event) => {
+    if (event.pointerType !== 'touch') return;
+    event.preventDefault();
+    lastTouchActivation = performance.now();
+    advance(event);
+  });
+  listen(button, 'click', (event) => {
+    if (performance.now() - lastTouchActivation < 600) return;
+    advance(event);
+  });
   listen(button, 'keydown', (event) => {
     if (!event.repeat && ['ArrowRight', 'ArrowDown'].includes(event.key)) {
       event.preventDefault();

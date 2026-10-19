@@ -9,7 +9,7 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - **Catalysk — Data Scientist:** hybrid RAG and agentic classification systems for financial intelligence; a 4,535-sample golden parity harness; sustainability scoring accuracy improved by 85%; feature-pipeline runtime reduced from 2,160 seconds to 125 seconds; 17,500+ merchant entities indexed with Sentence-BERT and FAISS; Ollama reasoning, monitoring hooks, and a zero-drift CI/CD gate.
 - **SM Khannukar Associates — ML Engineer Intern:** an LSTM/RNN stock-forecasting pipeline with 85% directional accuracy across a 30-day backtest, plus automated Yahoo Finance ingestion that reduced preprocessing time by 40%.
 - **[Ancient Modern Apparel — live website](https://ancient-modern-apparel-six.vercel.app/):** a full-stack fashion-tech platform combining AI-generated four-view avatars, real-time Three.js garment previews, personalized catalog flows, and cart experiences using Next.js, FastAPI, Drizzle, Turso, and Supabase.
-- **[Knee Osteoarthritis Detection — GitHub](https://github.com/Ramachandra-2k96/Kneeosteoarthritits):** a Compact Vision Net reaching 90% accuracy across 13 X-ray classes, paired with a literature-grounded LLaMA-3 RAG assistant using PyTorch, CLAHE, LangChain, and Groq.
+- **[Knee Osteoarthritis Detection — GitHub](https://github.com/Ramachandra-2k96/Kneeosteoarthritits):** ~90% accuracy on 5-grade knee osteoarthritis classification from X-rays, paired with a literature-grounded LLaMA-3 RAG assistant using PyTorch, CLAHE, LangChain, and Groq.
 
 ## Interactive features
 
@@ -22,6 +22,8 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Included Vercel Hobby pageview analytics, visible only in the signed-in project dashboard. Historical sources are unavailable because tracking was previously disabled; paid custom download events are not enabled.
 - Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation and received-inbox verification are complete.
 - **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound.
+- Lenis smooth scrolling with native anchor links, GSAP Core + ScrollTrigger reveal/parallax choreography, a low-contrast Vanta interactive network, and a React Bits Side Rays–style sunbeam layer that falls across the tree and page with reduced-motion and fallback handling.
+- An explicit ambient theme-sound toggle with quiet procedural soundscapes that change across the website light/dark modes and SIGNAL // ORBIT Ember, Moon and Verdigris palettes; audio never autoplays.
 
 ### Living fractal tree
 
@@ -54,6 +56,9 @@ The server listens on `0.0.0.0:3000` by default. Override the port with `PORT=30
 index.html                         Portfolio page and resume-grounded copy
 styles.css                         Renaissance design system and responsive layout
 app.js                             Portfolio interaction and module lifecycle
+motion-system.js                   Lenis, GSAP/ScrollTrigger and Vanta lifecycle
+side-rays.js                       Cursor-leaning warm Side Rays canvas atmosphere
+ambient-theme.js                   Opt-in theme-aware ambient Web Audio
 contact-delivery.js                Shared forwarding payload and response interpretation
 resume-tracking.js                 Silent download alerts and free pageview integration
 resume-attribution.js              Privacy-limited attribution normalization

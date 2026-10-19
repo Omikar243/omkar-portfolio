@@ -1,0 +1,197 @@
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+const initSideRays = () => {
+  const mount = document.querySelector('#sideRaysBackground');
+  if (!mount) return () => {};
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'side-rays-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  mount.appendChild(canvas);
+  const ctx = canvas.getContext('2d', { alpha: true });
+  if (!ctx) return () => canvas.remove();
+
+  const heroShell = document.querySelector('#heroVisual');
+  const heroCanvas = heroShell ? document.createElement('canvas') : null;
+  const heroCtx = heroCanvas?.getContext('2d', { alpha: true });
+  if (heroCanvas && heroCtx) {
+    heroCanvas.className = 'hero-side-rays';
+    heroCanvas.setAttribute('aria-hidden', 'true');
+    heroShell.appendChild(heroCanvas);
+  }
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const mobile = window.matchMedia('(max-width: 700px)');
+  const pointer = { x: .68, y: .34, targetX: .68, targetY: .34 };
+  const rayCount = mobile.matches ? 8 : 12;
+  const raySeeds = Array.from({ length: rayCount }, (_, index) => ({
+    phase: index * 1.73 + .4,
+    width: .045 + (index % 4) * .012,
+    alpha: .22 + (index % 5) * .025,
+  }));
+  let width = 0;
+  let height = 0;
+  let ratio = 1;
+  let heroWidth = 0;
+  let heroHeight = 0;
+  let heroRatio = 1;
+  let frame = 0;
+  let disposed = false;
+  let pulse = 0;
+  let lastTime = 0;
+  let lastDraw = -Infinity;
+  let lastHeroPaint = -Infinity;
+
+  const resizeCanvas = (target, targetCtx, nextWidth, nextHeight, maxRatio) => {
+    const nextRatio = Math.min(window.devicePixelRatio || 1, maxRatio);
+    target.width = Math.max(1, Math.round(nextWidth * nextRatio));
+    target.height = Math.max(1, Math.round(nextHeight * nextRatio));
+    target.style.width = `${nextWidth}px`;
+    target.style.height = `${nextHeight}px`;
+    targetCtx.setTransform(nextRatio, 0, 0, nextRatio, 0, 0);
+    return nextRatio;
+  };
+
+  const resize = () => {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    ratio = resizeCanvas(canvas, ctx, width, height, mobile.matches ? 1.25 : 1.6);
+    if (heroCanvas && heroCtx && heroShell) {
+      const rect = heroShell.getBoundingClientRect();
+      heroWidth = rect.width;
+      heroHeight = rect.height;
+      heroRatio = resizeCanvas(heroCanvas, heroCtx, heroWidth, heroHeight, mobile.matches ? 1.2 : 1.4);
+    }
+    draw(performance.now());
+  };
+
+  const colors = () => document.body.classList.contains('dark')
+    ? { first: [224, 190, 131], second: [151, 119, 80], glow: [220, 181, 116] }
+    : { first: [191, 143, 79], second: [143, 103, 58], glow: [218, 170, 96] };
+
+  const drawRay = (targetCtx, originX, originY, angle, length, ray, focus, palette, strength = 1) => {
+    const endX = originX + Math.cos(angle) * length;
+    const endY = originY + Math.sin(angle) * length;
+    const halfWidth = length * ray.width * (.9 + focus * .28) * strength;
+    const normalX = Math.cos(angle + Math.PI / 2) * halfWidth;
+    const normalY = Math.sin(angle + Math.PI / 2) * halfWidth;
+    const gradient = targetCtx.createLinearGradient(originX, originY, endX, endY);
+    const boost = 1 + pulse * .8;
+    const alpha = clamp(ray.alpha * boost * (0.72 + focus * .34) * strength, .035, .44);
+    gradient.addColorStop(0, `rgba(${palette.glow.join(',')},${alpha * .04})`);
+    gradient.addColorStop(.12, `rgba(${palette.first.join(',')},${alpha})`);
+    gradient.addColorStop(.52, `rgba(${palette.second.join(',')},${alpha * .28})`);
+    gradient.addColorStop(1, `rgba(${palette.second.join(',')},0)`);
+    targetCtx.beginPath();
+    targetCtx.moveTo(originX, originY);
+    targetCtx.lineTo(endX + normalX, endY + normalY);
+    targetCtx.lineTo(endX - normalX, endY - normalY);
+    targetCtx.closePath();
+    targetCtx.fillStyle = gradient;
+    targetCtx.fill();
+  };
+
+  const paintRays = (targetCtx, targetWidth, targetHeight, targetRatio, target, spread, strength, palette, time) => {
+    targetCtx.setTransform(targetRatio, 0, 0, targetRatio, 0, 0);
+    targetCtx.clearRect(0, 0, targetWidth, targetHeight);
+    const dark = document.body.classList.contains('dark');
+    targetCtx.globalCompositeOperation = dark ? 'screen' : 'multiply';
+
+    const originX = targetWidth * (.98 - (pointer.x - .5) * .045);
+    const originY = -targetHeight * (.04 + (pointer.y - .5) * .025);
+    const glowRadius = Math.max(targetWidth, targetHeight) * (target.isHero ? .64 : .52);
+    const glow = targetCtx.createRadialGradient(originX, originY, 0, originX, originY, glowRadius);
+    const glowAlpha = target.isHero ? (dark ? .24 : .12) : (dark ? .11 : .07);
+    glow.addColorStop(0, `rgba(${palette.glow.join(',')},${glowAlpha + pulse * .11})`);
+    glow.addColorStop(.16, `rgba(${palette.first.join(',')},${glowAlpha * .34 + pulse * .04})`);
+    glow.addColorStop(1, `rgba(${palette.first.join(',')},0)`);
+    targetCtx.fillStyle = glow;
+    targetCtx.fillRect(0, 0, targetWidth, targetHeight);
+
+    const centerAngle = Math.atan2(target.targetY - originY, target.targetX - originX);
+    const length = Math.hypot(targetWidth, targetHeight) * (target.isHero ? 1.3 : 1.42);
+    raySeeds.forEach((ray, index) => {
+      const normalized = raySeeds.length === 1 ? 0 : index / (raySeeds.length - 1) - .5;
+      // Two slow waves make the fan breathe and radiate without looking like a scanline.
+      const sway = reduceMotion.matches ? 0 : Math.sin(time * .00018 + ray.phase) * .034
+        + Math.sin(time * .000095 + ray.phase * .7) * .018;
+      const angle = centerAngle + normalized * spread + sway + (pointer.y - .5) * .035;
+      const focus = 1 - clamp(Math.abs(index / (raySeeds.length - 1) - pointer.x) * 1.6, 0, 1);
+      drawRay(targetCtx, originX, originY, angle, length, ray, focus, palette, strength);
+    });
+    targetCtx.globalCompositeOperation = 'source-over';
+  };
+
+  function draw(time) {
+    if (disposed || !width || !height) return;
+    const frameBudget = 1000 / 30;
+    if (!reduceMotion.matches && time - lastDraw < frameBudget) {
+      frame = requestAnimationFrame(draw);
+      return;
+    }
+    const elapsed = time - lastTime;
+    lastTime = time;
+    lastDraw = time;
+    if (!reduceMotion.matches) {
+      pointer.x += (pointer.targetX - pointer.x) * .035;
+      pointer.y += (pointer.targetY - pointer.y) * .035;
+      pulse = Math.max(0, pulse - Math.max(elapsed, 16) * .0011);
+    }
+    const palette = colors();
+    const heroRect = heroShell?.getBoundingClientRect();
+    const heroTargetX = heroRect?.width ? clamp(heroRect.left + heroRect.width * .52, width * .2, width * .8) : width * .52;
+    const heroTargetY = heroRect?.height ? clamp(heroRect.top + heroRect.height * .44, height * .22, height * .68) : height * .46;
+    paintRays(ctx, width, height, ratio, { targetX: heroTargetX, targetY: heroTargetY, isHero: false }, mobile.matches ? .82 : .98, 1, palette, time);
+    if (heroCanvas && heroCtx && heroWidth && heroHeight && (reduceMotion.matches || time - lastHeroPaint >= 1000 / 24)) {
+      paintRays(heroCtx, heroWidth, heroHeight, heroRatio, {
+        targetX: heroWidth * .52,
+        targetY: heroHeight * .43,
+        isHero: true,
+      }, mobile.matches ? .46 : .52, 1.12, palette, time);
+      lastHeroPaint = time;
+    }
+    if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);
+  }
+
+  const move = (event) => {
+    pointer.targetX = clamp(event.clientX / Math.max(window.innerWidth, 1), 0, 1);
+    pointer.targetY = clamp(event.clientY / Math.max(window.innerHeight, 1), 0, 1);
+  };
+  const touch = () => { pulse = 1; };
+  const visibility = () => {
+    cancelAnimationFrame(frame);
+    if (!document.hidden && !reduceMotion.matches) frame = requestAnimationFrame(draw);
+  };
+  const reducedChanged = () => {
+    cancelAnimationFrame(frame);
+    draw(performance.now());
+    if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);
+  };
+  const themeChanged = () => draw(performance.now());
+
+  window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('pointermove', move, { passive: true });
+  window.addEventListener('pointerdown', touch, { passive: true });
+  document.addEventListener('visibilitychange', visibility);
+  document.addEventListener('portfolio:themechange', themeChanged);
+  reduceMotion.addEventListener?.('change', reducedChanged);
+  resize();
+  mount.classList.add('is-ready');
+  if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);
+
+  return () => {
+    disposed = true;
+    cancelAnimationFrame(frame);
+    window.removeEventListener('resize', resize);
+    window.removeEventListener('pointermove', move);
+    window.removeEventListener('pointerdown', touch);
+    document.removeEventListener('visibilitychange', visibility);
+    document.removeEventListener('portfolio:themechange', themeChanged);
+    reduceMotion.removeEventListener?.('change', reducedChanged);
+    canvas.remove();
+    heroCanvas?.remove();
+    mount.classList.remove('is-ready');
+  };
+};
+
+export { initSideRays };

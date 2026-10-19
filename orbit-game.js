@@ -97,6 +97,7 @@ export const initOrbitGame = (element) => {
       button.classList.toggle('is-active', active);
       button.setAttribute('aria-pressed', String(active));
     });
+    document.dispatchEvent(new CustomEvent('portfolio:ambienttheme', { detail: { theme: name } }));
     announce(`${name} visual field selected.`);
   };
   const announce = (message) => {

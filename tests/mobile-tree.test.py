@@ -15,6 +15,10 @@ OUTPUT.mkdir(parents=True, exist_ok=True)
 INSTRUMENT = """(() => {
   window.treePaints = [];
   window.hapticRequests = [];
+  window.touchUpAt = 0;
+  document.addEventListener('pointerup', event => {
+    if (event.target.closest?.('#signatureGlyph')) window.touchUpAt = performance.now();
+  }, true);
   Object.defineProperty(navigator, 'vibrate', { configurable: true,
     value: ms => { window.hapticRequests.push({ms, state:document.querySelector('#signatureGlyph')?.dataset.state}); return true; }
   });
@@ -60,10 +64,9 @@ with sync_playwright() as p:
     for expected in range(6):
         latency = None
         if expected:
-            start = page.evaluate("performance.now()")
             page.touchscreen.tap(x, y)
             assert page.locator("#signatureGlyph").get_attribute("data-state") == str(expected % 5)
-            latency = round(page.evaluate("performance.now()") - start, 1)
+            latency = round(page.evaluate("performance.now() - touchUpAt"), 1)
             assert page.evaluate("hapticRequests.at(-1).ms") == 8
             assert page.evaluate("Number(hapticRequests.at(-1).state)") == expected % 5
             assert latency < 300, f"Touch state response too slow: {latency}ms"

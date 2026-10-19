@@ -61,6 +61,8 @@ const initMotionSystem = () => {
         autoRaf: false,
         anchors: true,
         allowNestedScroll: false,
+        lerp: .085,
+        smoothWheel: true,
         prevent: (node) => Boolean(node.closest?.('[data-lenis-prevent]')) || Boolean(node.closest?.('[data-orbit-game]')),
       });
     } catch (error) {
@@ -81,10 +83,10 @@ const initMotionSystem = () => {
         gsap.fromTo(element, { autoAlpha: 0, y: 22 }, {
           autoAlpha: 1,
           y: 0,
-          duration: 0.78,
-          ease: 'power3.out',
+          duration: 0.94,
+          ease: 'power2.out',
           clearProps: 'transform',
-          scrollTrigger: { trigger: element, start: 'top 88%', once: true },
+          scrollTrigger: { trigger: element, start: 'top 91%', once: true, fastScrollEnd: true },
         });
       });
       const heroArt = document.querySelector('.hero-art');
@@ -92,21 +94,21 @@ const initMotionSystem = () => {
         gsap.to(heroArt, {
           yPercent: 7,
           ease: 'none',
-          scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.8 },
+          scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: 0.62 },
         });
       }
       gsap.utils.toArray('.project-card').forEach((card, index) => {
         gsap.fromTo(card, { y: index % 2 ? 18 : 10 }, {
           y: index % 2 ? -8 : -3,
           ease: 'none',
-          scrollTrigger: { trigger: card, start: 'top bottom', end: 'bottom top', scrub: 1.2 },
+          scrollTrigger: { trigger: card, start: 'top 96%', end: 'bottom 12%', scrub: 0.82 },
         });
       });
       gsap.utils.toArray('.section-label').forEach((label) => {
         gsap.fromTo(label, { x: -12 }, {
           x: 0,
           ease: 'none',
-          scrollTrigger: { trigger: label, start: 'top 92%', end: 'top 55%', scrub: 0.7 },
+          scrollTrigger: { trigger: label, start: 'top 94%', end: 'top 58%', scrub: 0.52 },
         });
       });
     });

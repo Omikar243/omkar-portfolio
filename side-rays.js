@@ -12,13 +12,6 @@ const initSideRays = () => {
   if (!ctx) return () => canvas.remove();
 
   const heroShell = document.querySelector('#heroVisual');
-  const heroCanvas = heroShell ? document.createElement('canvas') : null;
-  const heroCtx = heroCanvas?.getContext('2d', { alpha: true });
-  if (heroCanvas && heroCtx) {
-    heroCanvas.className = 'hero-side-rays';
-    heroCanvas.setAttribute('aria-hidden', 'true');
-    heroShell.appendChild(heroCanvas);
-  }
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = window.matchMedia('(max-width: 700px)');
@@ -32,15 +25,11 @@ const initSideRays = () => {
   let width = 0;
   let height = 0;
   let ratio = 1;
-  let heroWidth = 0;
-  let heroHeight = 0;
-  let heroRatio = 1;
   let frame = 0;
   let disposed = false;
   let pulse = 0;
   let lastTime = 0;
   let lastDraw = -Infinity;
-  let lastHeroPaint = -Infinity;
 
   const resizeCanvas = (target, targetCtx, nextWidth, nextHeight, maxRatio) => {
     const nextRatio = Math.min(window.devicePixelRatio || 1, maxRatio);
@@ -56,12 +45,6 @@ const initSideRays = () => {
     width = window.innerWidth;
     height = window.innerHeight;
     ratio = resizeCanvas(canvas, ctx, width, height, mobile.matches ? 1.25 : 1.6);
-    if (heroCanvas && heroCtx && heroShell) {
-      const rect = heroShell.getBoundingClientRect();
-      heroWidth = rect.width;
-      heroHeight = rect.height;
-      heroRatio = resizeCanvas(heroCanvas, heroCtx, heroWidth, heroHeight, mobile.matches ? 1.2 : 1.4);
-    }
     draw(performance.now());
   };
 
@@ -147,18 +130,6 @@ const initSideRays = () => {
     };
     const sharedAngle = Math.atan2(heroTargetY - pageOrigin.y, heroTargetX - pageOrigin.x);
     paintRays(ctx, width, height, ratio, { targetX: heroTargetX, targetY: heroTargetY, isHero: false }, mobile.matches ? .82 : .98, 1, palette, time, pageOrigin, sharedAngle);
-    if (heroCanvas && heroCtx && heroWidth && heroHeight && (reduceMotion.matches || time - lastHeroPaint >= 1000 / 24)) {
-      const rect = heroShell.getBoundingClientRect();
-      paintRays(heroCtx, heroWidth, heroHeight, heroRatio, {
-        targetX: heroWidth * .52,
-        targetY: heroHeight * .43,
-        isHero: true,
-      }, mobile.matches ? .82 : .98, 1, palette, time, {
-        x: pageOrigin.x - rect.left,
-        y: pageOrigin.y - rect.top,
-      }, sharedAngle);
-      lastHeroPaint = time;
-    }
     if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);
   }
 
@@ -198,7 +169,6 @@ const initSideRays = () => {
     document.removeEventListener('portfolio:themechange', themeChanged);
     reduceMotion.removeEventListener?.('change', reducedChanged);
     canvas.remove();
-    heroCanvas?.remove();
     mount.classList.remove('is-ready');
   };
 };

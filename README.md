@@ -67,7 +67,7 @@ resume-attribution.js              Privacy-limited attribution normalization
 resume-alerts.md                   Owner-only notification and traffic-reporting guide
 orbit-game.js                      Canvas arcade rendering/input/UI/lifecycle
 orbit-physics.js                   Testable delta-time physics, score and state
-public/portrait-450.webp            Proportional mobile portrait source
+public/portrait-450.webp / -600.webp Proportional mobile portrait sources
 orbit-game.css                     Responsive espresso-and-gold game styling
 fractal-tree.js                    Canvas timeline, input handling and lifecycle
 tree-geometry.js                   Fixed connected graph and parameter interpolation

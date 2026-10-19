@@ -5,6 +5,7 @@ import { initPrivateWebAnalytics, initResumeTracking } from './resume-tracking.j
 import { initMotionSystem } from './motion-system.js';
 import { initAmbientTheme } from './ambient-theme.js';
 import { initCinematicStage } from './cinematic-stage.js';
+import { subscribeFrame, getQualityTier } from './frame-scheduler.js';
 
 const body = document.body;
 const loader = document.querySelector('#loader');
@@ -146,8 +147,9 @@ const resizeCanvas = () => {
 };
 const particleMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 let reduceMotion = particleMotion.matches;
-let particleFrame = 0;
-const particles = Array.from({ length: 42 }, (_, index) => ({
+let particleFrame = null;
+const quality = getQualityTier();
+const particles = Array.from({ length: quality.name === 'mobile' ? 28 : 42 }, (_, index) => ({
   x: Math.random() * window.innerWidth,
   y: Math.random() * window.innerHeight,
   radius: index % 5 === 0 ? 1.5 : .8,
@@ -156,7 +158,6 @@ const particles = Array.from({ length: 42 }, (_, index) => ({
   alpha: .18 + Math.random() * .35,
 }));
 const animateParticles = () => {
-  particleFrame = 0;
   if (!ctx || !canvas || document.hidden) return;
   ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
   const dark = body.classList.contains('dark');
@@ -174,18 +175,17 @@ const animateParticles = () => {
     ctx.fillStyle = dark ? `rgba(209,171,112,${particle.alpha})` : `rgba(115,83,51,${particle.alpha * .45})`;
     ctx.fill();
   });
-  if (!reduceMotion) particleFrame = requestAnimationFrame(animateParticles);
 };
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
-animateParticles();
+particleFrame = subscribeFrame(() => {
+  if (!reduceMotion || !ctx) animateParticles();
+});
 particleMotion.addEventListener('change', () => {
   reduceMotion = particleMotion.matches;
-  cancelAnimationFrame(particleFrame);
   animateParticles();
 });
 document.addEventListener('visibilitychange', () => {
-  cancelAnimationFrame(particleFrame);
   if (!document.hidden) animateParticles();
 });
 document.addEventListener('portfolio:themechange', () => { if (reduceMotion) animateParticles(); });
@@ -207,9 +207,8 @@ const destroyCinematicStage = initCinematicStage();
 initPrivateWebAnalytics();
 
 window.addEventListener('pagehide', (event) => {
-  cancelAnimationFrame(particleFrame);
-  if (!event.persisted) { destroyMotionSystem(); destroyAmbientTheme(); destroyCinematicStage(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
+  if (!event.persisted) { particleFrame?.(); particleFrame = null; destroyMotionSystem(); destroyAmbientTheme(); destroyCinematicStage(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
 });
 window.addEventListener('pageshow', () => {
-  if (!particleFrame && !document.hidden) animateParticles();
+  if (!particleFrame && !document.hidden) particleFrame = subscribeFrame(animateParticles);
 });

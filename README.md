@@ -22,7 +22,8 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Included Vercel Hobby pageview analytics, visible only in the signed-in project dashboard. Historical sources are unavailable because tracking was previously disabled; paid custom download events are not enabled.
 - Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation and received-inbox verification are complete.
 - **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound. From level 2 onward, a bounded transparent WebGL field, reactive rings/beams and denser particle bursts respond to the player and selected palette without changing the physics layer.
-- Lenis smooth scrolling with native anchor links, GSAP Core + ScrollTrigger reveal/parallax choreography, a low-contrast lazy-loaded Vanta interactive network, and a React Bits Side Rays–style sunbeam layer that falls across the tree and page with deterministic water-like drift at 60 FPS on desktop and a bounded mobile fallback.
+- Native anchor scrolling with GSAP Core + ScrollTrigger reveal/parallax choreography on desktop, a low-contrast lazy-loaded Vanta interactive network only for fine-pointer desktop devices, and a React Bits Side Rays–style sunbeam layer that falls across the tree and page with deterministic water-like drift at 60 FPS on desktop and a bounded mobile fallback. Touch devices use native scrolling and never initialize Lenis or Vanta.
+- All canvas systems share one singleton frame scheduler: page particles, Side Rays, the fractal tree and SIGNAL // ORBIT subscribe to one requestAnimationFrame pump. Device tiers cap mobile work at 30 FPS, 1.5× pixel density, lower tree depth and lower particle counts while preserving the precise O interaction.
 - An explicit ambient theme-sound toggle with quiet procedural soundscapes that crossfade across page sections, website light/dark modes and SIGNAL // ORBIT Ember, Moon and Verdigris palettes; audio never autoplays. Opt-in interface chimes reuse the same filtered sound field.
 - A cinematic depth stage inspired by high-end Three UI experiences: the precise tree/O remains central while pointer light, parallax rings, draggable orbit objects, reactive particles, scroll scene states and interactive 3D project-card tilt add depth without a second WebGL renderer. SIGNAL // ORBIT keeps its mechanics and gains the same perspective-light treatment.
 
@@ -59,6 +60,7 @@ styles.css                         Renaissance design system and responsive layo
 app.js                             Portfolio interaction and module lifecycle
 motion-system.js                   Lenis, GSAP/ScrollTrigger and Vanta lifecycle
 side-rays.js                       Cursor-leaning warm Side Rays canvas atmosphere
+frame-scheduler.js                 Shared RAF pump and mobile/desktop quality tiers
 ambient-theme.js                   Opt-in theme-and-section-aware ambient Web Audio
 cinematic-stage.js                 Pointer light, draggable depth objects and 3D card tilt
 contact-delivery.js                Shared forwarding payload and response interpretation

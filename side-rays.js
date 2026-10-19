@@ -1,3 +1,5 @@
+import { subscribeFrame, getQualityTier } from './frame-scheduler.js';
+
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const initSideRays = () => {
@@ -15,8 +17,9 @@ const initSideRays = () => {
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = window.matchMedia('(max-width: 700px)');
+  const quality = getQualityTier();
   const pointer = { x: .68, y: .34, targetX: .68, targetY: .34 };
-  const rayCount = mobile.matches ? 8 : 12;
+  const rayCount = quality.rayCount;
   const raySeeds = Array.from({ length: rayCount }, (_, index) => ({
     phase: index * 1.73 + .4,
     width: .045 + (index % 4) * .012,
@@ -25,7 +28,6 @@ const initSideRays = () => {
   let width = 0;
   let height = 0;
   let ratio = 1;
-  let frame = 0;
   let disposed = false;
   let pulse = 0;
   let lastTime = 0;
@@ -113,10 +115,7 @@ const initSideRays = () => {
   function draw(time) {
     if (disposed || !width || !height) return;
     const frameBudget = mobile.matches ? 1000 / 30 : 1000 / 60;
-    if (!reduceMotion.matches && time - lastDraw < frameBudget) {
-      frame = requestAnimationFrame(draw);
-      return;
-    }
+    if (!reduceMotion.matches && time - lastDraw < frameBudget) return;
     const elapsed = time - lastTime;
     lastTime = time;
     lastDraw = time;
@@ -135,7 +134,6 @@ const initSideRays = () => {
     };
     const sharedAngle = Math.atan2(heroTargetY - pageOrigin.y, heroTargetX - pageOrigin.x);
     paintRays(ctx, width, height, ratio, { targetX: heroTargetX, targetY: heroTargetY, isHero: false }, mobile.matches ? .82 : .98, 1, palette, time, pageOrigin, sharedAngle);
-    if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);
   }
 
   const move = (event) => {
@@ -144,13 +142,10 @@ const initSideRays = () => {
   };
   const touch = () => { pulse = 1; };
   const visibility = () => {
-    cancelAnimationFrame(frame);
-    if (!document.hidden && !reduceMotion.matches) frame = requestAnimationFrame(draw);
+    if (!document.hidden && !reduceMotion.matches) draw(performance.now());
   };
   const reducedChanged = () => {
-    cancelAnimationFrame(frame);
     draw(performance.now());
-    if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);
   };
   const themeChanged = () => draw(performance.now());
 
@@ -162,11 +157,11 @@ const initSideRays = () => {
   reduceMotion.addEventListener?.('change', reducedChanged);
   resize();
   mount.classList.add('is-ready');
-  if (!reduceMotion.matches && !document.hidden) frame = requestAnimationFrame(draw);
+  const unsubscribe = subscribeFrame(draw);
 
   return () => {
     disposed = true;
-    cancelAnimationFrame(frame);
+    unsubscribe();
     window.removeEventListener('resize', resize);
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerdown', touch);

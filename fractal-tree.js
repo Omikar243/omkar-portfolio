@@ -1,4 +1,5 @@
 import { buildTree, cloneTree, interpolateTree, TREE_PROFILES } from './tree-geometry.js';
+import { subscribeFrame, getQualityTier } from './frame-scheduler.js';
 
 export function initFractalTree(shell, canvas, button) {
   // Keep the artwork transparent so the shared page surface and sun rays flow
@@ -7,12 +8,13 @@ export function initFractalTree(shell, canvas, button) {
   if (!shell || !canvas || !button || !ctx) return () => {};
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobileQuery = window.matchMedia('(max-width: 640px)');
+  const quality = getQualityTier();
   const constrainedCPU = (navigator.hardwareConcurrency || 8) <= 4;
-  let lowPower = mobileQuery.matches || constrainedCPU;
+  let lowPower = quality.name === 'mobile' || mobileQuery.matches || constrainedCPU;
   // Each power tier has a stable topology; switching tiers rebuilds all poses together.
-  let depth = lowPower ? 6 : 7;
-  let fps = lowPower ? 30 : 60;
-  let ratio = Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 2);
+  let depth = lowPower ? quality.treeDepth : 7;
+  let fps = quality.fps;
+  let ratio = Math.min(window.devicePixelRatio || 1, quality.dpr);
   let poses = TREE_PROFILES.map((_, state) => buildTree(state, depth));
   let current = cloneTree(poses[0]);
   let source = cloneTree(current);
@@ -24,7 +26,7 @@ export function initFractalTree(shell, canvas, button) {
   let width = 0;
   let height = 0;
   let scale = 1;
-  let raf = 0;
+  let unsubscribeFrame = null;
   let active = false;
   let visible = true;
   let disposed = false;
@@ -338,7 +340,6 @@ export function initFractalTree(shell, canvas, button) {
       sample(now);
       paint();
     }
-    raf = requestAnimationFrame(tick);
   }
 
   function start() {
@@ -346,12 +347,9 @@ export function initFractalTree(shell, canvas, button) {
     active = true;
     lastTick = 0;
     lastFrame = -Infinity;
-    raf = requestAnimationFrame(tick);
   }
   function stop() {
     active = false;
-    cancelAnimationFrame(raf);
-    raf = 0;
     lastTick = 0;
   }
   function pause() {
@@ -361,10 +359,10 @@ export function initFractalTree(shell, canvas, button) {
   }
   function resize() {
     const bounds = shell.getBoundingClientRect();
-    const nextLowPower = mobileQuery.matches || constrainedCPU;
+    const nextLowPower = getQualityTier().name === 'mobile' || mobileQuery.matches || constrainedCPU;
     if (nextLowPower !== lowPower) {
       lowPower = nextLowPower;
-      depth = lowPower ? 6 : 7;
+      depth = lowPower ? quality.treeDepth : 7;
       poses = TREE_PROFILES.map((_, poseState) => buildTree(poseState, depth));
       current = cloneTree(poses[state]);
       source = cloneTree(current);
@@ -374,8 +372,8 @@ export function initFractalTree(shell, canvas, button) {
       canvas.dataset.branchCount = String(current.edges.length);
       announceForm(false);
     }
-    fps = lowPower ? 30 : 60;
-    const nextRatio = Math.min(window.devicePixelRatio || 1, lowPower ? 1.5 : 2);
+    fps = lowPower ? quality.fps : 60;
+    const nextRatio = Math.min(window.devicePixelRatio || 1, lowPower ? quality.dpr : 2);
     canvas.dataset.renderTier = lowPower ? 'mobile-30fps' : 'desktop-60fps';
     if (width === bounds.width && height === bounds.height && ratio === nextRatio) return;
     ratio = nextRatio;
@@ -490,6 +488,7 @@ export function initFractalTree(shell, canvas, button) {
   function destroy() {
     if (disposed) return;
     stop();
+    unsubscribeFrame?.();
     disposed = true;
     listeners.abort();
     resizeObserver?.disconnect();
@@ -504,6 +503,7 @@ export function initFractalTree(shell, canvas, button) {
   announceForm(false);
   updatePalette();
   resize();
+  unsubscribeFrame = subscribeFrame(tick);
   start();
   return destroy;
 }

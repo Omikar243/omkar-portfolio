@@ -9,6 +9,7 @@ import {
   setOrbitBounds,
   startOrbit,
 } from './orbit-physics.js';
+import { subscribeFrame, getQualityTier } from './frame-scheduler.js';
 
 const MAX_DPR = 2;
 const SOURCE_URL = 'https://github.com/Omikar243/omkar-portfolio';
@@ -54,6 +55,7 @@ export const initOrbitGame = (element) => {
   const overlayTitle = element.querySelector('[data-orbit-overlay-title]');
   const overlayCopy = element.querySelector('[data-orbit-overlay-copy]');
   const reducedMotionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const quality = getQualityTier();
   const controller = new AbortController();
   const { signal } = controller;
   const state = createOrbitState({ width: 720, height: 460, seed: 243 });
@@ -73,7 +75,7 @@ export const initOrbitGame = (element) => {
   let dpr = 1;
   let width = 720;
   let height = 460;
-  let raf = 0;
+  let unsubscribeFrame = null;
   let lastTime = 0;
   let destroyed = false;
   let visible = true;
@@ -202,7 +204,7 @@ export const initOrbitGame = (element) => {
       const speed = event.type === 'collect' ? 28 + Math.random() * 70 : 45 + Math.random() * 90;
       particles.push({ x: event.x, y: event.y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 0.5 + Math.random() * 0.45, maxLife: 0.9, size: 1.5 + Math.random() * Math.min(2.8, state.level * .35), color: event.type === 'collect' ? theme.gold : theme.redLight, twist: (Math.random() - .5) * 2 });
     }
-    if (particles.length > 300) particles.splice(0, particles.length - 300);
+    if (particles.length > quality.particleLimit + 80) particles.splice(0, particles.length - quality.particleLimit - 80);
   };
   const ensureAudio = () => {
     if (!soundEnabled) return null;
@@ -464,10 +466,9 @@ export const initOrbitGame = (element) => {
     updateOverlay();
   };
   const loop = (time) => {
-    raf = 0;
     if (destroyed || !visible || document.hidden) return;
     const budget = (width < 500 || reducedMotion) && state.status !== 'playing' ? 1000/24 : width < 500 ? 1000/30 : 1000/60;
-    if (time-lastPaint < budget-.6) { raf=window.requestAnimationFrame(loop); return; }
+    if (time-lastPaint < budget-.6) return;
     const dt = lastTime ? Math.min(0.05, (time-lastTime)/1000) : 0;
     lastTime=time; lastPaint=time;
     if(state.status==='playing')handleEvents(advanceOrbit(state,dt,input));
@@ -481,10 +482,10 @@ export const initOrbitGame = (element) => {
     if(overlay)overlay.style.opacity=String(overlayAlpha);
     draw(ambience);
     updateUI();
-    if(!reducedMotion || state.status==='playing' || Math.abs(target-overlayAlpha)>.01)raf=window.requestAnimationFrame(loop);
+
   };
   const schedule = () => {
-    if (!destroyed && visible && !document.hidden && !raf) raf = window.requestAnimationFrame(loop);
+    if (!destroyed && visible && !document.hidden) updateUI();
   };
   const start = () => {
     if (state.status === 'idle') startOrbit(state);
@@ -553,7 +554,7 @@ export const initOrbitGame = (element) => {
   canvas.addEventListener('blur',()=>{Object.keys(input).forEach(k=>input[k]=false);},{signal});
   window.addEventListener('resize', resize, { signal, passive: true });
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden) { clearInput(); if (state.status === 'playing') pauseOrbit(state); if (raf) cancelAnimationFrame(raf); raf = 0; }
+    if (document.hidden) { clearInput(); if (state.status === 'playing') pauseOrbit(state); }
     else { lastTime = 0; updateUI(); schedule(); }
   }, { signal });
   reducedMotionQuery?.addEventListener?.('change', (event) => { reducedMotion = event.matches; if(reducedMotion){particles.length=0;waves.length=0;} schedule(); }, { signal });
@@ -571,14 +572,14 @@ export const initOrbitGame = (element) => {
   setupShader();
   updateUI();
   draw(0);
+  unsubscribeFrame = subscribeFrame(loop);
   schedule();
 
   return () => {
     if (destroyed) return;
     destroyed = true;
     controller.abort();
-    if (raf) cancelAnimationFrame(raf);
-    raf = 0;
+    unsubscribeFrame?.();
     resizeObserver?.disconnect();
     intersectionObserver?.disconnect();
     if (audioContext) audioContext.close().catch(() => {});

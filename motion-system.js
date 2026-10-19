@@ -1,7 +1,10 @@
 import { initSideRays } from './side-rays.js';
+import { hasCoarsePointer, getQualityTier } from './frame-scheduler.js';
 
 const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-const mobileQuery = window.matchMedia('(max-width: 700px)');
+  const mobileQuery = window.matchMedia('(max-width: 700px)');
+  const quality = getQualityTier();
+  const touchDevice = hasCoarsePointer();
 
 const vantaPalette = (dark) => dark
   ? { backgroundColor: 0x211a15, color: 0xd1ab70 }
@@ -28,7 +31,7 @@ const initMotionSystem = () => {
     script.onload = resolve; script.onerror = reject; document.head.appendChild(script);
   });
   const scheduleVanta = () => {
-    if (destroyed || reducedMotion() || !mount || window.VANTA?.NET) return;
+    if (destroyed || reducedMotion() || touchDevice || !quality.vanta || !mount || window.VANTA?.NET) return;
     const boot = () => loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js')
       .then(() => loadScript('https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.net.min.js'))
       .then(() => initVanta())
@@ -70,7 +73,7 @@ const initMotionSystem = () => {
     mount.dataset.theme = event.detail?.dark ? 'dark' : 'light';
   };
 
-  if (lenisCtor && !reducedMotion()) {
+  if (lenisCtor && !reducedMotion() && !touchDevice) {
     try {
       lenis = new lenisCtor({
         autoRaf: false,
@@ -157,7 +160,7 @@ const initMotionSystem = () => {
       ScrollTrigger?.refresh();
     }
   });
-  window.addEventListener('load', scheduleVanta, { once: true });
+  if (!touchDevice) window.addEventListener('load', scheduleVanta, { once: true });
 
   return () => {
     if (destroyed) return;

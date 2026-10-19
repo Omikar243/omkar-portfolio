@@ -4,6 +4,7 @@ import { initFractalTree } from './fractal-tree.js';
 import { initPrivateWebAnalytics, initResumeTracking } from './resume-tracking.js';
 import { initMotionSystem } from './motion-system.js';
 import { initAmbientTheme } from './ambient-theme.js';
+import { initCinematicStage } from './cinematic-stage.js';
 
 const body = document.body;
 const loader = document.querySelector('#loader');
@@ -202,11 +203,12 @@ const destroyFractalTree = initFractalTree(document.querySelector('#heroVisual')
 const destroyResumeTracking = initResumeTracking();
 const destroyMotionSystem = initMotionSystem();
 const destroyAmbientTheme = initAmbientTheme();
+const destroyCinematicStage = initCinematicStage();
 initPrivateWebAnalytics();
 
 window.addEventListener('pagehide', (event) => {
   cancelAnimationFrame(particleFrame);
-  if (!event.persisted) { destroyMotionSystem(); destroyAmbientTheme(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
+  if (!event.persisted) { destroyMotionSystem(); destroyAmbientTheme(); destroyCinematicStage(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
 });
 window.addEventListener('pageshow', () => {
   if (!particleFrame && !document.hidden) animateParticles();

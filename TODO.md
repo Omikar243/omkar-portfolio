@@ -1,15 +1,8 @@
 
-## Non-crooked O correction
 
-- [x] Keep whole-shape lean while pairing the O’s left/right nodes around their local centers, so round profiles remain round and squared profiles remain squared instead of becoming skewed or pinched.
-- [x] Add regression checks for paired lower and upper O sides; geometry, continuous morph, five-state mobile, haptic, theme and reduced-motion checks pass.
+## Approved cinematic Koi Mecha-inspired layer
 
-
-## Motion, 3D atmosphere and theme audio
-
-- [x] Add Lenis smooth scrolling with anchors enabled, native touch usability preserved, nested game scrolling protected, and reduced-motion support respected.
-- [x] Add GSAP Core and ScrollTrigger choreography synchronized with Lenis for section reveals, project depth and restrained hero parallax; clean up triggers on page teardown.
-- [x] Add one low-contrast interactive Vanta background layer that responds to mouse and touch, follows light/dark theme changes, and has a static fallback for reduced motion, mobile limitations or WebGL failure.
-- [x] Add opt-in, low-volume custom ambient soundscapes that change with the visual theme and never autoplay.
-- [x] Change the Knee Osteoarthritis Detection project claim to approximately 90% accuracy on 5-grade knee osteoarthritis classification from X-rays.
-- [x] Add a React Bits Side Rays–style warm sunbeam layer from the top-right that leans toward mouse/touch, falls across the tree and spreads softly across the site, while Vanta remains underneath.
+- [x] Keep the precise fractal tree and geometric O as the hero identity anchor while surrounding them with a larger layered depth world.
+- [x] Add pointer/touch-following light, scroll-driven cinematic scene changes, parallax depth layers, draggable/orbiting stage objects, interactive 3D project cards, and reactive particles/branches.
+- [x] Preserve SIGNAL // ORBIT mechanics, accessibility and current interaction behavior while upgrading its visual surface to the same cinematic language.
+- [x] Make ambient sound opt-in and synchronize low-gain soundscapes to the selected visual theme and visible page section with smooth crossfades, no autoplay and visibility-safe suspension.

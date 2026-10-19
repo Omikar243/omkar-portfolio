@@ -62,7 +62,14 @@
         </div>
 
         <div class="hero-art reveal reveal-delay-2">
-          <div class="hero-visual-shell" id="heroVisual" data-morphing="false">
+          <div class="hero-visual-shell" id="heroVisual" data-morphing="false" data-scene="hero">
+            <div class="cinematic-stage" id="cinematicStage" aria-label="Interactive signal field">
+              <span class="stage-depth-ring stage-depth-ring-a" aria-hidden="true"></span>
+              <span class="stage-depth-ring stage-depth-ring-b" aria-hidden="true"></span>
+              <span class="stage-light" aria-hidden="true"></span>
+              <button class="stage-object stage-object-signal" data-stage-object="signal" type="button" aria-label="Drag the signal orbit object"><span aria-hidden="true">S</span></button>
+              <button class="stage-object stage-object-vision" data-stage-object="vision" type="button" aria-label="Drag the vision orbit object"><span aria-hidden="true">V</span></button>
+            </div>
             <canvas id="fractalCanvas" aria-hidden="true"></canvas>
             <div class="hero-visual-glow" aria-hidden="true"></div>
             <button class="signature-glyph" id="signatureGlyph" type="button" data-state="0" aria-label="Morph the fractal tree. Current form: rounded growth." aria-describedby="glyphHint"></button>

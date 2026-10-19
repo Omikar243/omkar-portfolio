@@ -23,7 +23,8 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Contact form forwarding to my inbox using FormSubmit, with visitor Reply-To, activation-aware feedback and preservation of typed messages on delivery failure. Owner activation and received-inbox verification are complete.
 - **SIGNAL // ORBIT:** optional Canvas physics arcade with keyboard/mouse/touch steering, moving hazards, collection combos, evolving orbital paths, a 90-second window, three lives, local best score, pause/restart and explicit opt-in sound.
 - Lenis smooth scrolling with native anchor links, GSAP Core + ScrollTrigger reveal/parallax choreography, a low-contrast Vanta interactive network, and a React Bits Side Rays–style sunbeam layer that falls across the tree and page with reduced-motion and fallback handling.
-- An explicit ambient theme-sound toggle with quiet procedural soundscapes that change across the website light/dark modes and SIGNAL // ORBIT Ember, Moon and Verdigris palettes; audio never autoplays.
+- An explicit ambient theme-sound toggle with quiet procedural soundscapes that crossfade across page sections, website light/dark modes and SIGNAL // ORBIT Ember, Moon and Verdigris palettes; audio never autoplays. Opt-in interface chimes reuse the same filtered sound field.
+- A cinematic depth stage inspired by high-end Three UI experiences: the precise tree/O remains central while pointer light, parallax rings, draggable orbit objects, reactive particles, scroll scene states and interactive 3D project-card tilt add depth without a second WebGL renderer. SIGNAL // ORBIT keeps its mechanics and gains the same perspective-light treatment.
 
 ### Living fractal tree
 
@@ -31,9 +32,9 @@ The hero artwork uses a single Canvas 2D renderer and fixed connected Bézier gr
 
 Run the repeatable geometry tests with `node tests/tree-geometry.test.js`. Real-touch Chromium mobile checks are in `tests/mobile-tree.test.py` (Python Playwright and Chromium required): `python3 tests/mobile-tree.test.py`. This verifies all five forms, rapid retargets, coordinated themes, reduced-motion repaint, persistence, low-power budgets and that only SIGNAL // ORBIT remains.
 
-The artwork uses an **opaque, synchronized canvas**, filling every backing pixel with the current cream or espresso theme before drawing. This avoids dependence on transparent low-latency compositing on mobile GPUs; paper texture uses sparse CSS specks rather than an SVG turbulence filter. Context-restoration handlers repaint the active theme. Signature changes add a restrained brightness wave along the existing trunk and canopy, with a small status-dot pulse; reduced-motion mode skips both. The About layout balances the full-frame portrait, compact **Omkar** caption and personal story at phone, tablet and desktop widths.
+The artwork uses a **transparent, synchronized canvas**, allowing the single page-wide ray field and theme surface to continue through the tree without a rectangular compositing boundary. Paper texture uses sparse CSS specks rather than an SVG turbulence filter. Context-restoration handlers repaint the active theme. Signature changes add a restrained brightness wave along the existing trunk and canopy, with a small status-dot pulse; reduced-motion mode skips both. The About layout balances the full-frame portrait, compact **Omkar** caption and personal story at phone, tablet and desktop widths.
 
-Run `python3 tests/live-portfolio.test.py https://omkar-v-shettigar.vercel.app/` for opaque light/dark pixel checks, all five touch/haptic requests, leaf-rustle PCM graph evidence, portrait/caption bounds, actual external project-button popups and original resume download. These are mobile-emulated browser checks, not validation of a physical phone’s GPU, loudspeaker or vibration actuator.
+Run `python3 tests/live-portfolio.test.py https://omkar-v-shettigar.vercel.app/` for transparent light/dark pixel checks, all five touch/haptic requests, leaf-rustle PCM graph evidence, portrait/caption bounds, actual external project-button popups and original resume download. These are mobile-emulated browser checks, not validation of a physical phone’s GPU, loudspeaker or vibration actuator.
 
 ## Run locally
 
@@ -58,7 +59,8 @@ styles.css                         Renaissance design system and responsive layo
 app.js                             Portfolio interaction and module lifecycle
 motion-system.js                   Lenis, GSAP/ScrollTrigger and Vanta lifecycle
 side-rays.js                       Cursor-leaning warm Side Rays canvas atmosphere
-ambient-theme.js                   Opt-in theme-aware ambient Web Audio
+ambient-theme.js                   Opt-in theme-and-section-aware ambient Web Audio
+cinematic-stage.js                 Pointer light, draggable depth objects and 3D card tilt
 contact-delivery.js                Shared forwarding payload and response interpretation
 resume-tracking.js                 Silent download alerts and free pageview integration
 resume-attribution.js              Privacy-limited attribution normalization

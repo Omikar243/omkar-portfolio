@@ -72,6 +72,7 @@ const initMotionSystem = () => {
 
   if (gsap && ScrollTrigger && !reducedMotion()) {
     gsap.registerPlugin(ScrollTrigger);
+    document.body.dataset.scene = 'hero';
     if (lenis) {
       lenis.on('scroll', ScrollTrigger.update);
       tickerHandler = (time) => lenis.raf(time * 1000);
@@ -79,6 +80,19 @@ const initMotionSystem = () => {
       gsap.ticker.lagSmoothing(0);
     }
     context = gsap.context(() => {
+      const setScene = (scene) => {
+        document.body.dataset.scene = scene;
+        document.querySelector('#heroVisual')?.setAttribute('data-scene', scene);
+      };
+      gsap.utils.toArray('main > section[id]').forEach((section) => {
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 58%',
+          end: 'bottom 42%',
+          onEnter: () => setScene(section.id),
+          onEnterBack: () => setScene(section.id),
+        });
+      });
       gsap.utils.toArray('.reveal').forEach((element) => {
         gsap.fromTo(element, { autoAlpha: 0, y: 22 }, {
           autoAlpha: 1,
@@ -98,8 +112,8 @@ const initMotionSystem = () => {
         });
       }
       gsap.utils.toArray('.project-card').forEach((card, index) => {
-        gsap.fromTo(card, { y: index % 2 ? 18 : 10 }, {
-          y: index % 2 ? -8 : -3,
+        gsap.fromTo(card, { '--card-depth-y': `${index % 2 ? 18 : 10}px` }, {
+          '--card-depth-y': `${index % 2 ? -8 : -3}px`,
           ease: 'none',
           scrollTrigger: { trigger: card, start: 'top 96%', end: 'bottom 12%', scrub: 0.82 },
         });

@@ -129,3 +129,9 @@ The visible copy lives in `index.html`. Interactions live in `app.js`, while the
 ### Two cinematic video modes
 
 The portfolio walkthrough is also delivered as two concise marketing edits: Website Mode is a roughly 28-second proof-led tour of the live site, while Pitch Deck Mode is a roughly 13-second presentation-focused cut showing the chapter rail and authored story structure. Both use captions and an energetic, restrained synthetic score with chapter stings; neither claims voiceover when voice generation is unavailable.
+
+### Presentation mode
+
+Pitch Deck Mode is a true full-screen slide stage, not a website skin. It replaces the long page with seven focused presentation slides, a progress bar, chapter rail, arrow-key navigation, touch swipes and an explicit exit control. Website Mode remains the scrollable portfolio.
+
+The latest video assets are `Omkar-website-mode-28s-clean.mp4` (28.88 seconds, synchronized section holds) and `Omkar-pitch-deck-mode-19s-slides.mp4` (19 seconds, full-screen slide presentation).

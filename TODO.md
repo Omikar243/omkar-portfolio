@@ -13,3 +13,11 @@
 - [x] Enable page-level proximity snap in Pitch Deck Mode across desktop, tablet and mobile while preserving native scrolling and reduced-motion fallback.
 - [x] Produce a Website Mode marketing cut in approximately 25–30 seconds with fast proof-led section progression, captions, and energetic interaction sound design.
 - [x] Produce a separate 10–20 second Pitch Deck Mode cut showing the chapter rail and presentation structure.
+
+## Full-screen Pitch Deck redesign
+
+- [x] Replace the website-like Pitch Deck overlay with a distinct full-screen slide stage that hides the normal header and long-form page.
+- [x] Add seven focused presentation slides: thesis, operator, evidence, proof, lab, toolkit and invitation.
+- [x] Add presentation controls: progress bar, chapter rail, previous/next controls, arrow-key navigation, touch swipes and explicit Exit presentation action.
+- [x] Validate desktop, tablet and mobile stage activation, no horizontal overflow, slide progression, keyboard navigation and Escape exit without browser errors.
+- [x] Recapture the Pitch Deck video from the new slide stage as a 19-second presentation cut.

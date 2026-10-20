@@ -28,3 +28,12 @@
 - [x] Retiming pass: delay chapter captions and accents until the section visuals settle, then fade the final invitation to black with a matching audio resolve.
 - [x] Verify deployed Website Mode on desktop, tablet and mobile emulation: no mobile horizontal overflow, page scroll moves continuously across the playground, tree tap remains responsive, and no browser errors occur.
 - [x] Verify deployed Pitch Deck Mode on tablet and mobile touch emulation: full-screen stage opens, vertical swipe advances slides, keyboard navigation works, and Escape exits cleanly.
+
+## Pitch Deck layout and content refinement
+
+- [x] Keep every Pitch Deck slide’s thesis, operator, evidence, proof, lab, toolkit and invitation copy inside the viewport on desktop, tablet and mobile.
+- [x] Move the chapter rail into a compact top navigation band so it never covers slide text, the operator details, the lab/playground, toolkit, or invitation.
+- [x] Include the SIGNAL // ORBIT lab in the Pitch Deck with its touch, physics, power-up, WebGL and theme capabilities plus a direct action to open the live playground.
+- [x] Include the actual toolkit from the portfolio: LangChain, LangGraph, FAISS, SBERT, Ollama, PyTorch, FastAPI, AWS, Three.js, TypeScript/JavaScript, CI/CD and MLflow.
+- [x] Restore a visible invitation with a contact action and LinkedIn/GitHub links.
+- [x] Add direct proof links for Ancient Modern Apparel and Knee Osteoarthritis Detection.

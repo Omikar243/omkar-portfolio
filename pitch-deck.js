@@ -10,6 +10,7 @@ const initPitchDeck = () => {
   const prev = document.querySelector('[data-pitch-prev]');
   const next = document.querySelector('[data-pitch-next]');
   const exit = document.querySelector('[data-pitch-exit]');
+  const exitTo = [...document.querySelectorAll('[data-pitch-exit-to]')];
   if (!toggle || !rail || !stage || !slides.length) return () => {};
   let active = 0;
   let wheelLock = false;
@@ -55,6 +56,13 @@ const initPitchDeck = () => {
   prev?.addEventListener('click', () => setActive(active - 1, true));
   next?.addEventListener('click', () => setActive(active + 1, true));
   exit?.addEventListener('click', () => setMode(false));
+  const exitToClick = (event) => {
+    const target = event.currentTarget.getAttribute('data-pitch-exit-to');
+    if (!target) return;
+    setMode(false);
+    window.setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
+  };
+  exitTo.forEach((button) => button.addEventListener('click', exitToClick));
   toggle.addEventListener('click', () => setMode(!document.body.classList.contains('pitch-mode')));
   const keydown = (event) => {
     if (!document.body.classList.contains('pitch-mode')) return;
@@ -83,7 +91,7 @@ const initPitchDeck = () => {
   setMode(saved === 'on', false);
   return () => {
     document.removeEventListener('keydown', keydown); stage.removeEventListener('wheel', wheel); stage.removeEventListener('touchstart', touchStart); stage.removeEventListener('touchend', touchEnd);
-    chapters.forEach((button) => button.removeEventListener('click', chapterClick)); window.visualViewport?.removeEventListener('resize', syncVisualViewport); window.removeEventListener('resize', syncVisualViewport);
+    chapters.forEach((button) => button.removeEventListener('click', chapterClick)); exitTo.forEach((button) => button.removeEventListener('click', exitToClick)); window.visualViewport?.removeEventListener('resize', syncVisualViewport); window.removeEventListener('resize', syncVisualViewport);
   };
 };
 export { initPitchDeck };

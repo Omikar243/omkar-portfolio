@@ -162,6 +162,21 @@ const initAmbientTheme = () => {
     oscillator.stop(now + 0.18);
   };
 
+  const playSpotlight = () => {
+    if (!enabled || !audio || !filter) return;
+    const oscillator = audio.createOscillator();
+    const gain = audio.createGain();
+    const now = audio.currentTime;
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(620, now);
+    oscillator.frequency.exponentialRampToValueAtTime(760, now + .1);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, profile().level * .18), now + .012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + .11);
+    oscillator.connect(gain).connect(filter);
+    oscillator.start(now); oscillator.stop(now + .13);
+  };
+
   const toggle = () => {
     if (enabled) stop();
     else start();
@@ -186,6 +201,7 @@ const initAmbientTheme = () => {
   document.addEventListener('portfolio:themechange', onPageTheme);
   document.addEventListener('visibilitychange', onVisibility);
   document.addEventListener('pointerdown', playInteraction, { capture: true, passive: true });
+  document.addEventListener('portfolio:spotlight', playSpotlight);
   observeSections();
   setLabel();
 
@@ -195,6 +211,7 @@ const initAmbientTheme = () => {
     document.removeEventListener('portfolio:themechange', onPageTheme);
     document.removeEventListener('visibilitychange', onVisibility);
     document.removeEventListener('pointerdown', playInteraction, { capture: true });
+    document.removeEventListener('portfolio:spotlight', playSpotlight);
     sectionObserver?.disconnect();
     voices.forEach(({ oscillator }) => oscillator.stop());
     audio?.close().catch(() => {});

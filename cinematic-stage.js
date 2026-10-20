@@ -8,6 +8,11 @@ const initCinematicStage = () => {
 
   let activeObject = null;
   let drag = null;
+  let scrolling = false;
+  let scrollTimer = 0;
+  let lastSpotlight = 0;
+  let lastSpotlightX = 0;
+  let lastSpotlightY = 0;
 
   const setPointer = (event) => {
     const rect = stage.getBoundingClientRect();
@@ -21,16 +26,29 @@ const initCinematicStage = () => {
     hero.style.setProperty('--stage-pointer-y', '0');
   };
   const setOrbitPointer = (event) => {
-    if (!orbit || reduced.matches) return;
+    if (!orbit || reduced.matches || scrolling) return;
     const rect = orbit.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
     const y = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
     orbit.style.setProperty('--orbit-pointer-x', `${Math.max(-1, Math.min(1, x))}`);
     orbit.style.setProperty('--orbit-pointer-y', `${Math.max(-1, Math.min(1, y))}`);
+    const now = performance.now();
+    const distance = Math.hypot(x - lastSpotlightX, y - lastSpotlightY);
+    if (now - lastSpotlight > 160 && distance > .12) {
+      lastSpotlight = now; lastSpotlightX = x; lastSpotlightY = y;
+      document.dispatchEvent(new CustomEvent('portfolio:spotlight', { detail: { x, y } }));
+    }
   };
   const resetOrbitPointer = () => {
     orbit?.style.setProperty('--orbit-pointer-x', '0');
     orbit?.style.setProperty('--orbit-pointer-y', '0');
+  };
+  const onScroll = () => {
+    scrolling = true;
+    orbit?.classList.add('is-scrolling');
+    resetOrbitPointer();
+    window.clearTimeout(scrollTimer);
+    scrollTimer = window.setTimeout(() => { scrolling = false; orbit?.classList.remove('is-scrolling'); }, 150);
   };
 
   const startDrag = (event) => {
@@ -59,7 +77,7 @@ const initCinematicStage = () => {
   };
 
   const updateCard = (event) => {
-    if (reduced.matches) return;
+    if (reduced.matches || scrolling) return;
     const card = event.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width - 0.5;
@@ -79,6 +97,7 @@ const initCinematicStage = () => {
   hero.addEventListener('pointerleave', resetPointer, { passive: true });
   orbit?.addEventListener('pointermove', setOrbitPointer, { passive: true });
   orbit?.addEventListener('pointerleave', resetOrbitPointer, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
   stage.querySelectorAll('[data-stage-object]').forEach((object) => {
     object.dataset.x = '0';
     object.dataset.y = '0';
@@ -99,6 +118,8 @@ const initCinematicStage = () => {
     hero.removeEventListener('pointerleave', resetPointer);
     orbit?.removeEventListener('pointermove', setOrbitPointer);
     orbit?.removeEventListener('pointerleave', resetOrbitPointer);
+    window.removeEventListener('scroll', onScroll);
+    window.clearTimeout(scrollTimer);
     stage.querySelectorAll('[data-stage-object]').forEach((object) => {
       object.removeEventListener('pointerdown', startDrag);
       object.removeEventListener('pointermove', moveDrag);

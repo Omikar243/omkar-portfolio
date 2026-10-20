@@ -179,9 +179,10 @@ const animateParticles = () => {
 };
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
-particleFrame = subscribeFrame(() => {
+if (quality.name !== 'mobile') particleFrame = subscribeFrame(() => {
   if (!reduceMotion || !ctx) animateParticles();
 });
+else animateParticles();
 particleMotion.addEventListener('change', () => {
   reduceMotion = particleMotion.matches;
   animateParticles();
@@ -199,7 +200,21 @@ window.addEventListener('pointermove', (event) => {
 });
 
 
-const destroyOrbitGame = initOrbitGame(document.querySelector('[data-orbit-game]'));
+let destroyOrbitGame = () => {};
+let orbitBooted = false;
+const orbitArticle = document.querySelector('[data-orbit-game]');
+const bootOrbit = () => {
+  if (orbitBooted) return;
+  orbitBooted = true;
+  destroyOrbitGame = initOrbitGame(orbitArticle);
+};
+if (orbitArticle && 'IntersectionObserver' in window) {
+  const orbitBootObserver = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) return;
+    bootOrbit(); orbitBootObserver.disconnect();
+  }, { rootMargin: '240px 0px' });
+  orbitBootObserver.observe(orbitArticle);
+} else bootOrbit();
 const destroyFractalTree = initFractalTree(document.querySelector('#heroVisual'), document.querySelector('#fractalCanvas'), document.querySelector('#signatureGlyph'));
 const destroyResumeTracking = initResumeTracking();
 const destroyMotionSystem = initMotionSystem();
@@ -217,5 +232,5 @@ window.addEventListener('pagehide', (event) => {
   if (!event.persisted) { particleFrame?.(); particleFrame = null; destroyMotionSystem(); destroyAmbientTheme(); destroyCinematicStage(); destroyDesktopBloom(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
 });
 window.addEventListener('pageshow', () => {
-  if (!particleFrame && !document.hidden) particleFrame = subscribeFrame(animateParticles);
+  if (!particleFrame && quality.name !== 'mobile' && !document.hidden) particleFrame = subscribeFrame(animateParticles);
 });

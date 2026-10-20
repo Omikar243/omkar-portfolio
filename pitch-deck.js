@@ -11,6 +11,7 @@ const initPitchDeck = () => {
   const next = document.querySelector('[data-pitch-next]');
   const exit = document.querySelector('[data-pitch-exit]');
   const exitTo = [...document.querySelectorAll('[data-pitch-exit-to]')];
+  const skillTokens = [...document.querySelectorAll('.pitch-toolkit span')];
   if (!toggle || !rail || !stage || !slides.length) return () => {};
   let active = 0;
   let wheelLock = false;
@@ -63,6 +64,16 @@ const initPitchDeck = () => {
     window.setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
   };
   exitTo.forEach((button) => button.addEventListener('click', exitToClick));
+  const skillEnter = (event) => {
+    const index = skillTokens.indexOf(event.currentTarget);
+    skillTokens.forEach((token, tokenIndex) => {
+      const distance = Math.abs(tokenIndex - index);
+      token.style.setProperty('--skill-distance', String(distance));
+      token.classList.toggle('is-pulsing', distance <= 2);
+    });
+  };
+  const skillLeave = () => skillTokens.forEach((token) => { token.style.removeProperty('--skill-distance'); token.classList.remove('is-pulsing'); });
+  skillTokens.forEach((token) => { token.addEventListener('pointerenter', skillEnter); token.addEventListener('pointerleave', skillLeave); });
   toggle.addEventListener('click', () => setMode(!document.body.classList.contains('pitch-mode')));
   const keydown = (event) => {
     if (!document.body.classList.contains('pitch-mode')) return;
@@ -91,7 +102,7 @@ const initPitchDeck = () => {
   setMode(saved === 'on', false);
   return () => {
     document.removeEventListener('keydown', keydown); stage.removeEventListener('wheel', wheel); stage.removeEventListener('touchstart', touchStart); stage.removeEventListener('touchend', touchEnd);
-    chapters.forEach((button) => button.removeEventListener('click', chapterClick)); exitTo.forEach((button) => button.removeEventListener('click', exitToClick)); window.visualViewport?.removeEventListener('resize', syncVisualViewport); window.removeEventListener('resize', syncVisualViewport);
+    chapters.forEach((button) => button.removeEventListener('click', chapterClick)); exitTo.forEach((button) => button.removeEventListener('click', exitToClick)); skillTokens.forEach((token) => { token.removeEventListener('pointerenter', skillEnter); token.removeEventListener('pointerleave', skillLeave); }); window.visualViewport?.removeEventListener('resize', syncVisualViewport); window.removeEventListener('resize', syncVisualViewport);
   };
 };
 export { initPitchDeck };

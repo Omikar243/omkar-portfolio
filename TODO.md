@@ -37,3 +37,11 @@
 - [x] Include the actual toolkit from the portfolio: LangChain, LangGraph, FAISS, SBERT, Ollama, PyTorch, FastAPI, AWS, Three.js, TypeScript/JavaScript, CI/CD and MLflow.
 - [x] Restore a visible invitation with a contact action and LinkedIn/GitHub links.
 - [x] Add direct proof links for Ancient Modern Apparel and Knee Osteoarthritis Detection.
+
+## Pitch Deck operator, lab, toolkit and invitation pass
+
+- [x] Place operator labels on the left and corresponding values on the right: Based in India / Mumbai, Currently Building At / Catalysk, and Engineering Foundation / GPA / 8.44.
+- [x] Show a visible SIGNAL // ORBIT live preview in the Lab slide instead of only abstract orbit artwork, with a direct Play action into the real playground.
+- [x] Include all skills from the Website Mode toolkit in the Pitch Deck and give them a gentle breathing glow plus two-neighbor hover chain reaction.
+- [x] Add an unmistakable Open Contact Form action and invitation card that exits Pitch Deck Mode and scrolls to the real contact form.
+- [x] Keep every revised slide fitted within desktop, tablet and mobile viewports.

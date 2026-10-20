@@ -56,8 +56,8 @@ const initMotionSystem = () => {
     const ScrollTrigger = window.ScrollTrigger;
     librariesLoaded = true;
     if (Lenis) {
-      try { lenis = new Lenis({ autoRaf: false, anchors: true, allowNestedScroll: false, lerp: .085, smoothWheel: true,
-        prevent: (node) => Boolean(node.closest?.('[data-lenis-prevent]')) || Boolean(node.closest?.('[data-orbit-game]')) }); }
+      try { lenis = new Lenis({ autoRaf: false, anchors: true, allowNestedScroll: false, lerp: .075, smoothWheel: true,
+        prevent: (node) => Boolean(node.closest?.('[data-lenis-prevent]')) }); document.documentElement.classList.add('lenis-active'); }
       catch (error) { console.warn('Lenis unavailable; native scrolling remains enabled.', error); }
     }
     if (!(gsap && ScrollTrigger)) return;
@@ -103,7 +103,7 @@ const initMotionSystem = () => {
     window.removeEventListener('load', refreshScroll);
     window.removeEventListener('pointerdown', requestVanta);
     if (tickerHandler && window.gsap) window.gsap.ticker.remove(tickerHandler);
-    context?.revert(); lenis?.destroy(); vanta?.destroy();
+    context?.revert(); lenis?.destroy(); document.documentElement.classList.remove('lenis-active'); vanta?.destroy();
     destroySideRays(); mount?.classList.remove('is-ready');
   };
 };

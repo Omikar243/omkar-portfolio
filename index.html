@@ -71,6 +71,7 @@
             <div class="hero-visual-glow" aria-hidden="true"></div>
             <button class="signature-glyph" id="signatureGlyph" type="button" data-state="0" aria-label="Morph the fractal tree. Current form: rounded growth." aria-describedby="glyphHint"></button>
             <div class="tree-art-controls"><button class="tree-sound-toggle" id="treeSoundToggle" type="button" aria-label="Enable wind-through-leaves sound" aria-pressed="false"><span aria-hidden="true">♪</span><span data-tree-sound-label>Leaves off</span></button><button class="tree-theme-toggle" id="treeThemeToggle" data-theme-toggle type="button" aria-label="Switch artwork and website to dark mode" aria-pressed="false"><span aria-hidden="true">◐</span><span data-theme-label>Dark canvas</span></button></div>
+            <fieldset class="bloom-panel" data-bloom-panel><legend>desktop bloom</legend><label><input type="checkbox" data-bloom-toggle checked /> <span>glow field</span></label><label class="bloom-intensity"><span>intensity</span><input type="range" data-bloom-intensity min="0" max="100" value="62" step="1" /></label></fieldset>
             <span class="glyph-hint" id="glyphHint">tap the tree · form 1 / 5</span>
             <span class="sr-only" id="treeStatus" role="status" aria-live="polite"></span>
             <div class="art-caption"><span>01</span><span>signal → system</span></div>
@@ -152,7 +153,7 @@
     <p class="orbit-deck">Experiments in motion, physics &amp; interaction. Collect power-ups as the field levels up. Keep the signal alive for 90 seconds.</p>
   </header>
   <div class="orbit-stage">
-    <div class="orbit-canvas-shell">
+    <div class="orbit-canvas-shell" data-lenis-prevent>
       <canvas class="orbit-canvas" data-orbit-canvas tabindex="0" role="application" aria-label="SIGNAL // ORBIT game. Use arrow keys or WASD, or aim with pointer or touch."></canvas>
       <canvas class="orbit-shader" data-orbit-shader aria-hidden="true"></canvas>
       <div class="orbit-overlay" data-orbit-overlay>

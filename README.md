@@ -25,6 +25,8 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - Native anchor scrolling with GSAP Core + ScrollTrigger reveal/parallax choreography on desktop, a low-contrast lazy-loaded Vanta interactive network only for fine-pointer desktop devices, and a React Bits Side Rays–style sunbeam layer that falls across the tree and page with deterministic water-like drift at 60 FPS on desktop and a bounded mobile fallback. Touch devices use native scrolling and never initialize Lenis or Vanta.
 - All canvas systems share one singleton frame scheduler: page particles, Side Rays, the fractal tree and SIGNAL // ORBIT subscribe to one requestAnimationFrame pump. Device tiers cap mobile work at 30 FPS, 1.5× pixel density, lower tree depth and lower particle counts while preserving the precise O interaction.
 - Desktop fine-pointer sessions receive a subtle low-resolution WebGL bloom pass over the hero only after the browser is idle. It shares the same scheduler, pauses when the hero is offscreen, and is excluded from touch and reduced-motion sessions so it does not compete with first paint or mobile interaction.
+- The desktop bloom has a live **desktop bloom** panel with an on/off switch and intensity slider. Its setting persists locally, and when the opt-in ambient soundscape is active the existing analyser gently modulates the glow instead of creating another audio graph.
+- SIGNAL // ORBIT owns native interaction only inside its canvas shell. The surrounding heading, HUD and controls remain part of the page scroll, preventing Lenis/native-scroll handoff stutter while preserving touch input on the game surface.
 - An explicit ambient theme-sound toggle with quiet procedural soundscapes that crossfade across page sections, website light/dark modes and SIGNAL // ORBIT Ember, Moon and Verdigris palettes; audio never autoplays. Opt-in interface chimes reuse the same filtered sound field.
 - A cinematic depth stage inspired by high-end Three UI experiences: the precise tree/O remains central while pointer light, parallax rings, draggable orbit objects, reactive particles, scroll scene states and interactive 3D project-card tilt add depth without a second WebGL renderer. SIGNAL // ORBIT keeps its mechanics and gains the same perspective-light treatment.
 
@@ -63,6 +65,7 @@ motion-system.js                   Lenis, GSAP/ScrollTrigger and Vanta lifecycle
 side-rays.js                       Cursor-leaning warm Side Rays canvas atmosphere
 frame-scheduler.js                 Shared RAF pump and mobile/desktop quality tiers
 desktop-bloom.js                   Deferred desktop-only WebGL hero bloom pass
+research-cinematic-refresh.md      Walkthrough diagnosis and reference research
 ambient-theme.js                   Opt-in theme-and-section-aware ambient Web Audio
 cinematic-stage.js                 Pointer light, draggable depth objects and 3D card tilt
 contact-delivery.js                Shared forwarding payload and response interpretation

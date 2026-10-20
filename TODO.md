@@ -1,6 +1,8 @@
 
 
-## Desktop bloom and final TBT pass
+## Playground stability and cinematic refresh
 
-- [x] Add a subtle low-resolution WebGL bloom pass only for fine-pointer desktop devices; share the singleton RAF scheduler, skip touch/reduced-motion devices, pause when the hero is offscreen, and preserve the existing tree/O hierarchy.
-- [x] Further reduce TBT by keeping GSAP/Lenis/Vanta post-idle enhancements out of the initial critical path and retain native/reduced-motion fallbacks.
+- [ ] Fix playground scroll buffering/glitching by preventing Lenis only inside the interactive game canvas, not the entire SIGNAL // ORBIT article; keep the header, HUD and controls in normal page scroll flow.
+- [ ] Add an interactive desktop bloom panel with a live on/off toggle and intensity slider; persist the user’s choice and keep the panel hidden on touch/reduced-motion sessions.
+- [ ] Feed the existing opt-in ambient analyser into bloom intensity so the glow pulses subtly with the active theme/section soundscape without creating a second audio graph.
+- [ ] Improve cinematic scroll quality with stable section ownership, a calmer lab-to-toolkit transition, chapter breathing room and no forced snap-scroll.

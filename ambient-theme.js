@@ -25,6 +25,8 @@ const initAmbientTheme = () => {
   let audio = null;
   let master = null;
   let filter = null;
+  let analyser = null;
+  let analyserConnected = false;
   let interactionGain = null;
   let voices = [];
   let enabled = false;
@@ -102,7 +104,10 @@ const initAmbientTheme = () => {
       filter.Q.value = 0.35;
       filter.connect(master);
       master.gain.value = 0.0001;
-      master.connect(audio.destination);
+      analyser ||= audio.createAnalyser();
+      analyser.fftSize = 256;
+      if (!analyserConnected) { master.connect(analyser).connect(audio.destination); analyserConnected = true; }
+      window.__ambientAnalyser = analyser;
       if (!voices.length) {
         voices = profile().frequencies.map((frequency, index) => {
           const oscillator = audio.createOscillator();
@@ -196,6 +201,9 @@ const initAmbientTheme = () => {
     voices = [];
     audio = null;
     filter = null;
+    analyser = null;
+    analyserConnected = false;
+    delete window.__ambientAnalyser;
     interactionGain = null;
     master = null;
   };

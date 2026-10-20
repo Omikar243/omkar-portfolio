@@ -1,0 +1,49 @@
+1
+00:00:00,000 --> 00:00:04,000
+OMKAR V. SHETTIGAR  /  AI + ML ENGINEER
+A living pitch deck for building intelligence people can trust.
+
+2
+00:00:04,000 --> 00:00:08,000
+THE SIGNAL
+A precise O grows inside a fractal tree — five states, one evolving system.
+
+3
+00:00:08,000 --> 00:00:12,000
+THE OPERATOR
+First-person story, portrait, ambition, and the person behind the pipelines.
+
+4
+00:00:12,000 --> 00:00:16,000
+THE PROOF
+Projects arrive as evidence: product, model, stack, result, destination.
+
+5
+00:00:16,000 --> 00:00:20,000
+THE LAB
+SIGNAL // ORBIT turns interaction, physics and reactive visuals into a live demonstration.
+
+6
+00:00:20,000 --> 00:00:27,000
+EXPERIENCE / TIMELINE
+Production constraints and measurable outcomes become an authored scroll story.
+
+7
+00:00:27,000 --> 00:00:35,000
+SELECTED WORK
+Ancient Modern Apparel and five-grade knee osteoarthritis classification show the range from product to applied research.
+
+8
+00:00:35,000 --> 00:00:43,000
+SIGNAL // ORBIT
+Touch, keyboard and pointer control, power-ups, palettes, particles and a restrained WebGL field.
+
+9
+00:00:43,000 --> 00:00:48,000
+THE TOOLKIT
+Generative AI, retrieval, production ML, data systems and performance thinking.
+
+10
+00:00:48,000 --> 00:00:51,640
+THE INVITATION
+A memorable first impression, followed by enough proof to start the next conversation.

@@ -6,6 +6,7 @@ import { initMotionSystem } from './motion-system.js';
 import { initAmbientTheme } from './ambient-theme.js';
 import { initCinematicStage } from './cinematic-stage.js';
 import { initDesktopBloom } from './desktop-bloom.js';
+import { initPitchDeck } from './pitch-deck.js';
 import { subscribeFrame, getQualityTier } from './frame-scheduler.js';
 
 const body = document.body;
@@ -224,6 +225,7 @@ const destroyResumeTracking = initResumeTracking();
 const destroyMotionSystem = initMotionSystem();
 const destroyAmbientTheme = initAmbientTheme();
 const destroyCinematicStage = initCinematicStage();
+const destroyPitchDeck = initPitchDeck();
 let destroyDesktopBloom = () => {};
 const startDesktopBloom = () => { destroyDesktopBloom = initDesktopBloom(); };
 if (window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -233,7 +235,7 @@ if (window.matchMedia('(pointer: fine)').matches && !window.matchMedia('(prefers
 initPrivateWebAnalytics();
 
 window.addEventListener('pagehide', (event) => {
-  if (!event.persisted) { particleFrame?.(); particleFrame = null; destroyMotionSystem(); destroyAmbientTheme(); destroyCinematicStage(); destroyDesktopBloom(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
+  if (!event.persisted) { particleFrame?.(); particleFrame = null; destroyMotionSystem(); destroyAmbientTheme(); destroyCinematicStage(); destroyPitchDeck(); destroyDesktopBloom(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
 });
 window.addEventListener('pageshow', () => {
   if (!particleFrame && quality.name !== 'mobile' && !document.hidden) particleFrame = subscribeFrame(animateParticles, { label: 'page-particles', fps: 30 });

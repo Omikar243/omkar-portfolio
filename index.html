@@ -42,8 +42,20 @@
         <span class="theme-icon theme-sun">☼</span><span class="theme-icon theme-moon">◐</span>
       </button>
       <button class="ambient-toggle" data-ambient-toggle type="button" aria-label="Enable ambient theme sound" aria-pressed="false"><span aria-hidden="true">◌</span><span data-ambient-label>Ambient off</span></button>
+      <button class="pitch-toggle" id="pitchToggle" type="button" aria-label="Enter Pitch Deck Mode" aria-pressed="false"><span aria-hidden="true">◈</span><span data-pitch-label>Pitch deck</span></button>
       <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
     </header>
+    <aside class="pitch-rail" id="pitchRail" hidden aria-label="Pitch deck chapters">
+      <p>THE PITCH</p>
+      <button type="button" data-pitch-target="hero"><span>00</span> thesis</button>
+      <button type="button" data-pitch-target="about"><span>01</span> operator</button>
+      <button type="button" data-pitch-target="experience"><span>02</span> evidence</button>
+      <button type="button" data-pitch-target="work"><span>03</span> proof</button>
+      <button type="button" data-pitch-target="playground"><span>04</span> lab</button>
+      <button type="button" data-pitch-target="skills"><span>05</span> toolkit</button>
+      <button type="button" data-pitch-target="contact"><span>06</span> invitation</button>
+      <small>ESC TO EXIT</small>
+    </aside>
 
     <main>
       <section class="hero section-shell" id="hero">

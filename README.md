@@ -33,6 +33,7 @@ A Modern Renaissance portfolio for **Omkar V Shettigar**, an AI Engineer, ML Eng
 - When Ambient is enabled, meaningful spotlight movement emits a short, low-volume tonal cue. It is throttled and uses the existing audio graph rather than autoplaying a new soundtrack.
 - An explicit ambient theme-sound toggle with quiet procedural soundscapes that crossfade across page sections, website light/dark modes and SIGNAL // ORBIT Ember, Moon and Verdigris palettes; audio never autoplays. Opt-in interface chimes reuse the same filtered sound field.
 - A cinematic depth stage inspired by high-end Three UI experiences: the precise tree/O remains central while pointer light, parallax rings, draggable orbit objects, reactive particles, scroll scene states and interactive 3D project-card tilt add depth without a second WebGL renderer. SIGNAL // ORBIT keeps its mechanics and gains the same perspective-light treatment.
+- **Pitch Deck Mode:** a persistent presentation layer with a chapter rail for thesis, operator, evidence, proof, lab, toolkit and invitation. Desktop chapters use full-height cinematic pacing with proximity snap; mobile keeps native scrolling with a compact bottom rail. Escape exits the mode, and the rail tracks the active chapter while smooth-jumping between sections.
 
 ### Living fractal tree
 
@@ -72,6 +73,7 @@ desktop-bloom.js                   Deferred desktop-only WebGL hero bloom pass
 research-cinematic-refresh.md      Walkthrough diagnosis and reference research
 ambient-theme.js                   Opt-in theme-and-section-aware ambient Web Audio
 cinematic-stage.js                 Pointer light, draggable depth objects and 3D card tilt
+pitch-deck.js                      Presentation mode toggle and chapter rail
 contact-delivery.js                Shared forwarding payload and response interpretation
 resume-tracking.js                 Silent download alerts and free pageview integration
 resume-attribution.js              Privacy-limited attribution normalization

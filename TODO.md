@@ -1,11 +1,8 @@
 
 
-## Typography and pacing pass
+## Pitch Deck Mode and video pacing
 
-- [x] Strengthen editorial hierarchy with larger headline contrast, restrained gold emphasis, calmer supporting copy and clearer section-label rhythm.
-- [x] Refactor project cards into one scroll beat each: visual first, then title, evidence, stack and action.
-- [x] Decouple SIGNAL // ORBIT canvas rendering from per-frame DOM/UI writes so smooth scrolling does not contend with the game loop.
-- [x] Make pointer interaction more visible through a moving spotlight, conic light shafts, translated depth ring and stronger card/canvas response.
-- [x] Remove the remaining article-wide scroll boundary, allow vertical pan through the canvas, suspend playground tilt while scrolling, and lazy-boot the game near its viewport boundary.
-- [x] Add a throttled opt-in spotlight sound cue through the existing ambient audio graph.
-- [x] Run mobile Chromium emulation and a deployed Lighthouse audit; a physical handset test remains a hardware limitation of this environment.
+- [x] Add a high-end interactive Pitch Deck Mode toggle that transforms the portfolio into an immersive, presentation-ready story experience rather than a second color theme.
+- [x] In Pitch Deck Mode, provide a persistent chapter rail for thesis, operator, evidence, proof, lab, toolkit and invitation; track the active chapter, support smooth chapter jumps, persist the preference, and allow Escape to exit.
+- [x] Keep the mode responsive: desktop uses full-height cinematic chapter pacing and snap proximity; mobile uses a compact bottom chapter rail without breaking native scrolling or touch gameplay.
+- [x] Recap the portfolio video with a cinematic opening that explains what the site is within 20 seconds instead of holding on a static starting page for 30–40 seconds.

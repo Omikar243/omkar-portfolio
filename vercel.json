@@ -24,7 +24,8 @@
           "frame-scheduler.js",
           "desktop-bloom.js",
           "ambient-theme.js",
-          "cinematic-stage.js"
+          "cinematic-stage.js",
+          "pitch-deck.js"
         ]
       }
     }

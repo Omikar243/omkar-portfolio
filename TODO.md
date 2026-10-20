@@ -21,3 +21,10 @@
 - [x] Add presentation controls: progress bar, chapter rail, previous/next controls, arrow-key navigation, touch swipes and explicit Exit presentation action.
 - [x] Validate desktop, tablet and mobile stage activation, no horizontal overflow, slide progression, keyboard navigation and Escape exit without browser errors.
 - [x] Recapture the Pitch Deck video from the new slide stage as a 19-second presentation cut.
+
+## Website Mode sound design and production QA
+
+- [x] Add an upbeat instrumental marketing bed with synchronized chapter whooshes, interface clicks and transition chimes while keeping the 28.88-second visual edit unchanged.
+- [x] Retiming pass: delay chapter captions and accents until the section visuals settle, then fade the final invitation to black with a matching audio resolve.
+- [x] Verify deployed Website Mode on desktop, tablet and mobile emulation: no mobile horizontal overflow, page scroll moves continuously across the playground, tree tap remains responsive, and no browser errors occur.
+- [x] Verify deployed Pitch Deck Mode on tablet and mobile touch emulation: full-screen stage opens, vertical swipe advances slides, keyboard navigation works, and Escape exits cleanly.

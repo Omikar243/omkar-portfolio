@@ -128,7 +128,7 @@ The visible copy lives in `index.html`. Interactions live in `app.js`, while the
 
 ### Two cinematic video modes
 
-The portfolio walkthrough is also delivered as two concise marketing edits: Website Mode is a roughly 28-second proof-led tour of the live site, while Pitch Deck Mode is a roughly 13-second presentation-focused cut showing the chapter rail and authored story structure. Both use captions and an energetic, restrained synthetic score with chapter stings; neither claims voiceover when voice generation is unavailable.
+The portfolio walkthrough is also delivered as two concise marketing edits: Website Mode is a 28.88-second proof-led tour of the live site with an upbeat instrumental bed, chapter whooshes, interface clicks, transition chimes, retimed captions and a clean visual/audio resolve. Pitch Deck Mode is a 19-second full-screen slide presentation showing the authored story structure.
 
 ### Presentation mode
 

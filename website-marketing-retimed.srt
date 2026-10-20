@@ -1,0 +1,29 @@
+1
+00:00:00,000 --> 00:00:04,600
+WEBSITE MODE  /  OMKAR V. SHETTIGAR
+AI, ML and data systems — presented as a living story.
+
+2
+00:00:05,200 --> 00:00:09,800
+THE OPERATOR
+A first-person introduction to the builder behind the pipelines.
+
+3
+00:00:10,200 --> 00:00:14,900
+THE PROOF
+Production AI, Ancient Modern Apparel, and five-grade X-ray classification.
+
+4
+00:00:15,400 --> 00:00:20,200
+THE LAB
+SIGNAL // ORBIT: touch, physics, power-ups and reactive visual systems.
+
+5
+00:00:22,300 --> 00:00:24,700
+THE TOOLKIT
+Retrieval, agents, production ML, data and performance thinking.
+
+6
+00:00:25,000 --> 00:00:27,000
+THE INVITATION
+See the work. Feel the system. Start the next conversation.

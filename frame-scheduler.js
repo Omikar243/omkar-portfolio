@@ -1,4 +1,6 @@
 const subscribers = new Set();
+const metadata = new Map();
+const profileEnabled = new URLSearchParams(location.search).has('profile');
 let raf = 0;
 let running = false;
 
@@ -6,7 +8,12 @@ const pump = (time) => {
   raf = 0;
   if (document.hidden) return;
   subscribers.forEach((subscriber) => {
+    const info = metadata.get(subscriber) || {};
+    if (info.minInterval && time - (info.lastTime || -Infinity) < info.minInterval) return;
+    info.lastTime = time;
+    const start = profileEnabled ? performance.now() : 0;
     try { subscriber(time); } catch (error) { console.warn('Animation subscriber failed.', error); }
+    if (profileEnabled) performance.measure(`scheduler:${info.label || subscriber.name || 'anonymous'}`, { start, end: performance.now() });
   });
   if (subscribers.size && !document.hidden) raf = requestAnimationFrame(pump);
 };
@@ -21,11 +28,13 @@ const ensure = () => {
   }
 };
 
-const subscribeFrame = (subscriber) => {
+const subscribeFrame = (subscriber, options = {}) => {
   subscribers.add(subscriber);
+  metadata.set(subscriber, { label: options.label, minInterval: options.fps ? 1000 / options.fps : 0, lastTime: -Infinity });
   ensure();
   return () => {
     subscribers.delete(subscriber);
+    metadata.delete(subscriber);
     if (!subscribers.size && raf) {
       cancelAnimationFrame(raf);
       raf = 0;

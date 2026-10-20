@@ -41,7 +41,7 @@ const initDesktopBloom = () => {
   const onIntensity = () => { intensity=Number(intensityInput.value)/100; saveSettings({enabled,intensity}); };
   toggle?.addEventListener('change', onToggle); intensityInput?.addEventListener('input', onIntensity);
   const observer = new IntersectionObserver(([entry]) => { visible=entry.isIntersecting; if(visible) draw(performance.now()); }, { threshold:.02 }); observer.observe(host);
-  const unsubscribe = subscribeFrame(draw); window.addEventListener('resize',resize,{passive:true}); resize();
+  const unsubscribe = subscribeFrame(draw, { label: 'desktop-bloom', fps: 30 }); window.addEventListener('resize',resize,{passive:true}); resize();
   const analyser=window.__ambientAnalyser; if (analyser) { samples=new Float32Array(analyser.fftSize); }
   host.dataset.bloom='desktop-webgl';
   return () => { disposed=true; unsubscribe(); observer.disconnect(); window.removeEventListener('resize',resize); toggle?.removeEventListener('change',onToggle); intensityInput?.removeEventListener('input',onIntensity); canvas.remove(); delete host.dataset.bloom; };

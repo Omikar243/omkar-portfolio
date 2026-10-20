@@ -150,3 +150,5 @@ html.lenis-active{scroll-behavior:auto}.bloom-panel{position:absolute;right:18px
 @media(max-width:700px){.hero h1{letter-spacing:-.06em}.stage-light{width:40%;opacity:.72}.hero-visual-shell:after{inset:-3%;opacity:.3}.project-content h3{font-size:31px}}
 
 .orbit-article.is-scrolling{transform:none!important;transition:none!important}.orbit-article.is-scrolling:before{opacity:.35}.orbit-article.is-scrolling .orbit-canvas-shell{transform:none!important;transition:none!important}
+
+.loader p{display:none}

@@ -17,12 +17,12 @@ const canvas = document.querySelector('#particleCanvas');
 const ctx = canvas?.getContext('2d');
 const cursorGlow = document.querySelector('#cursorGlow');
 
-window.addEventListener('load', () => {
-  window.setTimeout(() => {
-    loader?.classList.add('is-done');
-    body.classList.remove('is-loading');
-  }, 450);
-});
+const revealPortfolio = () => window.setTimeout(() => {
+  loader?.classList.add('is-done');
+  body.classList.remove('is-loading');
+}, 280);
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', revealPortfolio, { once: true });
+else revealPortfolio();
 
 const themeControls = [...document.querySelectorAll('[data-theme-toggle]')];
 const applyTheme = (dark) => {
@@ -82,10 +82,14 @@ document.querySelectorAll('.timeline-toggle').forEach((toggle) => {
 });
 
 const updateProgress = () => {
-  const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+  const scrollable = documentHeight - window.innerHeight;
   if (progress) progress.style.width = `${scrollable ? (window.scrollY / scrollable) * 100 : 0}%`;
 };
+let documentHeight = document.documentElement.scrollHeight;
+const updateDocumentHeight = () => { documentHeight = document.documentElement.scrollHeight; updateProgress(); };
 window.addEventListener('scroll', updateProgress, { passive: true });
+window.addEventListener('resize', updateDocumentHeight, { passive: true });
+window.addEventListener('load', updateDocumentHeight, { once: true });
 updateProgress();
 
 const toast = document.querySelector('#toast');
@@ -181,7 +185,7 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 if (quality.name !== 'mobile') particleFrame = subscribeFrame(() => {
   if (!reduceMotion || !ctx) animateParticles();
-});
+}, { label: 'page-particles', fps: 30 });
 else animateParticles();
 particleMotion.addEventListener('change', () => {
   reduceMotion = particleMotion.matches;
@@ -232,5 +236,5 @@ window.addEventListener('pagehide', (event) => {
   if (!event.persisted) { particleFrame?.(); particleFrame = null; destroyMotionSystem(); destroyAmbientTheme(); destroyCinematicStage(); destroyDesktopBloom(); destroyFractalTree(); destroyOrbitGame(); destroyResumeTracking(); }
 });
 window.addEventListener('pageshow', () => {
-  if (!particleFrame && quality.name !== 'mobile' && !document.hidden) particleFrame = subscribeFrame(animateParticles);
+  if (!particleFrame && quality.name !== 'mobile' && !document.hidden) particleFrame = subscribeFrame(animateParticles, { label: 'page-particles', fps: 30 });
 });

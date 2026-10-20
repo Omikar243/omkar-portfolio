@@ -32,6 +32,8 @@ const initSideRays = () => {
   let pulse = 0;
   let lastTime = 0;
   let lastDraw = -Infinity;
+  let heroTargetX = 0;
+  let heroTargetY = 0;
 
   const resizeCanvas = (target, targetCtx, nextWidth, nextHeight, maxRatio) => {
     const nextRatio = Math.min(window.devicePixelRatio || 1, maxRatio);
@@ -47,7 +49,14 @@ const initSideRays = () => {
     width = window.innerWidth;
     height = window.innerHeight;
     ratio = resizeCanvas(canvas, ctx, width, height, mobile.matches ? 1.25 : 1.6);
+    updateHeroTarget();
     draw(performance.now());
+  };
+
+  const updateHeroTarget = () => {
+    const heroRect = heroShell?.getBoundingClientRect();
+    heroTargetX = heroRect?.width ? clamp(heroRect.left + heroRect.width * .52, width * .2, width * .8) : width * .52;
+    heroTargetY = heroRect?.height ? clamp(heroRect.top + heroRect.height * .44, height * .22, height * .68) : height * .46;
   };
 
   const colors = () => document.body.classList.contains('dark')
@@ -125,9 +134,6 @@ const initSideRays = () => {
       pulse = Math.max(0, pulse - Math.max(elapsed, 16) * .0011);
     }
     const palette = colors();
-    const heroRect = heroShell?.getBoundingClientRect();
-    const heroTargetX = heroRect?.width ? clamp(heroRect.left + heroRect.width * .52, width * .2, width * .8) : width * .52;
-    const heroTargetY = heroRect?.height ? clamp(heroRect.top + heroRect.height * .44, height * .22, height * .68) : height * .46;
     const pageOrigin = {
       x: width * (.98 - (pointer.x - .5) * .045),
       y: -height * (.04 + (pointer.y - .5) * .025),
@@ -150,6 +156,7 @@ const initSideRays = () => {
   const themeChanged = () => draw(performance.now());
 
   window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('scroll', updateHeroTarget, { passive: true });
   window.addEventListener('pointermove', move, { passive: true });
   window.addEventListener('pointerdown', touch, { passive: true });
   document.addEventListener('visibilitychange', visibility);
@@ -157,12 +164,13 @@ const initSideRays = () => {
   reduceMotion.addEventListener?.('change', reducedChanged);
   resize();
   mount.classList.add('is-ready');
-  const unsubscribe = subscribeFrame(draw);
+  const unsubscribe = subscribeFrame(draw, { label: 'side-rays', fps: quality.name === 'mobile' ? 24 : 60 });
 
   return () => {
     disposed = true;
     unsubscribe();
     window.removeEventListener('resize', resize);
+    window.removeEventListener('scroll', updateHeroTarget);
     window.removeEventListener('pointermove', move);
     window.removeEventListener('pointerdown', touch);
     document.removeEventListener('visibilitychange', visibility);

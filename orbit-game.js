@@ -570,7 +570,7 @@ export const initOrbitGame = (element) => {
   setupShader();
   updateUI();
   draw(0);
-  unsubscribeFrame = subscribeFrame(loop);
+  unsubscribeFrame = subscribeFrame(loop, { label: 'orbit-game', fps: width < 500 ? 30 : 60 });
   schedule();
 
   return () => {

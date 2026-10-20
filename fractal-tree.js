@@ -503,7 +503,7 @@ export function initFractalTree(shell, canvas, button) {
   announceForm(false);
   updatePalette();
   resize();
-  unsubscribeFrame = subscribeFrame(tick);
+  unsubscribeFrame = subscribeFrame(tick, { label: 'fractal-tree', fps });
   start();
   return destroy;
 }

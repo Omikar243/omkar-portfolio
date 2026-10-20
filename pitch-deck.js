@@ -16,6 +16,7 @@ const initPitchDeck = () => {
   };
   const setMode = (enabled, persist = true) => {
     document.body.classList.toggle('pitch-mode', enabled);
+    document.documentElement.classList.toggle('pitch-mode', enabled);
     toggle.setAttribute('aria-pressed', String(enabled));
     toggle.setAttribute('aria-label', enabled ? 'Exit Pitch Deck Mode' : 'Enter Pitch Deck Mode');
     if (label) label.textContent = enabled ? 'Pitch deck on' : 'Pitch deck';

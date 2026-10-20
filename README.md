@@ -125,3 +125,7 @@ Browser tests use real Chromium touchscreen events in mobile emulation. The vibr
 ## Personalization
 
 The visible copy lives in `index.html`. Interactions live in `app.js`, while the palette, type system, responsive breakpoints, timeline controls, playground panels, and game states live in `styles.css`. Replace the PDF in `public/` only when a newer resume should become the download source.
+
+### Two cinematic video modes
+
+The portfolio walkthrough is also delivered as two concise marketing edits: Website Mode is a roughly 28-second proof-led tour of the live site, while Pitch Deck Mode is a roughly 13-second presentation-focused cut showing the chapter rail and authored story structure. Both use captions and an energetic, restrained synthetic score with chapter stings; neither claims voiceover when voice generation is unavailable.

@@ -70,7 +70,12 @@ const initMotionSystem = () => {
       gsap.utils.toArray('.reveal').forEach((element) => gsap.fromTo(element, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: .94, ease: 'power2.out', clearProps: 'transform', scrollTrigger: { trigger: element, start: 'top 91%', once: true, fastScrollEnd: true } }));
       const heroArt = document.querySelector('.hero-art');
       if (heroArt) gsap.to(heroArt, { yPercent: 7, ease: 'none', scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: .62 } });
-      gsap.utils.toArray('.project-card').forEach((card, index) => gsap.fromTo(card, { '--card-depth-y': `${index % 2 ? 18 : 10}px` }, { '--card-depth-y': `${index % 2 ? -8 : -3}px`, ease: 'none', scrollTrigger: { trigger: card, start: 'top 96%', end: 'bottom 12%', scrub: .82 } }));
+      gsap.utils.toArray('[data-project-beat]').forEach((card, index) => {
+        const pieces = card.querySelectorAll('.project-visual,.project-index,h3,p,.project-stack,.project-link');
+        gsap.set(pieces, { autoAlpha: 0, y: 18 });
+        gsap.to(pieces, { autoAlpha: 1, y: 0, duration: .72, stagger: .11, ease: 'power3.out', scrollTrigger: { trigger: card, start: 'top 78%', once: true, fastScrollEnd: true } });
+        gsap.fromTo(card, { '--card-depth-y': `${index % 2 ? 18 : 10}px` }, { '--card-depth-y': `${index % 2 ? -8 : -3}px`, ease: 'none', scrollTrigger: { trigger: card, start: 'top 96%', end: 'bottom 12%', scrub: .9 } });
+      });
       gsap.utils.toArray('.section-label').forEach((label) => gsap.fromTo(label, { x: -12 }, { x: 0, ease: 'none', scrollTrigger: { trigger: label, start: 'top 94%', end: 'top 58%', scrub: .52 } }));
     });
     refreshScroll();

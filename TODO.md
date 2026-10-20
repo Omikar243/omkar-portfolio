@@ -1,8 +1,8 @@
 
 
-## Playground stability and cinematic refresh
+## Typography and pacing pass
 
-- [ ] Fix playground scroll buffering/glitching by preventing Lenis only inside the interactive game canvas, not the entire SIGNAL // ORBIT article; keep the header, HUD and controls in normal page scroll flow.
-- [ ] Add an interactive desktop bloom panel with a live on/off toggle and intensity slider; persist the user’s choice and keep the panel hidden on touch/reduced-motion sessions.
-- [ ] Feed the existing opt-in ambient analyser into bloom intensity so the glow pulses subtly with the active theme/section soundscape without creating a second audio graph.
-- [ ] Improve cinematic scroll quality with stable section ownership, a calmer lab-to-toolkit transition, chapter breathing room and no forced snap-scroll.
+- [x] Strengthen editorial hierarchy with larger headline contrast, restrained gold emphasis, calmer supporting copy and clearer section-label rhythm.
+- [x] Refactor project cards into one scroll beat each: visual first, then title, evidence, stack and action.
+- [x] Decouple SIGNAL // ORBIT canvas rendering from per-frame DOM/UI writes so smooth scrolling does not contend with the game loop.
+- [x] Make pointer interaction more visible through a moving spotlight, conic light shafts, translated depth ring and stronger card/canvas response.

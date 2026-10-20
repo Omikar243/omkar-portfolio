@@ -65,7 +65,7 @@ export const initOrbitGame = (element) => {
   const waves = [];
   let lastPaint = 0;
   let ambience = 0;
-  let overlayAlpha = 1;
+  let uiClock = 0;
   const stars = Array.from({ length: 42 }, (_, index) => ({
     x: ((index * 71) % 101) / 100,
     y: ((index * 43 + 19) % 97) / 100,
@@ -151,6 +151,7 @@ export const initOrbitGame = (element) => {
     const status = state.status;
     overlay.hidden = false;
     overlay.setAttribute('aria-hidden', String(status === 'playing'));
+    overlay.classList.toggle('is-live', status === 'playing');
     if (status === 'idle') {
       overlayTitle.textContent = 'A living signal field';
       overlayCopy.textContent = 'Guide the gold signal through the orbitals. Collect ivory nodes; avoid the red unstable nodes.';
@@ -463,7 +464,6 @@ export const initOrbitGame = (element) => {
     context.fill();
     context.restore();
     renderShader(time);
-    updateOverlay();
   };
   const loop = (time) => {
     if (destroyed || !visible || document.hidden) return;
@@ -477,11 +477,9 @@ export const initOrbitGame = (element) => {
       updateParticles(dt);
       for(let i=waves.length-1;i>=0;i--){waves[i].life-=dt;waves[i].radius+=dt*140;if(waves[i].life<=0)waves.splice(i,1);}
     }
-    const target=state.status==='playing'?0:1;
-    overlayAlpha += (target-overlayAlpha)*(1-Math.exp(-dt*9));
-    if(overlay)overlay.style.opacity=String(overlayAlpha);
+    uiClock += dt;
     draw(ambience);
-    updateUI();
+    if (uiClock >= .12 || state.status !== 'playing') { updateUI(); uiClock = 0; }
 
   };
   const schedule = () => {

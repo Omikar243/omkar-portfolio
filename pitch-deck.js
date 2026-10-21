@@ -117,7 +117,13 @@ const initPitchDeck = () => {
     });
   };
   const skillLeave = () => skillTokens.forEach((token) => { token.style.removeProperty('--skill-distance'); token.classList.remove('is-pulsing'); });
-  skillTokens.forEach((token) => { token.addEventListener('pointerenter', skillEnter); token.addEventListener('pointerleave', skillLeave); });
+  skillTokens.forEach((token) => {
+    token.addEventListener('pointerenter', skillEnter);
+    token.addEventListener('pointerleave', skillLeave);
+    token.addEventListener('pointerdown', skillEnter);
+    token.addEventListener('focus', skillEnter, true);
+    token.addEventListener('blur', skillLeave, true);
+  });
   toggle.addEventListener('click', () => setMode(!document.body.classList.contains('pitch-mode')));
   const keydown = (event) => {
     if (!document.body.classList.contains('pitch-mode')) return;
@@ -146,7 +152,7 @@ const initPitchDeck = () => {
   setMode(saved === 'on', false);
   return () => {
     document.removeEventListener('keydown', keydown); stage.removeEventListener('wheel', wheel); stage.removeEventListener('touchstart', touchStart); stage.removeEventListener('touchend', touchEnd);
-    chapters.forEach((button) => button.removeEventListener('click', chapterClick)); exitTo.forEach((button) => button.removeEventListener('click', exitToClick)); skillTokens.forEach((token) => { token.removeEventListener('pointerenter', skillEnter); token.removeEventListener('pointerleave', skillLeave); }); window.visualViewport?.removeEventListener('resize', syncVisualViewport); window.removeEventListener('resize', syncVisualViewport);
+    chapters.forEach((button) => button.removeEventListener('click', chapterClick)); exitTo.forEach((button) => button.removeEventListener('click', exitToClick)); skillTokens.forEach((token) => { token.removeEventListener('pointerenter', skillEnter); token.removeEventListener('pointerleave', skillLeave); token.removeEventListener('pointerdown', skillEnter); token.removeEventListener('focus', skillEnter, true); token.removeEventListener('blur', skillLeave, true); }); window.visualViewport?.removeEventListener('resize', syncVisualViewport); window.removeEventListener('resize', syncVisualViewport);
   };
 };
 export { initPitchDeck };

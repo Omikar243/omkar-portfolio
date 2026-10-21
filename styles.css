@@ -198,3 +198,14 @@ html.pitch-mode{scroll-behavior:smooth;scroll-snap-type:y proximity}body.pitch-m
 .pitch-slide-lab .pitch-orbit-graphic i,.pitch-slide-lab .pitch-orbit-graphic b{background-color:var(--gold);border-color:var(--gold);color:var(--gold)}
 .pitch-slide-lab .pitch-orbit-graphic i{background-color:var(--gold)}
 .pitch-slide-lab .pitch-orbit-graphic b{background:transparent;border-color:var(--gold);color:var(--gold)}
+
+/* Toolkit interaction: the slide remains passive, but its skill rail owns scroll and pointer input. */
+.pitch-slide-toolkit,.pitch-slide-toolkit .pitch-toolkit,.pitch-slide-toolkit .pitch-toolkit span{pointer-events:auto}
+.pitch-slide-toolkit .pitch-toolkit{touch-action:pan-y;overscroll-behavior:contain;scrollbar-gutter:stable;isolation:isolate}
+.pitch-slide-toolkit .pitch-toolkit span{min-width:0;max-width:100%;overflow:hidden}
+.pitch-slide-toolkit .skill-logo{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain}
+.pitch-slide-toolkit .skill-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pitch-slide-toolkit .pitch-toolkit span.is-pulsing{z-index:4}
+
+/* No visible card around the embedded Lab: the slide canvas continues underneath it. */
+.pitch-orbit-mount{background:transparent!important;border-color:transparent!important;box-shadow:none!important}

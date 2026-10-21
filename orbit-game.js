@@ -16,8 +16,8 @@ const SOURCE_URL = 'https://github.com/Omikar243/omkar-portfolio';
 const BEST_KEY = 'signal-orbit-best';
 const TAU = Math.PI * 2;
 const THEMES = {
-  paper: { ink: '#302319', soft: '#5f5145', gold: '#b9894d', bronze: '#735333', red: '#9a5c4b', redLight: '#b9876b', bg: ['#f3eadc', '#eadcc8', '#d9c4a5'], line: 'rgba(115,83,51,.28)', player: '#302319' },
-  ember: { ink: '#f3eadc', soft: '#cdbda8', gold: '#d1ab70', bronze: '#9b7042', red: '#bd6c53', redLight: '#e4a07a', bg: ['#38281d', '#211813', '#120e0b'], line: 'rgba(209,171,112,.28)', player: '#fff0c2' },
+  paper: { ink: '#302319', soft: '#5f5145', gold: '#b9894d', bronze: '#735333', red: '#9a5c4b', redLight: '#b9876b', bg: null, line: 'rgba(115,83,51,.28)', player: '#302319' },
+  ember: { ink: '#f3eadc', soft: '#cdbda8', gold: '#d1ab70', bronze: '#9b7042', red: '#bd6c53', redLight: '#e4a07a', bg: null, line: 'rgba(209,171,112,.28)', player: '#fff0c2' },
   moon: { ink: '#e7eef2', soft: '#aebdca', gold: '#9fc4d5', bronze: '#65899b', red: '#c77d86', redLight: '#efb0a9', bg: ['#263746', '#172632', '#0b121a'], line: 'rgba(159,196,213,.3)', player: '#e8f7ff' },
   verdigris: { ink: '#e7efe4', soft: '#b4c6b0', gold: '#a9c59d', bronze: '#638b76', red: '#c48a66', redLight: '#edbd8b', bg: ['#26382f', '#17251f', '#0b1511'], line: 'rgba(169,197,157,.3)', player: '#efffe9' },
 };
@@ -34,7 +34,7 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 export const initOrbitGame = (element) => {
   if (!element) return () => {};
   const canvas = element.querySelector('[data-orbit-canvas]');
-  const context = canvas?.getContext('2d', { alpha: false });
+  const context = canvas?.getContext('2d', { alpha: true });
   const shaderCanvas = element.querySelector('[data-orbit-shader]');
   const gl = shaderCanvas?.getContext('webgl', { alpha: true, antialias: false, powerPreference: 'low-power' });
   if (!canvas || !context) return () => {};
@@ -136,6 +136,7 @@ export const initOrbitGame = (element) => {
     element.style.setProperty('--orbit-bronze', theme.bronze);
     element.style.setProperty('--orbit-red', theme.red);
     element.style.setProperty('--orbit-red-light', theme.redLight);
+    element.style.setProperty('--orbit-line', theme.line);
     themeButtons.forEach((button) => {
       const active = button.dataset.orbitTheme === themeName;
       button.classList.toggle('is-active', active);
@@ -325,12 +326,15 @@ export const initOrbitGame = (element) => {
     context.restore();
   };
   const draw = (time) => {
-    const gradient = context.createRadialGradient(width * 0.5, height * 0.48, 4, width * 0.5, height * 0.5, Math.max(width, height) * 0.75);
-    gradient.addColorStop(0, theme.bg[0]);
-    gradient.addColorStop(0.55, theme.bg[1]);
-    gradient.addColorStop(1, theme.bg[2]);
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, width, height);
+    context.clearRect(0, 0, width, height);
+    if (theme.bg) {
+      const gradient = context.createRadialGradient(width * 0.5, height * 0.48, 4, width * 0.5, height * 0.5, Math.max(width, height) * 0.75);
+      gradient.addColorStop(0, theme.bg[0]);
+      gradient.addColorStop(0.55, theme.bg[1]);
+      gradient.addColorStop(1, theme.bg[2]);
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, width, height);
+    }
     context.save();
     stars.forEach((star, index) => {
       const drift = reducedMotion ? 0 : Math.sin(time * 0.00015 + index) * 2;

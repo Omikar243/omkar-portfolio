@@ -186,3 +186,15 @@ html.pitch-mode{scroll-behavior:smooth;scroll-snap-type:y proximity}body.pitch-m
 .pitch-toolkit span{display:inline-flex;align-items:center;gap:8px;box-shadow:0 0 0 rgba(209,171,112,0);transition:transform .32s cubic-bezier(.16,1,.3,1),box-shadow .32s ease,color .32s ease,border-color .32s ease,background .32s ease}.skill-mark{display:grid;place-items:center;width:22px;height:22px;border:1px solid currentColor;border-radius:7px;color:var(--gold);font:700 11px/1 var(--sans);letter-spacing:-.05em;font-style:normal;flex:0 0 22px}.skill-logo{padding:4px;object-fit:contain;filter:none}.skill-glyph{font-size:12px;letter-spacing:-.08em}.skill-name{line-height:1}.pitch-toolkit span.is-pulsing{box-shadow:0 0 calc(18px + (3 - min(var(--skill-distance, 3), 3)) * 10px) rgba(209,171,112,.42),inset 0 0 18px rgba(209,171,112,.12);background:rgba(209,171,112,.11)}.pitch-toolkit span.is-pulsing .skill-mark{background:var(--gold);color:var(--paper);box-shadow:0 0 18px rgba(209,171,112,.75)}.pitch-toolkit span.is-pulsing .skill-logo{filter:brightness(0) saturate(100%) invert(92%) sepia(8%) saturate(483%) hue-rotate(346deg) brightness(105%) contrast(95%)}.pitch-toolkit span.is-pulsing:after{opacity:.82;transform:scale(1.12)}
 @media(max-width:900px){.pitch-orbit-mount{width:100%;height:clamp(340px,52vh,480px);min-height:0}.pitch-embedded-orbit>.orbit-article{padding:30px 10px 8px}.pitch-embedded-orbit .orbit-canvas-shell{height:clamp(170px,27vh,240px)}.pitch-embedded-orbit .orbit-hud{grid-template-columns:repeat(3,1fr)}.pitch-toolkit span{gap:5px}.skill-mark{width:18px;height:18px;flex-basis:18px;font-size:9px}.skill-logo{padding:3px}}
 .pitch-orbit-mount{pointer-events:auto}.pitch-orbit-mount *{pointer-events:auto}
+
+/* Global theme parity: Pitch Deck and SIGNAL // ORBIT inherit the site canvas. */
+.pitch-slide-lab{background:var(--paper);color:var(--ink)}
+.pitch-slide-lab:before{background:radial-gradient(circle at 76% 47%,color-mix(in srgb,var(--gold) 20%,transparent),transparent 24%),linear-gradient(115deg,transparent 38%,color-mix(in srgb,var(--gold) 10%,transparent) 38.2% 38.5%,transparent 38.7% 55%,color-mix(in srgb,var(--gold) 8%,transparent) 55.2% 55.45%,transparent 55.7%)}
+.pitch-slide-lab .pitch-subtitle,.pitch-slide-lab .pitch-slide-index{color:var(--ink-soft)}
+.pitch-lab-line span{border-color:var(--line);color:var(--gold)}
+.pitch-orbit-graphic,.pitch-orbit-mount{border-color:color-mix(in srgb,var(--gold) 42%,transparent);background:color-mix(in srgb,var(--paper-2) 58%,transparent);box-shadow:0 18px 80px color-mix(in srgb,var(--brown) 22%,transparent),inset 0 0 70px color-mix(in srgb,var(--gold) 8%,transparent)}
+.pitch-orbit-mount-label{color:var(--gold)}
+.pitch-embedded-orbit .orbit-canvas-shell{border-color:color-mix(in srgb,var(--gold) 26%,transparent)}
+.pitch-slide-lab .pitch-orbit-graphic i,.pitch-slide-lab .pitch-orbit-graphic b{background-color:var(--gold);border-color:var(--gold);color:var(--gold)}
+.pitch-slide-lab .pitch-orbit-graphic i{background-color:var(--gold)}
+.pitch-slide-lab .pitch-orbit-graphic b{background:transparent;border-color:var(--gold);color:var(--gold)}

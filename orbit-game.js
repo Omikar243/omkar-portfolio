@@ -16,6 +16,7 @@ const SOURCE_URL = 'https://github.com/Omikar243/omkar-portfolio';
 const BEST_KEY = 'signal-orbit-best';
 const TAU = Math.PI * 2;
 const THEMES = {
+  paper: { ink: '#302319', soft: '#5f5145', gold: '#b9894d', bronze: '#735333', red: '#9a5c4b', redLight: '#b9876b', bg: ['#f3eadc', '#eadcc8', '#d9c4a5'], line: 'rgba(115,83,51,.28)', player: '#302319' },
   ember: { ink: '#f3eadc', soft: '#cdbda8', gold: '#d1ab70', bronze: '#9b7042', red: '#bd6c53', redLight: '#e4a07a', bg: ['#38281d', '#211813', '#120e0b'], line: 'rgba(209,171,112,.28)', player: '#fff0c2' },
   moon: { ink: '#e7eef2', soft: '#aebdca', gold: '#9fc4d5', bronze: '#65899b', red: '#c77d86', redLight: '#efb0a9', bg: ['#263746', '#172632', '#0b121a'], line: 'rgba(159,196,213,.3)', player: '#e8f7ff' },
   verdigris: { ink: '#e7efe4', soft: '#b4c6b0', gold: '#a9c59d', bronze: '#638b76', red: '#c48a66', redLight: '#edbd8b', bg: ['#26382f', '#17251f', '#0b1511'], line: 'rgba(169,197,157,.3)', player: '#efffe9' },
@@ -83,7 +84,7 @@ export const initOrbitGame = (element) => {
   let audioContext = null;
   let soundEnabled = false;
   let lastSoundLevel = 1;
-  let themeName = 'ember';
+  let themeName = document.body.classList.contains('dark') ? 'ember' : 'paper';
   let theme = THEMES[themeName];
   let shader = null;
 
@@ -146,6 +147,9 @@ export const initOrbitGame = (element) => {
   const announce = (message) => {
     if (liveRegion) liveRegion.textContent = message;
   };
+  const syncSiteTheme = (event) => applyTheme(event.detail?.dark ? 'ember' : 'paper');
+  document.addEventListener('portfolio:themechange', syncSiteTheme, { signal });
+  applyTheme(themeName);
   const updateOverlay = () => {
     if (!overlay || !overlayTitle || !overlayCopy) return;
     const status = state.status;

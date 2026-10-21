@@ -209,8 +209,9 @@ let destroyOrbitGame = () => {};
 let orbitBooted = false;
 const orbitArticle = document.querySelector('[data-orbit-game]');
 const bootOrbit = () => {
-  if (orbitBooted) return;
+  if (orbitBooted || orbitArticle?.dataset.orbitBooted === 'true') return;
   orbitBooted = true;
+  orbitArticle.dataset.orbitBooted = 'true';
   destroyOrbitGame = initOrbitGame(orbitArticle);
 };
 if (orbitArticle && 'IntersectionObserver' in window) {

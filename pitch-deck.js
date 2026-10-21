@@ -1,3 +1,5 @@
+import { initOrbitGame } from './orbit-game.js';
+
 const initPitchDeck = () => {
   const toggle = document.querySelector('#pitchToggle');
   const rail = document.querySelector('#pitchRail');
@@ -12,13 +14,47 @@ const initPitchDeck = () => {
   const exit = document.querySelector('[data-pitch-exit]');
   const exitTo = [...document.querySelectorAll('[data-pitch-exit-to]')];
   const skillTokens = [...document.querySelectorAll('.pitch-toolkit span')];
+  const orbitArticle = document.querySelector('[data-orbit-game]');
+  const orbitMount = document.querySelector('[data-pitch-orbit-mount]');
+  const orbitPlaceholder = orbitArticle ? document.createComment('signal-orbit-home') : null;
+  let orbitWasMoved = false;
+  let pitchOrbitDestroy = null;
   if (!toggle || !rail || !stage || !slides.length) return () => {};
+  const skillMarks = {
+    LANGCHAIN: 'LC', LANGGRAPH: 'LG', 'AGENTIC AI': 'AI', RAG: 'R', OLLAMA: 'O', 'HUGGING FACE': 'HF', MCP: 'M', 'LLAMA-3': 'L3', GEMMA: 'G', SBERT: 'SB', FAISS: 'F', PYTORCH: 'PT', 'SCIKIT-LEARN': 'SK', XGBOOST: 'XG', CLASSIFICATION: 'CL', CALIBRATION: 'CA', HITL: 'H', FASTAPI: 'FA', DOCKER: 'DK', 'AWS EC2': 'EC', 'AWS S3': 'S3', 'AWS RDS': 'RD', MLFLOW: 'MF', MONITORING: 'MO', 'A/B TESTING': 'AB', PROFILING: 'PR', PYTHON: 'PY', TYPESCRIPT: 'TS', JAVASCRIPT: 'JS', JAVA: 'JV', 'C#': 'C#', POSTGRESQL: 'PG', MYSQL: 'MY', SUPABASE: 'SB', TURSO: 'TU', 'THREE.JS': '3D', 'HTML / CSS': 'H/', 'CI / CD': 'CI',
+  };
+  skillTokens.forEach((token) => {
+    const name = token.textContent.trim();
+    token.dataset.skill = name;
+    token.innerHTML = `<i class="skill-mark" aria-hidden="true">${skillMarks[name] || name.slice(0, 2)}</i><span class="skill-name">${name}</span>`;
+  });
   let active = 0;
   let wheelLock = false;
   const syncVisualViewport = () => {
     const viewport = window.visualViewport;
     if (!viewport) return;
     stage.style.setProperty('--pitch-vh', `${viewport.height}px`);
+  };
+  const mountOrbit = () => {
+    if (!orbitArticle || !orbitMount || orbitWasMoved) return;
+    orbitArticle.before(orbitPlaceholder);
+    orbitMount.append(orbitArticle);
+    orbitArticle.classList.add('pitch-embedded-orbit');
+    orbitWasMoved = true;
+    if (orbitArticle.dataset.orbitBooted !== 'true') {
+      orbitArticle.dataset.orbitBooted = 'true';
+      pitchOrbitDestroy = initOrbitGame(orbitArticle);
+    }
+  };
+  const restoreOrbit = () => {
+    if (!orbitArticle || !orbitPlaceholder || !orbitWasMoved) return;
+    const createdHere = Boolean(pitchOrbitDestroy);
+    pitchOrbitDestroy?.();
+    pitchOrbitDestroy = null;
+    if (createdHere) delete orbitArticle.dataset.orbitBooted;
+    orbitPlaceholder.replaceWith(orbitArticle);
+    orbitArticle.classList.remove('pitch-embedded-orbit');
+    orbitWasMoved = false;
   };
   const setActive = (index, focus = false) => {
     active = (index + slides.length) % slides.length;
@@ -34,6 +70,7 @@ const initPitchDeck = () => {
     });
     if (progress) progress.style.width = `${((active + 1) / slides.length) * 100}%`;
     if (current) current.textContent = String(active + 1).padStart(2, '0');
+    if (document.body.classList.contains('pitch-mode') && active === 4) mountOrbit();
     if (focus) slides[active].focus({ preventScroll: true });
   };
   const setMode = (enabled, persist = true) => {
@@ -47,6 +84,7 @@ const initPitchDeck = () => {
     document.body.classList.toggle('pitch-active', enabled);
     if (persist) try { localStorage.setItem('omkar-pitch-mode', enabled ? 'on' : 'off'); } catch {}
     if (enabled) { setActive(active); stage.focus({ preventScroll: true }); }
+    else restoreOrbit();
     document.dispatchEvent(new CustomEvent('portfolio:pitchchange', { detail: { enabled } }));
   };
   const chapterClick = (event) => {
@@ -69,7 +107,7 @@ const initPitchDeck = () => {
     skillTokens.forEach((token, tokenIndex) => {
       const distance = Math.abs(tokenIndex - index);
       token.style.setProperty('--skill-distance', String(distance));
-      token.classList.toggle('is-pulsing', distance <= 2);
+      token.classList.toggle('is-pulsing', distance <= 3);
     });
   };
   const skillLeave = () => skillTokens.forEach((token) => { token.style.removeProperty('--skill-distance'); token.classList.remove('is-pulsing'); });

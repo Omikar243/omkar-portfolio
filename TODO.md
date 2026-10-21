@@ -1,47 +1,9 @@
 
 
-## Pitch Deck Mode and video pacing
+## Lab game and toolkit identity pass
 
-- [x] Add a high-end interactive Pitch Deck Mode toggle that transforms the portfolio into an immersive, presentation-ready story experience rather than a second color theme.
-- [x] In Pitch Deck Mode, provide a persistent chapter rail for thesis, operator, evidence, proof, lab, toolkit and invitation; track the active chapter, support smooth chapter jumps, persist the preference, and allow Escape to exit.
-- [x] Keep the mode responsive: desktop uses full-height cinematic chapter pacing and snap proximity; mobile uses a compact bottom chapter rail without breaking native scrolling or touch gameplay.
-- [x] Recap the portfolio video with a cinematic opening that explains what the site is within 20 seconds instead of holding on a static starting page for 30–40 seconds.
-
-## Two-mode cinematic video delivery
-
-- [x] Validate Pitch Deck Mode on simulated tablet and mobile viewports: chapter rail remains inside the visual viewport, seven chapter buttons are present, no horizontal overflow occurs, chapter jumps work, and Escape exits cleanly.
-- [x] Enable page-level proximity snap in Pitch Deck Mode across desktop, tablet and mobile while preserving native scrolling and reduced-motion fallback.
-- [x] Produce a Website Mode marketing cut in approximately 25–30 seconds with fast proof-led section progression, captions, and energetic interaction sound design.
-- [x] Produce a separate 10–20 second Pitch Deck Mode cut showing the chapter rail and presentation structure.
-
-## Full-screen Pitch Deck redesign
-
-- [x] Replace the website-like Pitch Deck overlay with a distinct full-screen slide stage that hides the normal header and long-form page.
-- [x] Add seven focused presentation slides: thesis, operator, evidence, proof, lab, toolkit and invitation.
-- [x] Add presentation controls: progress bar, chapter rail, previous/next controls, arrow-key navigation, touch swipes and explicit Exit presentation action.
-- [x] Validate desktop, tablet and mobile stage activation, no horizontal overflow, slide progression, keyboard navigation and Escape exit without browser errors.
-- [x] Recapture the Pitch Deck video from the new slide stage as a 19-second presentation cut.
-
-## Website Mode sound design and production QA
-
-- [x] Add an upbeat instrumental marketing bed with synchronized chapter whooshes, interface clicks and transition chimes while keeping the 28.88-second visual edit unchanged.
-- [x] Retiming pass: delay chapter captions and accents until the section visuals settle, then fade the final invitation to black with a matching audio resolve.
-- [x] Verify deployed Website Mode on desktop, tablet and mobile emulation: no mobile horizontal overflow, page scroll moves continuously across the playground, tree tap remains responsive, and no browser errors occur.
-- [x] Verify deployed Pitch Deck Mode on tablet and mobile touch emulation: full-screen stage opens, vertical swipe advances slides, keyboard navigation works, and Escape exits cleanly.
-
-## Pitch Deck layout and content refinement
-
-- [x] Keep every Pitch Deck slide’s thesis, operator, evidence, proof, lab, toolkit and invitation copy inside the viewport on desktop, tablet and mobile.
-- [x] Move the chapter rail into a compact top navigation band so it never covers slide text, the operator details, the lab/playground, toolkit, or invitation.
-- [x] Include the SIGNAL // ORBIT lab in the Pitch Deck with its touch, physics, power-up, WebGL and theme capabilities plus a direct action to open the live playground.
-- [x] Include the actual toolkit from the portfolio: LangChain, LangGraph, FAISS, SBERT, Ollama, PyTorch, FastAPI, AWS, Three.js, TypeScript/JavaScript, CI/CD and MLflow.
-- [x] Restore a visible invitation with a contact action and LinkedIn/GitHub links.
-- [x] Add direct proof links for Ancient Modern Apparel and Knee Osteoarthritis Detection.
-
-## Pitch Deck operator, lab, toolkit and invitation pass
-
-- [x] Place operator labels on the left and corresponding values on the right: Based in India / Mumbai, Currently Building At / Catalysk, and Engineering Foundation / GPA / 8.44.
-- [x] Show a visible SIGNAL // ORBIT live preview in the Lab slide instead of only abstract orbit artwork, with a direct Play action into the real playground.
-- [x] Include all skills from the Website Mode toolkit in the Pitch Deck and give them a gentle breathing glow plus two-neighbor hover chain reaction.
-- [x] Add an unmistakable Open Contact Form action and invitation card that exits Pitch Deck Mode and scrolls to the real contact form.
-- [x] Keep every revised slide fitted within desktop, tablet and mobile viewports.
+- [ ] Mount the actual SIGNAL // ORBIT game article inside Pitch Deck Lab slide 04/07 when presentation mode is active, preserving its real canvas, controls, themes, sound and power-ups; restore it to Website Mode on exit.
+- [ ] Give toolkit skills compact brand-colored monogram marks and preserve readable skill names without depending on external logo requests.
+- [ ] Increase the skill hover chain reaction to three neighboring tokens with a clearer gold bloom, while keeping the effect restrained and responsive.
+- [ ] Test the deployed seven-slide Pitch Deck on mobile/tablet touch viewports for slide fit, swipe navigation, no horizontal overflow and live Lab game visibility.
+- [ ] Review the 28.88-second Website Mode marketing master for active opening, synchronized chapter holds, audible fun effects and clean ending fade.

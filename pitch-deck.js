@@ -13,7 +13,7 @@ const initPitchDeck = () => {
   const next = document.querySelector('[data-pitch-next]');
   const exit = document.querySelector('[data-pitch-exit]');
   const exitTo = [...document.querySelectorAll('[data-pitch-exit-to]')];
-  const skillTokens = [...document.querySelectorAll('.pitch-toolkit span')];
+  const skillTokens = [...document.querySelectorAll('.pitch-toolkit > span')];
   const orbitArticle = document.querySelector('[data-orbit-game]');
   const orbitMount = document.querySelector('[data-pitch-orbit-mount]');
   const orbitPlaceholder = orbitArticle ? document.createComment('signal-orbit-home') : null;

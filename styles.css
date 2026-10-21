@@ -209,3 +209,13 @@ html.pitch-mode{scroll-behavior:smooth;scroll-snap-type:y proximity}body.pitch-m
 
 /* No visible card around the embedded Lab: the slide canvas continues underneath it. */
 .pitch-orbit-mount{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+
+/* Both game instances follow the website's active light/dark canvas. */
+.orbit-article{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}
+.orbit-canvas-shell{background:var(--paper)!important;border-color:var(--line)!important;box-shadow:none!important}
+.orbit-hud{background:var(--paper-2)!important;border-color:var(--line)!important}
+.orbit-stat,.orbit-powerup-status{border-color:var(--line)!important}
+.orbit-overlay{background:color-mix(in srgb,var(--paper) 84%,transparent)!important}
+.pitch-orbit-mount{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+
+.orbit-article.pitch-embedded-orbit{background:var(--paper)!important;color:var(--ink)!important}

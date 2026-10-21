@@ -20,13 +20,19 @@ const initPitchDeck = () => {
   let orbitWasMoved = false;
   let pitchOrbitDestroy = null;
   if (!toggle || !rail || !stage || !slides.length) return () => {};
-  const skillMarks = {
-    LANGCHAIN: 'LC', LANGGRAPH: 'LG', 'AGENTIC AI': 'AI', RAG: 'R', OLLAMA: 'O', 'HUGGING FACE': 'HF', MCP: 'M', 'LLAMA-3': 'L3', GEMMA: 'G', SBERT: 'SB', FAISS: 'F', PYTORCH: 'PT', 'SCIKIT-LEARN': 'SK', XGBOOST: 'XG', CLASSIFICATION: 'CL', CALIBRATION: 'CA', HITL: 'H', FASTAPI: 'FA', DOCKER: 'DK', 'AWS EC2': 'EC', 'AWS S3': 'S3', 'AWS RDS': 'RD', MLFLOW: 'MF', MONITORING: 'MO', 'A/B TESTING': 'AB', PROFILING: 'PR', PYTHON: 'PY', TYPESCRIPT: 'TS', JAVASCRIPT: 'JS', JAVA: 'JV', 'C#': 'C#', POSTGRESQL: 'PG', MYSQL: 'MY', SUPABASE: 'SB', TURSO: 'TU', 'THREE.JS': '3D', 'HTML / CSS': 'H/', 'CI / CD': 'CI',
+  const skillIcons = {
+    LANGCHAIN: 'langchain', LANGGRAPH: 'langgraph', OLLAMA: 'ollama', 'HUGGING FACE': 'huggingface', MCP: 'modelcontextprotocol', PYTORCH: 'pytorch', 'SCIKIT-LEARN': 'scikitlearn', FASTAPI: 'fastapi', DOCKER: 'docker', MLFLOW: 'mlflow', PYTHON: 'python', TYPESCRIPT: 'typescript', JAVASCRIPT: 'javascript', JAVA: 'openjdk', POSTGRESQL: 'postgresql', MYSQL: 'mysql', SUPABASE: 'supabase', TURSO: 'turso', 'THREE.JS': 'threedotjs', 'HTML / CSS': 'html5', 'CI / CD': 'githubactions',
+  };
+  const skillGlyphs = {
+    'AGENTIC AI': '✦', RAG: '↗', 'LLAMA-3': 'λ', GEMMA: 'G', SBERT: 'S', FAISS: '∥', XGBOOST: '✣', CLASSIFICATION: '⊙', CALIBRATION: '◒', HITL: '◌', 'AWS EC2': 'AWS', 'AWS S3': 'AWS', 'AWS RDS': 'AWS', MONITORING: '◉', 'A/B TESTING': '↔', PROFILING: '⌁', 'C#': 'C#',
   };
   skillTokens.forEach((token) => {
     const name = token.textContent.trim();
     token.dataset.skill = name;
-    token.innerHTML = `<i class="skill-mark" aria-hidden="true">${skillMarks[name] || name.slice(0, 2)}</i><span class="skill-name">${name}</span>`;
+    const icon = skillIcons[name]
+      ? `<img class="skill-mark skill-logo" src="/skill-icons/${skillIcons[name]}.svg" alt="" aria-hidden="true" loading="lazy" decoding="async">`
+      : `<i class="skill-mark skill-glyph" aria-hidden="true">${skillGlyphs[name] || '•'}</i>`;
+    token.innerHTML = `${icon}<span class="skill-name">${name}</span>`;
   });
   let active = 0;
   let wheelLock = false;

@@ -227,3 +227,5 @@ html.pitch-mode{scroll-behavior:smooth;scroll-snap-type:y proximity}body.pitch-m
 .pitch-slide-toolkit .pitch-toolkit>span>.skill-mark{flex:0 0 22px}
 .pitch-slide-toolkit .pitch-toolkit>span>.skill-logo{width:22px;height:22px;padding:4px}
 @media(max-width:700px){.pitch-slide-toolkit .pitch-toolkit{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:6px 0}.pitch-slide-toolkit .pitch-toolkit>span{min-height:36px;padding:5px 5px;gap:5px;font-size:7px}.pitch-slide-toolkit .pitch-toolkit>span>.skill-mark,.pitch-slide-toolkit .pitch-toolkit>span>.skill-logo{flex-basis:17px;width:17px;height:17px;padding:2px}}
+.pitch-contact-cta{text-decoration:none}
+.pitch-slide-toolkit .skill-logo[src*="amazonwebservices"]{padding:2px;object-fit:contain}

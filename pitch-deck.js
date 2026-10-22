@@ -21,7 +21,13 @@ const initPitchDeck = () => {
   let pitchOrbitDestroy = null;
   if (!toggle || !rail || !stage || !slides.length) return () => {};
   const skillIcons = {
-    LANGCHAIN: 'langchain', LANGGRAPH: 'langgraph', OLLAMA: 'ollama', 'HUGGING FACE': 'huggingface', MCP: 'modelcontextprotocol', PYTORCH: 'pytorch', 'SCIKIT-LEARN': 'scikitlearn', FASTAPI: 'fastapi', DOCKER: 'docker', MLFLOW: 'mlflow', PYTHON: 'python', TYPESCRIPT: 'typescript', JAVASCRIPT: 'javascript', JAVA: 'openjdk', POSTGRESQL: 'postgresql', MYSQL: 'mysql', SUPABASE: 'supabase', TURSO: 'turso', 'THREE.JS': 'threedotjs', 'HTML / CSS': 'html5', 'CI / CD': 'githubactions',
+    LANGCHAIN: 'langchain', LANGGRAPH: 'langgraph', OLLAMA: 'ollama', 'HUGGING FACE': 'huggingface', MCP: 'modelcontextprotocol', PYTORCH: 'pytorch', 'SCIKIT-LEARN': 'scikitlearn', FASTAPI: 'fastapi', DOCKER: 'docker', 'AWS EC2': 'amazonwebservices', 'AWS S3': 'amazonwebservices', 'AWS RDS': 'amazonwebservices', MLFLOW: 'mlflow', PYTHON: 'python', TYPESCRIPT: 'typescript', JAVASCRIPT: 'javascript', JAVA: 'openjdk', POSTGRESQL: 'postgresql', MYSQL: 'mysql', SUPABASE: 'supabase', TURSO: 'turso', 'THREE.JS': 'threedotjs', 'HTML / CSS': 'html5', 'CI / CD': 'githubactions',
+  };
+  const skillLabels = {
+    RAG: 'RAG / Retrieval', SBERT: 'Sentence-BERT', FAISS: 'FAISS / Vector Search', CLASSIFICATION: 'Supervised Classification', CALIBRATION: 'Confidence Calibration', HITL: 'Human-in-the-Loop', MONITORING: 'Model Monitoring', PROFILING: 'Inference Profiling', MCP: 'MCP Protocol', 'AWS EC2': 'AWS / EC2', 'AWS S3': 'AWS / S3', 'AWS RDS': 'AWS / RDS',
+  };
+  const skillDescriptions = {
+    RAG: 'Retrieval-Augmented Generation: ground model answers in trusted sources.', SBERT: 'Sentence-BERT: semantic embeddings for language similarity and search.', FAISS: 'FAISS: vector indexing and similarity search.', CLASSIFICATION: 'Supervised classification: learn labels from verified examples.', CALIBRATION: 'Confidence calibration: make model confidence match real-world accuracy.', HITL: 'Human-in-the-Loop: route uncertain predictions to a reviewer.', MONITORING: 'Model monitoring: track drift, latency and prediction quality.', PROFILING: 'Inference profiling: find and reduce runtime bottlenecks.', MCP: 'Model Context Protocol: connect models to tools and context.', 'AWS EC2': 'AWS Elastic Compute Cloud: virtual servers.', 'AWS S3': 'AWS Simple Storage Service: durable object storage.', 'AWS RDS': 'AWS Relational Database Service: managed relational databases.',
   };
   const skillGlyphs = {
     'AGENTIC AI': '✦', RAG: '↗', 'LLAMA-3': 'λ', GEMMA: 'G', SBERT: 'S', FAISS: '∥', XGBOOST: '✣', CLASSIFICATION: '⊙', CALIBRATION: '◒', HITL: '◌', 'AWS EC2': 'AWS', 'AWS S3': 'AWS', 'AWS RDS': 'AWS', MONITORING: '◉', 'A/B TESTING': '↔', PROFILING: '⌁', 'C#': 'C#',
@@ -29,10 +35,13 @@ const initPitchDeck = () => {
   skillTokens.forEach((token) => {
     const name = token.textContent.trim();
     token.dataset.skill = name;
+    const label = skillLabels[name] || name;
+    token.title = skillDescriptions[name] || label;
+    token.setAttribute('aria-label', skillDescriptions[name] || label);
     const icon = skillIcons[name]
       ? `<img class="skill-mark skill-logo" src="/skill-icons/${skillIcons[name]}.svg" alt="" aria-hidden="true" loading="lazy" decoding="async">`
       : `<i class="skill-mark skill-glyph" aria-hidden="true">${skillGlyphs[name] || '•'}</i>`;
-    token.innerHTML = `${icon}<span class="skill-name">${name}</span>`;
+    token.innerHTML = `${icon}<span class="skill-name">${label}</span>`;
   });
   let active = 0;
   let wheelLock = false;
@@ -104,8 +113,11 @@ const initPitchDeck = () => {
   const exitToClick = (event) => {
     const target = event.currentTarget.getAttribute('data-pitch-exit-to');
     if (!target) return;
+    const isAnchor = event.currentTarget.tagName === 'A';
+    if (!isAnchor) event.preventDefault();
     setMode(false);
-    window.setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 40);
+    if (isAnchor) return;
+    window.requestAnimationFrame(() => window.setTimeout(() => document.getElementById(target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80));
   };
   exitTo.forEach((button) => button.addEventListener('click', exitToClick));
   const skillEnter = (event) => {

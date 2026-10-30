@@ -234,3 +234,5 @@ html.pitch-mode{scroll-behavior:smooth;scroll-snap-type:y proximity}body.pitch-m
 .pitch-slide-end .pitch-end-links,
 .pitch-slide-end .pitch-end-links a,
 .pitch-slide-end .pitch-end-links button { pointer-events: auto; }
+/* Deep links such as #contact must not leave the destination behind a reveal animation. */
+main > section:target .reveal { opacity: 1; transform: none; }

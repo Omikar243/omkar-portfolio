@@ -235,6 +235,16 @@ if (orbitArticle && 'IntersectionObserver' in window) {
 const destroyFractalTree = initFractalTree(document.querySelector('#heroVisual'), document.querySelector('#fractalCanvas'), document.querySelector('#signatureGlyph'));
 const destroyResumeTracking = initResumeTracking();
 const destroyMotionSystem = initMotionSystem();
+if (hashTarget) {
+  window.setTimeout(() => {
+    hashTarget.querySelectorAll('.reveal').forEach((element) => {
+      element.classList.add('is-visible');
+      element.style.setProperty('opacity', '1', 'important');
+      element.style.setProperty('visibility', 'visible', 'important');
+      element.style.setProperty('transform', 'none', 'important');
+    });
+  }, 80);
+}
 const destroyAmbientTheme = initAmbientTheme();
 const destroyCinematicStage = initCinematicStage();
 const destroyPitchDeck = initPitchDeck();

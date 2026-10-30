@@ -11,7 +11,7 @@ const initDesktopBloom = () => {
   const intensityInput = panel?.querySelector('[data-bloom-intensity]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const quality = getQualityTier();
-  if (!host || !quality.vanta || hasCoarsePointer() || reduced.matches || !window.WebGLRenderingContext) return () => {};
+  if (!host || hasCoarsePointer() || reduced.matches || !window.WebGLRenderingContext) return () => {};
 
   const settings = readSettings();
   let enabled = settings.enabled !== false;
@@ -43,8 +43,8 @@ const initDesktopBloom = () => {
   const observer = new IntersectionObserver(([entry]) => { visible=entry.isIntersecting; if(visible) draw(performance.now()); }, { threshold:.02 }); observer.observe(host);
   const unsubscribe = subscribeFrame(draw, { label: 'desktop-bloom', fps: 30 }); window.addEventListener('resize',resize,{passive:true}); resize();
   const analyser=window.__ambientAnalyser; if (analyser) { samples=new Float32Array(analyser.fftSize); }
-  host.dataset.bloom='desktop-webgl';
-  return () => { disposed=true; unsubscribe(); observer.disconnect(); window.removeEventListener('resize',resize); toggle?.removeEventListener('change',onToggle); intensityInput?.removeEventListener('input',onIntensity); canvas.remove(); delete host.dataset.bloom; };
+  host.dataset.bloom='desktop-webgl'; panel?.classList.add('is-ready');
+  return () => { disposed=true; unsubscribe(); observer.disconnect(); window.removeEventListener('resize',resize); toggle?.removeEventListener('change',onToggle); intensityInput?.removeEventListener('input',onIntensity); canvas.remove(); delete host.dataset.bloom; panel?.classList.remove('is-ready'); };
 };
 
 export { initDesktopBloom };

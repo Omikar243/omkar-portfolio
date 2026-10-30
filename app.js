@@ -67,6 +67,14 @@ const revealObserver = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.13 });
 reveals.forEach((element) => revealObserver.observe(element));
+const hashTarget = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+if (hashTarget) {
+  hashTarget.querySelectorAll('.reveal').forEach((element) => {
+    element.classList.add('is-visible');
+    revealObserver.unobserve(element);
+  });
+  requestAnimationFrame(() => hashTarget.scrollIntoView({ behavior: 'auto', block: 'start' }));
+}
 
 document.querySelectorAll('.timeline-toggle').forEach((toggle) => {
   const detail = document.getElementById(toggle.getAttribute('aria-controls'));

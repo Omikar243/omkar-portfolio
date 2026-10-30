@@ -42,7 +42,9 @@ export async function forwardContact(payload, fetcher = fetch, headers = {}) {
     return { ok: false, code: 'invalid_fields', message: 'Please provide your name, a valid email and a message under 5,000 characters.' };
   }
   try {
-    const response = await fetcher(CONTACT_ENDPOINT, {
+    const isStaticBackup = typeof location !== 'undefined' && /github\.io$/i.test(location.hostname);
+    const endpoint = isStaticBackup || typeof location === 'undefined' ? CONTACT_ENDPOINT : '/api/contact';
+    const response = await fetcher(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...headers },
       body: JSON.stringify(note),

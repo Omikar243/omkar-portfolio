@@ -71,6 +71,9 @@ const hashTarget = location.hash ? document.getElementById(location.hash.slice(1
 if (hashTarget) {
   hashTarget.querySelectorAll('.reveal').forEach((element) => {
     element.classList.add('is-visible');
+    element.style.setProperty('opacity', '1', 'important');
+    element.style.setProperty('visibility', 'visible', 'important');
+    element.style.setProperty('transform', 'none', 'important');
     revealObserver.unobserve(element);
   });
   requestAnimationFrame(() => hashTarget.scrollIntoView({ behavior: 'auto', block: 'start' }));
